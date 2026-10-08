@@ -31,6 +31,8 @@ Copyright (c) 2026 Jawad Niazi. All Rights Reserved. A license will be chosen la
 - **Find and replace** (Ctrl+Shift+F, or **Find...** above the page list) searches every page name, heading, paragraph and choice.
 - **Unfinished flag:** the bookmark button on a page marks it as unfinished; the Check tab lists them.
 - **Why can't players reach this page?** is in a page's ... menu, and the Check tab lists pages no simulated player reached.
+- **Game tab:** turn on **Options, Advanced, Game** and a Game tab appears between Check and Play. It holds the options for your exported
+  games and a live preview of your own story; hover over or arrow through the colors to try each one.
 - **Save manuscript (.md)** in the File menu writes all the words of your story as one text file for proofreading.
 
 ## What players of your game get

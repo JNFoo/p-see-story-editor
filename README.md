@@ -26,6 +26,13 @@ Copyright (c) 2026 Jawad Niazi. All Rights Reserved. A license will be chosen la
 6. **Share:** **Export game** makes one small HTML file (about 25-50 KB for a typical story). Send it to anyone; it opens in any
    modern browser, online or off. **Options → Quick guide** inside the editor explains each part in plain words.
 
+## Handy while writing
+
+- **Find and replace** (Ctrl+Shift+F, or **Find...** above the page list) searches every page name, heading, paragraph and choice.
+- **Unfinished flag:** the bookmark button on a page marks it as unfinished; the Check tab lists them.
+- **Why can't players reach this page?** is in a page's ... menu, and the Check tab lists pages no simulated player reached.
+- **Save manuscript (.md)** in the File menu writes all the words of your story as one text file for proofreading.
+
 ## What players of your game get
 
 Saves their place automatically, a Back button (if you turn it on), a reader comfort button (Aa) for text size, spacing and colors,

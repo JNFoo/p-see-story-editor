@@ -18,6 +18,8 @@ Copyright (c) 2026 Jawad Niazi. All Rights Reserved. A license will be chosen la
 ## The quick tour
 
 1. **Write:** add a page, type its text, add choices and point each choice at another page. Mark a page as an ending (good, bad or neutral).
+   Press **Ctrl+K** to jump to any page by typing part of its name; the same type-to-find box picks where a choice leads. ‹ › step back and forward,
+   the panel buttons hide the side lists, click an item to give it, paste a scene with `-` lines as choices, and Ctrl+Shift+Enter splits a page at the cursor.
 2. **Check:** the Check tab tells you about pages nobody can reach, choices that lead nowhere, endings players can't get to, and traps.
 3. **Map:** see the whole story as a picture. Several views, from a plain flow to a bird's-eye "story shape". Click a page to open it.
 4. **Items:** objects and states players can get or lose, numbers (with bars), dice skill checks, and locked choices. Turn on

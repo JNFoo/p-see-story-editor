@@ -1,0 +1,7 @@
+Story Editor
+Copyright (c) 2026 Jawad Niazi. All Rights Reserved.
+
+(A license will be chosen later, the same way as for Apple Press.)
+
+The Inter Tight typeface in editor/fonts/ is used under the SIL Open Font License;
+its license text is editor/fonts/InterTight-OFL.txt.

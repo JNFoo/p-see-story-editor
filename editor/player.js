@@ -73,12 +73,24 @@ function klPlayer(root, story, opts = {}) {
     const v = readJson(k);
     return Array.isArray(v) ? v.filter(x => typeof x === 'string') : [];
   }
+  /* Storage can be off (a private window, blocked site data, a full disk). The game still plays, but nothing is remembered, so the player is told
+     once per page instead of finding out after a reload. It is checked once at the start, and again by every save. */
+  let saveFailed = false;
+  if (opts.persist) {
+    try {
+      const probe = 'story-editor-probe';
+      localStorage.setItem(probe, '1');
+      localStorage.removeItem(probe);
+    } catch (e) {
+      saveFailed = true;
+    }
+  }
   function writeJson(k, v) {
     if (!opts.persist) return;
     try {
       localStorage.setItem(k, JSON.stringify(v));
     } catch (e) {
-      /* storage may be off: carry on */
+      saveFailed = true; // storage may be off: carry on
     }
   }
 
@@ -99,8 +111,9 @@ function klPlayer(root, story, opts = {}) {
       const before = localStorage.getItem(key);
       localStorage.setItem(key, JSON.stringify(state));
       if (before) localStorage.setItem(spareKey, before); // after the new save is safely written, the old one becomes the spare
+      saveFailed = false;
     } catch (e) {
-      /* storage may be off: carry on */
+      saveFailed = true; // storage may be off: carry on
     }
   }
   /* a save is written on every move; this makes sure nothing is lost if the page is hidden or closed mid-move */
@@ -307,6 +320,7 @@ function klPlayer(root, story, opts = {}) {
     page.setAttribute('tabindex', '-1'); // so keyboard and screen-reader users land on the new page
     if (opts.showTitle !== false) page.appendChild(el('h1', 'kl-title', story.title));
     if (p.heading) page.appendChild(el('h2', 'kl-head', p.heading));
+    if (saveFailed) page.appendChild(el('p', 'kl-nosave', 'This browser is not saving your place (a private window or blocked site data can cause this). If you close or reload this page, you will start over.'));
     each('pageTop', p, page); // the dice note
     klVisibleBlocks(p, state.flags).forEach(b => {
       const t = String(b.text).trim();

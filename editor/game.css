@@ -25,6 +25,7 @@
 .kl-title{margin:0 0 6px;font:500 .73em/1.3 var(--font);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .kl-head{margin:0 0 16px;font:var(--dw) 1.6em/1.2 var(--display);color:var(--fg);text-wrap:balance}
 .kl-page p{margin:0 0 1em;white-space:pre-line;letter-spacing:.01em}   /* a touch more air for long reading in the tighter typeface */
+.kl-page p.kl-nosave{margin:0 0 1em;padding:8px 12px;font-size:.85em;color:var(--fg);background:var(--lampbg);border-left:3px solid var(--signal);white-space:normal}
 .kl-have{margin:0 0 1em;font-size:.85em;color:var(--muted);border-left:3px solid var(--lamp);padding-left:10px}
 
 /* Choice buttons */

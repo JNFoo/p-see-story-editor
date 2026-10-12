@@ -21,6 +21,7 @@ module.exports = {
     S('tools8', 'tools8.js', EDITOR, true),
     S('ffsmoke', 'ffsmoke.js', EDITOR, true, ['firefox']),
     S('packed', 'packed-check.js', ['build.py', 'lzma/lzma_pack.py', 'lzma/lzma-decode.js'], true),
+    S('nosave', 'nosave.js', ['player.js', 'game.css', 'core.js'], true),
     S('touch1', 'touch1.js', EDITOR, true, ['chromium']),
     S('top10-export', 'top10-export.js', ['core.js', 'player.js', 'game.css', 'ui5-app.js'], true),
     S('top10-player', 'top10-player.js', ['core.js', 'player.js', 'game.css'], true),

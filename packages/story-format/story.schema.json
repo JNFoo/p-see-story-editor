@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jnfoo.github.io/p-see-story-editor/packages/story-format/story.schema.json",
+  "title": "Story project",
+  "description": "A branching interactive story: pages, choices, things the player carries, numbers, dice checks and start-of-story questions. This is the shape the Story Editor saves. Only `passages` is required; normalizeProject() fills in every other field and removes anything broken, so hand-written or AI-written files may leave fields out. Ids are short strings (letters, digits, _ and -, up to 64 characters). A page whose `ending` is true shows no choices.",
+  "type": "object",
+  "required": ["passages"],
+  "properties": {
+    "format": { "const": "story-editor" },
+    "version": { "type": "integer", "minimum": 1 },
+    "id": { "type": "string", "maxLength": 64 },
+    "title": { "type": "string" },
+    "author": { "type": "string" },
+    "start": { "type": "string", "description": "id of the first page (defaults to the first page in the list)" },
+    "gameFont": { "const": "system", "description": "use the reader's own font in the exported game (smaller file)" },
+    "game": {
+      "type": "object",
+      "description": "Reader options for the exported game. Only non-default values need to be present.",
+      "properties": {
+        "back": { "enum": ["off", "remember", "reroll", "block"], "description": "a Back button; for dice checks it can remember the old roll, roll again, or be blocked" },
+        "tracker": { "type": "boolean", "description": "show 'endings found' and remember them on the reader's device" },
+        "comfort": { "type": "boolean", "description": "the Aa button (text size, spacing, contrast, calm motion)" },
+        "odds": { "type": "boolean", "description": "show the chance of success on dice checks" },
+        "place": { "type": "boolean", "description": "a copyable code that returns a reader to their place" },
+        "pal": { "enum": ["paper", "night", "sepia", "ocean", "forest", "contrast"], "description": "the game's color set" }
+      },
+      "additionalProperties": false
+    },
+    "items": {
+      "type": "array",
+      "description": "Things the player can carry (object), conditions they can be in (state), or numbers (stat).",
+      "items": {
+        "type": "object",
+        "required": ["id", "name"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "kind": { "enum": ["object", "state", "stat"] },
+          "show": { "type": "boolean", "description": "list it for the reader" },
+          "lo": { "type": "integer", "description": "stat only: lowest value" },
+          "hi": { "type": "integer", "description": "stat only: highest value" },
+          "start": { "type": "integer", "description": "stat only: value at the start" },
+          "names": {
+            "type": "array",
+            "description": "show the item under another name while the player has or is `when`",
+            "items": { "type": "object", "required": ["when", "name"], "properties": { "when": { "type": "string" }, "name": { "type": "string" } } }
+          }
+        }
+      }
+    },
+    "givens": {
+      "type": "array",
+      "description": "Questions asked before page one. The reader's answer becomes a state they are in for the whole story.",
+      "items": {
+        "type": "object",
+        "required": ["id", "options"],
+        "properties": {
+          "id": { "type": "string" },
+          "question": { "type": "string" },
+          "options": { "type": "array", "items": { "type": "string", "description": "id of a state item" }, "minItems": 2 }
+        }
+      }
+    },
+    "passages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string", "description": "the author's name for the page (never shown to the reader)" },
+          "heading": { "type": "string", "description": "shown above the text; for an ending, its title" },
+          "ending": { "type": "boolean" },
+          "valence": { "enum": ["", "good", "bad"], "description": "for endings: good, bad, or neutral (empty)" },
+          "todo": { "type": "boolean", "description": "the author's 'unfinished' flag (never exported)" },
+          "blocks": {
+            "type": "array",
+            "description": "paragraphs",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": { "type": "string" },
+                "needs": { "$ref": "#/$defs/ids" },
+                "forbid": { "$ref": "#/$defs/ids" },
+                "orPrev": { "type": "boolean", "description": "show only if the paragraph above was hidden" }
+              }
+            }
+          },
+          "gives": { "$ref": "#/$defs/ids", "description": "item ids gained on arrival" },
+          "takes": { "$ref": "#/$defs/ids", "description": "item ids lost on arrival" },
+          "adds": { "$ref": "#/$defs/adds" },
+          "sends": { "type": "object", "description": "where a lost object went: 'here' or 'w:<name of who got it>'", "additionalProperties": { "type": "string" } },
+          "choices": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": { "type": "string" },
+                "to": { "type": "string", "description": "id of the page it leads to ('' = nowhere yet)" },
+                "needs": { "$ref": "#/$defs/ids" },
+                "forbid": { "$ref": "#/$defs/ids" },
+                "gives": { "$ref": "#/$defs/ids" },
+                "takes": { "$ref": "#/$defs/ids" },
+                "adds": { "$ref": "#/$defs/adds" },
+                "check": {
+                  "oneOf": [
+                    { "type": "null" },
+                    {
+                      "type": "object",
+                      "description": "a dice check: roll two six-sided dice, add the player's `stat`; reaching `target` goes to the choice's page, otherwise to `fail`",
+                      "required": ["stat", "target", "fail"],
+                      "properties": { "stat": { "type": "string" }, "target": { "type": "integer" }, "fail": { "type": "string" } }
+                    }
+                  ]
+                },
+                "lock": { "type": "boolean", "description": "show greyed out (with `why`) while its conditions are not met, instead of hiding it" },
+                "why": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "ids": { "type": "array", "items": { "type": "string" }, "description": "item ids; a stat condition is written t:<statId>:<n> and means 'the stat is n or more'" },
+    "adds": { "type": "object", "description": "{ statId: number } to add (negative to subtract)", "additionalProperties": { "type": "number" } }
+  }
+}

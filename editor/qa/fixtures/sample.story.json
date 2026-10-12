@@ -1,0 +1,1994 @@
+{
+ "format": "story-editor",
+ "version": 1,
+ "id": "s_keepers_light",
+ "title": "The Keeper’s Light",
+ "author": "",
+ "start": "p_start",
+ "items": [
+  {
+   "id": "i_lantern",
+   "name": "Lantern",
+   "kind": "object",
+   "show": true
+  },
+  {
+   "id": "i_key",
+   "name": "Spare key",
+   "kind": "object",
+   "show": true
+  },
+  {
+   "id": "i_oil",
+   "name": "Can of oil",
+   "kind": "object",
+   "show": true
+  },
+  {
+   "id": "i_flare",
+   "name": "Flare pistol",
+   "kind": "object",
+   "show": true
+  },
+  {
+   "id": "i_dark",
+   "name": "Hooded lamp doused",
+   "kind": "state",
+   "show": false
+  },
+  {
+   "id": "i_pell",
+   "name": "Dealt with Pell",
+   "kind": "state",
+   "show": false
+  },
+  {
+   "id": "i_barred",
+   "name": "Door barred",
+   "kind": "state",
+   "show": false
+  }
+ ],
+ "givens": [],
+ "passages": [
+  {
+   "id": "p_start",
+   "name": "Start",
+   "heading": "",
+   "ending": false,
+   "valence": "",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "The supply boat noses away from Gull Rock and the fog closes behind it like a door. You have come to relieve the keeper for the winter, and the great lamp above you should be turning. It is dark.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "The lighthouse door stands open a hand’s width. No window is lit. You have a duffel, a box of matches, and nobody to ask.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    }
+   ],
+   "gives": [],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": [
+    {
+     "label": "Push the door open and go in",
+     "to": "p_hall",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Walk the shoreline first",
+     "to": "p_shore",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    }
+   ]
+  },
+  {
+   "id": "p_shore",
+   "name": "Shore",
+   "heading": "",
+   "ending": false,
+   "valence": "",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "The rocks are wet and loud with waves. A line of bootprints climbs toward a set of cliff steps, and a tin-roofed shed squats beside the landing.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "Near the tide line a hurricane lantern lies on its side, still faintly warm.",
+     "needs": [],
+     "forbid": [
+      "i_lantern"
+     ],
+     "orPrev": false
+    },
+    {
+     "text": "You hold the lantern in front of you. Its small flame makes the fog glow.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": true
+    }
+   ],
+   "gives": [],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": [
+    {
+     "label": "Pick up the lantern",
+     "to": "p_take_lantern",
+     "needs": [],
+     "forbid": [
+      "i_lantern"
+     ],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Look inside the tin shed",
+     "to": "p_shed",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Follow the bootprints up the cliff steps",
+     "to": "p_cliff",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Go to the lighthouse door",
+     "to": "p_hall",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    }
+   ]
+  },
+  {
+   "id": "p_take_lantern",
+   "name": "Take lantern",
+   "heading": "",
+   "ending": false,
+   "valence": "",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "You right the lantern and shake it. There is oil in it still. A match later the flame stands up small and steady, and the fog around you turns to gold.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "Whoever dropped it left in a hurry.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    }
+   ],
+   "gives": [
+    "i_lantern"
+   ],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": [
+    {
+     "label": "Look around the rocks again",
+     "to": "p_shore",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    }
+   ]
+  },
+  {
+   "id": "p_shed",
+   "name": "Shed",
+   "heading": "",
+   "ending": false,
+   "valence": "",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "The shed smells of tar and rust. A fog bell hangs from a beam with its rope cut short. On a shelf, behind a coil of line, sits a red box with EMERGENCY stenciled on the lid.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "The lid is not locked.",
+     "needs": [],
+     "forbid": [
+      "i_flare"
+     ],
+     "orPrev": false
+    },
+    {
+     "text": "The red box stands open and empty now.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": true
+    }
+   ],
+   "gives": [],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": [
+    {
+     "label": "Open the red box",
+     "to": "p_take_flare",
+     "needs": [],
+     "forbid": [
+      "i_flare"
+     ],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Step back out onto the rocks",
+     "to": "p_shore",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    }
+   ]
+  },
+  {
+   "id": "p_take_flare",
+   "name": "Take flare",
+   "heading": "",
+   "ending": false,
+   "valence": "",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "Inside, wrapped in oilcloth, are a flare pistol and one fat red cartridge. It is cold and heavier than it looks. You tuck it into your coat, where it knocks against your ribs.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    }
+   ],
+   "gives": [
+    "i_flare"
+   ],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": [
+    {
+     "label": "Go back out to the landing",
+     "to": "p_shore",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    }
+   ]
+  },
+  {
+   "id": "p_cliff",
+   "name": "Cliff",
+   "heading": "",
+   "ending": false,
+   "valence": "",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "The cliff steps end at a ledge of wet grass, with the open sea gray and quiet beyond it.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "Below the ledge the mooring post stands bare, a cut rope trailing in the black water.",
+     "needs": [
+      "i_pell"
+     ],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "Below the ledge a slipway runs down to a pocket of calm water, where a rowboat is tied to an iron post, oars shipped. Nobody is guarding it.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": true
+    },
+    {
+     "text": "Farther along the edge a man stands beside a tall pole, and he has already turned toward your lantern. A hooded lamp hangs from the pole, burning steady and bright, aimed out to sea. In fog, with the great lamp dark, a captain might take it for a harbor light.",
+     "needs": [
+      "i_lantern"
+     ],
+     "forbid": [
+      "i_pell",
+      "i_dark"
+     ],
+     "orPrev": false
+    },
+    {
+     "text": "Farther along the edge a man stands beside a tall pole. The hooded lamp on it has gone dark. He is peering up at it, and then he sees your lantern.",
+     "needs": [
+      "i_lantern",
+      "i_dark"
+     ],
+     "forbid": [
+      "i_pell"
+     ],
+     "orPrev": true
+    },
+    {
+     "text": "Farther along the edge a man sits with his back to you beside a tall pole. A hooded lamp hangs from it, burning steady and bright, aimed out to sea. He has not looked round. In fog, with the great lamp dark, a captain might take that lamp for a harbor light.",
+     "needs": [],
+     "forbid": [
+      "i_lantern",
+      "i_pell",
+      "i_dark"
+     ],
+     "orPrev": true
+    },
+    {
+     "text": "Farther along the edge a man sits with his back to you beside a tall pole. The hooded lamp on it is dark. He has not looked round, or noticed.",
+     "needs": [
+      "i_dark"
+     ],
+     "forbid": [
+      "i_lantern",
+      "i_pell"
+     ],
+     "orPrev": true
+    },
+    {
+     "text": "The pole at the edge stands alone now, its hooded lamp still burning, aimed out to sea.",
+     "needs": [
+      "i_pell"
+     ],
+     "forbid": [
+      "i_dark"
+     ],
+     "orPrev": true
+    },
+    {
+     "text": "The pole at the edge stands alone now, its hooded lamp dark.",
+     "needs": [
+      "i_pell",
+      "i_dark"
+     ],
+     "forbid": [],
+     "orPrev": true
+    }
+   ],
+   "gives": [],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": [
+    {
+     "label": "Slip the mooring and row away",
+     "to": "p_end_flee",
+     "needs": [],
+     "forbid": [
+      "i_lantern",
+      "i_pell"
+     ],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Creep up to the pole and pinch out the lamp",
+     "to": "p_cliff_douse",
+     "needs": [],
+     "forbid": [
+      "i_lantern",
+      "i_dark",
+      "i_pell"
+     ],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Put out the lamp on the pole",
+     "to": "p_cliff_douse",
+     "needs": [
+      "i_pell"
+     ],
+     "forbid": [
+      "i_dark"
+     ],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Walk toward the man, lantern raised",
+     "to": "p_cliff_pell",
+     "needs": [
+      "i_lantern"
+     ],
+     "forbid": [
+      "i_pell"
+     ],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Go back down to the rocks",
+     "to": "p_shore",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    }
+   ]
+  },
+  {
+   "id": "p_cliff_douse",
+   "name": "Cliff douse",
+   "heading": "",
+   "ending": false,
+   "valence": "",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "You reach up, lift the hood, and pinch the wick out between a wet finger and thumb. The light dies with a small hiss.",
+     "needs": [
+      "i_pell"
+     ],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "You keep low and keep the fog between you and the man. He is humming to himself and does not turn. You reach the pole in four steps, lift the hood, and pinch the wick out between a wet finger and thumb. The light dies with a small hiss. The humming stops. Then it starts again. He thinks the wind did it.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": true
+    },
+    {
+     "text": "Out in the dark, a long way off, a ship’s horn sounds, uncertain, as if it has just lost something.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    }
+   ],
+   "gives": [
+    "i_dark"
+   ],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": [
+    {
+     "label": "Go back to the ledge",
+     "to": "p_cliff",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    }
+   ]
+  },
+  {
+   "id": "p_cliff_pell",
+   "name": "Cliff pell",
+   "heading": "",
+   "ending": false,
+   "valence": "",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "The man waits until you are close, then smiles with half his face. “Relief, is it?” he says. “They told me you wouldn’t come till Thursday.” One hand stays in his coat.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "“Name’s Pell. Nobody needs to be hurt tonight. By morning there’ll be a wreck on the Rock, and a share in it for anyone who minds his own business.” His eyes drop to your sleeve, where cellar rope has left gray fuzz, and lift again. “I see you’ve met the old man. Well. That needn’t change anything.”",
+     "needs": [
+      "i_key"
+     ],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "“Name’s Pell. Nobody needs to be hurt tonight. By morning there’ll be a wreck on the Rock, and a share in it for anyone who minds his own business.”",
+     "needs": [],
+     "forbid": [
+      "i_key"
+     ],
+     "orPrev": false
+    }
+   ],
+   "gives": [],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": [
+    {
+     "label": "Hear what he is offering",
+     "to": "p_cliff_deal",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Swing the lantern at him and shove him down the slipway",
+     "to": "p_cliff_fight",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Back away down the steps",
+     "to": "p_shore",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    }
+   ]
+  },
+  {
+   "id": "p_cliff_deal",
+   "name": "Cliff deal",
+   "heading": "",
+   "ending": false,
+   "valence": "",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "“One share in five,” says Pell. “You sit in the keeper’s hall and drink his tea and you never saw a thing. By dawn you’ll have more silver than a keeper sees in ten years.” He holds out a closed fist. Something clinks inside it.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    }
+   ],
+   "gives": [],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": [
+    {
+     "label": "Take his hand",
+     "to": "p_end_bought",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Refuse. Swing the lantern and shove him",
+     "to": "p_cliff_fight",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Say nothing and back away down the steps",
+     "to": "p_shore",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    }
+   ]
+  },
+  {
+   "id": "p_cliff_fight",
+   "name": "Cliff fight",
+   "heading": "",
+   "ending": false,
+   "valence": "",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "You swing the lantern low and wide, so the light jerks across his eyes, and drive your shoulder into his chest. Pell goes backward down the slipway and lands hard in the rowboat.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "Before he can find his feet you have the mooring rope off its post. The tide takes the boat, and Pell with it, out into the fog, cursing in a voice that gets smaller and smaller until the fog takes that too. The lantern, somehow, is still burning.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    }
+   ],
+   "gives": [
+    "i_pell"
+   ],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": [
+    {
+     "label": "Catch your breath on the ledge",
+     "to": "p_cliff",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    }
+   ]
+  },
+  {
+   "id": "p_hall",
+   "name": "Hall",
+   "heading": "",
+   "ending": false,
+   "valence": "",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "The entry hall smells of lamp oil and cold stone. A logbook lies open on the keeper’s table. Stairs spiral up the tower wall, a low door stands beside them, and a trapdoor in the floor leads down to the cellar.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "Under your feet, very faintly, something is knocking.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    }
+   ],
+   "gives": [],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": [
+    {
+     "label": "Read the logbook",
+     "to": "p_logbook",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Climb the tower stairs",
+     "to": "p_stairs",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Try the low door beside the stairs",
+     "to": "p_store",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Climb down through the trapdoor",
+     "to": "p_cellar",
+     "needs": [
+      "i_lantern"
+     ],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Peer down through the trapdoor",
+     "to": "p_cellar_dark",
+     "needs": [],
+     "forbid": [
+      "i_lantern"
+     ],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Step back outside",
+     "to": "p_shore",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    }
+   ]
+  },
+  {
+   "id": "p_logbook",
+   "name": "Logbook",
+   "heading": "",
+   "ending": false,
+   "valence": "",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "The last entry is written in a shaky hand.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "“Men came by boat at noon. They want the light dark tonight, so a ship will break up on the rocks and they can pick through the wreck. One of them is to stay up on the cliff with a false light, to draw her in. They locked me in the cellar and took the lamp room key. I still have the spare, in my boot. They poured out the lamp oil, but I hid a can in the store under the stairs. If anyone finds this, bring a lantern. It is black as pitch down here.”",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    }
+   ],
+   "gives": [],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": [
+    {
+     "label": "Close the book",
+     "to": "p_hall",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    }
+   ]
+  },
+  {
+   "id": "p_store",
+   "name": "Store",
+   "heading": "",
+   "ending": false,
+   "valence": "",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "By lantern light the store is a narrow room of coiled rope, empty drums and sacks of sawdust. Behind the sacks, where a careful person might find it, sits a blue can with a stopper wired in place.",
+     "needs": [
+      "i_lantern"
+     ],
+     "forbid": [
+      "i_oil"
+     ],
+     "orPrev": false
+    },
+    {
+     "text": "By lantern light the store is a narrow room of coiled rope, empty drums and sacks of sawdust. You have already taken the only thing in it worth taking.",
+     "needs": [
+      "i_lantern",
+      "i_oil"
+     ],
+     "forbid": [],
+     "orPrev": true
+    },
+    {
+     "text": "The store is as black as the inside of a boot. You feel rope, a cold drum, a sack that gives under your hand. If there is anything useful in here, you will not find it without a light.",
+     "needs": [],
+     "forbid": [
+      "i_lantern"
+     ],
+     "orPrev": true
+    }
+   ],
+   "gives": [],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": [
+    {
+     "label": "Take the blue can",
+     "to": "p_take_oil",
+     "needs": [
+      "i_lantern"
+     ],
+     "forbid": [
+      "i_oil"
+     ],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Go back to the hall",
+     "to": "p_hall",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    }
+   ]
+  },
+  {
+   "id": "p_take_oil",
+   "name": "Take oil",
+   "heading": "",
+   "ending": false,
+   "valence": "",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "The can is heavy and sloshes sweetly. Lamp oil, the good kind, enough to fill a reservoir and burn till dawn. You carry it out with both hands.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    }
+   ],
+   "gives": [
+    "i_oil"
+   ],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": [
+    {
+     "label": "Go back to the hall",
+     "to": "p_hall",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    }
+   ]
+  },
+  {
+   "id": "p_cellar_dark",
+   "name": "Cellar dark",
+   "heading": "",
+   "ending": false,
+   "valence": "",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "You lower one foot onto the ladder and the dark swallows it. The knocking comes again, closer now, patient, like someone who has been at it for hours. Without a light you would be climbing down blind.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    }
+   ],
+   "gives": [],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": [
+    {
+     "label": "Climb back up",
+     "to": "p_hall",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    }
+   ]
+  },
+  {
+   "id": "p_cellar",
+   "name": "Cellar",
+   "heading": "",
+   "ending": false,
+   "valence": "",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "The ladder ends in a low stone cellar. By lantern light you find the keeper sitting against a barrel, his beard gray with damp.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "A rope ties his wrist to an iron ring. He nods toward his boot. “Spare key,” he whispers. “Cut me loose and take it.”",
+     "needs": [],
+     "forbid": [
+      "i_key"
+     ],
+     "orPrev": false
+    },
+    {
+     "text": "He is on his feet now, rubbing his wrist and testing his knees. “Go on,” he says. “The ship will be here within the hour.”",
+     "needs": [],
+     "forbid": [],
+     "orPrev": true
+    }
+   ],
+   "gives": [],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": [
+    {
+     "label": "Cut him loose and take the spare key",
+     "to": "p_free_keeper",
+     "needs": [],
+     "forbid": [
+      "i_key"
+     ],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Climb back up",
+     "to": "p_hall",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    }
+   ]
+  },
+  {
+   "id": "p_free_keeper",
+   "name": "Free keeper",
+   "heading": "",
+   "ending": false,
+   "valence": "",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "The rope parts under your knife. The keeper pulls off his boot and tips a small brass key into your palm, then works his stiff fingers open and shut.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "“Ames,” he says. “Thank you. Listen. There’s a man on the cliff called Pell with a lamp he shouldn’t have. If you can put it out, do. The great lamp has no oil in it. They saw to that, but I hid a can in the store. And if you light it, Pell will know within a minute and come straight up the stairs. There’s an iron bar for that door.” He gets one foot under him and winces. “Go on. I’ll follow as these knees allow.”",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    }
+   ],
+   "gives": [
+    "i_key"
+   ],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": [
+    {
+     "label": "Climb back up to the hall",
+     "to": "p_hall",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    }
+   ]
+  },
+  {
+   "id": "p_stairs",
+   "name": "Stairs",
+   "heading": "",
+   "ending": false,
+   "valence": "",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "A hundred and twelve steps spiral up to a heavy oak door with a brass lock. Through the wall you can hear the ship’s horn out in the fog, low and worried. Far below, you hear Ames starting up after you, one hand sliding along the wall.",
+     "needs": [
+      "i_key"
+     ],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "A hundred and twelve steps spiral up to a heavy oak door with a brass lock. Through the wall you can hear the ship’s horn out in the fog, low and worried.",
+     "needs": [],
+     "forbid": [
+      "i_key"
+     ],
+     "orPrev": false
+    }
+   ],
+   "gives": [],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": [
+    {
+     "label": "Unlock the door with the spare key",
+     "to": "p_lamp",
+     "needs": [
+      "i_key"
+     ],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Throw your shoulder against the door",
+     "to": "p_stairs_locked",
+     "needs": [],
+     "forbid": [
+      "i_key"
+     ],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Go back down",
+     "to": "p_hall",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    }
+   ]
+  },
+  {
+   "id": "p_stairs_locked",
+   "name": "Stairs locked",
+   "heading": "",
+   "ending": false,
+   "valence": "",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "The door is solid oak. Your shoulder will be bruised in the morning and the door will not have noticed.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    }
+   ],
+   "gives": [],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": [
+    {
+     "label": "Step back from the door",
+     "to": "p_stairs",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    }
+   ]
+  },
+  {
+   "id": "p_lamp",
+   "name": "Lamp",
+   "heading": "",
+   "ending": false,
+   "valence": "",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "The lamp room is all glass and brass, with the great lens cold and dark in the middle. Beyond the glass the fog glows a faint gray. The ship’s horn sounds again, much nearer. Under it you can hear surf breaking on the rocks.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "The blue can of oil sits beside the lens pedestal. Ames has made the last of the stairs behind you and stands holding the doorframe, getting his breath. The iron bar lies across the door.",
+     "needs": [
+      "i_oil",
+      "i_barred"
+     ],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "The blue can of oil sits beside the lens pedestal. Ames has made the last of the stairs behind you and stands holding the doorframe, getting his breath. The iron bar hangs on its hooks by the door.",
+     "needs": [
+      "i_oil"
+     ],
+     "forbid": [
+      "i_barred"
+     ],
+     "orPrev": false
+    },
+    {
+     "text": "The reservoir under the lens is bone dry. Ames has made the last of the stairs behind you and stands holding the doorframe, getting his breath. The iron bar lies across the door.",
+     "needs": [
+      "i_barred"
+     ],
+     "forbid": [
+      "i_oil"
+     ],
+     "orPrev": false
+    },
+    {
+     "text": "The reservoir under the lens is bone dry. Ames has made the last of the stairs behind you and stands holding the doorframe, getting his breath. The iron bar hangs on its hooks by the door.",
+     "needs": [],
+     "forbid": [
+      "i_oil",
+      "i_barred"
+     ],
+     "orPrev": false
+    }
+   ],
+   "gives": [],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": [
+    {
+     "label": "Fill the reservoir and light the great lamp",
+     "to": "p_lamp_light",
+     "needs": [
+      "i_oil"
+     ],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Try to light the great lamp",
+     "to": "p_lamp_dry",
+     "needs": [],
+     "forbid": [
+      "i_oil"
+     ],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Drop the iron bar across the door",
+     "to": "p_lamp_bar",
+     "needs": [],
+     "forbid": [
+      "i_barred"
+     ],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Lift the bar and go back down",
+     "to": "p_lamp_unbar",
+     "needs": [
+      "i_barred"
+     ],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Go back down the stairs",
+     "to": "p_stairs",
+     "needs": [],
+     "forbid": [
+      "i_barred"
+     ],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Swing the lantern from the balcony rail",
+     "to": "p_end_signal",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Fire the red flare from the balcony",
+     "to": "p_end_flare",
+     "needs": [
+      "i_flare"
+     ],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Sit down. You have done enough",
+     "to": "p_end_sleep",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    }
+   ]
+  },
+  {
+   "id": "p_lamp_dry",
+   "name": "Lamp dry",
+   "heading": "",
+   "ending": false,
+   "valence": "",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "You hold the lantern’s flame to the wick and nothing takes. The reservoir is dry. Somebody poured the oil out on purpose, and the keeper said he had hidden a spare can. It is not up here.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    }
+   ],
+   "gives": [],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": [
+    {
+     "label": "Step back from the lens",
+     "to": "p_lamp",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    }
+   ]
+  },
+  {
+   "id": "p_lamp_bar",
+   "name": "Lamp bar",
+   "heading": "",
+   "ending": false,
+   "valence": "",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "You lift the iron bar from its hooks and drop it across the door. It settles into its brackets with a sound like a cell closing. Ames nods once, as if you had passed a test. Whoever comes up those stairs will have to get through oak and iron.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    }
+   ],
+   "gives": [
+    "i_barred"
+   ],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": [
+    {
+     "label": "Turn back to the lamp",
+     "to": "p_lamp",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    }
+   ]
+  },
+  {
+   "id": "p_lamp_unbar",
+   "name": "Lamp unbar",
+   "heading": "",
+   "ending": false,
+   "valence": "",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "You lift the bar from its brackets and lean it against the wall. The door opens onto the dark spiral of the stairs.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    }
+   ],
+   "gives": [],
+   "takes": [
+    "i_barred"
+   ],
+   "adds": {},
+   "sends": {},
+   "choices": [
+    {
+     "label": "Start down",
+     "to": "p_stairs",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    }
+   ]
+  },
+  {
+   "id": "p_lamp_light",
+   "name": "Lamp light",
+   "heading": "",
+   "ending": false,
+   "valence": "",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "You pour the oil into the reservoir, trim the wick, and touch your lantern’s flame to it. The wick catches. The great lens gathers the little fire and throws it across the water in a long white arm, and the whole gallery fills with light.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "There is nobody left on the cliff to notice.",
+     "needs": [
+      "i_pell"
+     ],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "Down on the cliff, a man swears, loudly, and then you hear him running. Far below, a door slams.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": true
+    }
+   ],
+   "gives": [],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": [
+    {
+     "label": "Watch the ship from the glass",
+     "to": "p_ship_check",
+     "needs": [
+      "i_pell"
+     ],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Listen at the door",
+     "to": "p_pell_hammers",
+     "needs": [
+      "i_barred"
+     ],
+     "forbid": [
+      "i_pell"
+     ],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Turn as the door bursts open",
+     "to": "p_end_taken",
+     "needs": [],
+     "forbid": [
+      "i_pell",
+      "i_barred"
+     ],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    }
+   ]
+  },
+  {
+   "id": "p_pell_hammers",
+   "name": "Pell hammers",
+   "heading": "",
+   "ending": false,
+   "valence": "",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "Boots pound up the spiral, fast, and then fists hit the oak. “Open it!” It is Pell, and he is not asking. He throws his weight against the door once, twice, three times. The bar holds. The wood groans and holds.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "After a while the pounding stops. You hear him going down, a step at a time, and then nothing. Ames lets out a breath he seems to have been holding since noon. Light lies across the sea in a long white road.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    }
+   ],
+   "gives": [],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": [
+    {
+     "label": "Turn back to the glass",
+     "to": "p_ship_check",
+     "needs": [],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    }
+   ]
+  },
+  {
+   "id": "p_ship_check",
+   "name": "Ship check",
+   "heading": "",
+   "ending": false,
+   "valence": "",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "You stand at the glass. The beam sweeps the water in long slow strokes and the fog glows white around it. Out in the gray, the ship’s horn sounds, nearer, nearer, and then stops, as if the whole sea were holding its breath.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    }
+   ],
+   "gives": [],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": [
+    {
+     "label": "Wait for the ship to answer",
+     "to": "p_end_good",
+     "needs": [
+      "i_dark"
+     ],
+     "forbid": [],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    },
+    {
+     "label": "Wait for the ship to answer",
+     "to": "p_end_two_lights",
+     "needs": [],
+     "forbid": [
+      "i_dark"
+     ],
+     "gives": [],
+     "takes": [],
+     "adds": {},
+     "check": null,
+     "lock": false,
+     "why": ""
+    }
+   ]
+  },
+  {
+   "id": "p_end_good",
+   "name": "End good",
+   "heading": "The Light Holds",
+   "ending": true,
+   "valence": "good",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "The horn sounds again, and this time it is farther off, turning away from the rocks. The great lamp throws its long white arm across the water, and the only other light on this coast, the false one on the cliff, is dark. The ship has nothing to follow but the truth.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "Pell is picked up by a fishing smack the next afternoon, forty miles down the coast, cold and sullen and still sitting in the boat you cut loose.",
+     "needs": [
+      "i_pell"
+     ],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "Pell is gone before dawn. The hammering on the door stopped sometime around two, and the rowboat below the cliff went out with the tide. He will turn up somewhere else with the same sort of plan.",
+     "needs": [
+      "i_barred"
+     ],
+     "forbid": [
+      "i_pell"
+     ],
+     "orPrev": true
+    },
+    {
+     "text": "By morning Ames is wrapped in a blanket beside the stove, refusing broth. The next supply boat finds a lit lighthouse and a story it does not quite believe.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    }
+   ],
+   "gives": [],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": []
+  },
+  {
+   "id": "p_end_two_lights",
+   "name": "End two lights",
+   "heading": "Two Lights",
+   "ending": true,
+   "valence": "good",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "Out on the cliff the false lamp still burns, and above it the great lamp burns too. From the ship’s bridge there are two lights where there should be one, and for a long, bad hour nobody aboard can say which to trust.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "In the end the swell decides. The ship swings, and scrapes along the reef, and sits there groaning with her keel half open. By dawn every soul aboard is in a lifeboat and rowing for your rock, cold and furious and alive. The ship does not get off so lightly.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "Pell’s lamp is still burning on its pole when the sun comes up. You will think for a long time about how easily you could have reached it.",
+     "needs": [
+      "i_pell"
+     ],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "Pell and his boat are gone before the first lifeboat touches the rock. His lamp is still burning on its pole. You will think for a long time about how easily you could have reached it.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": true
+    }
+   ],
+   "gives": [],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": []
+  },
+  {
+   "id": "p_end_signal",
+   "name": "End signal",
+   "heading": "A Small Light",
+   "ending": true,
+   "valence": "good",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "You swing the lantern in wide arcs over the balcony rail. It is a poor, flickering thing beside the great lamp that is not lit, but the ship’s lookout sees it.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "The horn stops. The ship stands off until dawn. In the morning Ames lights the great lamp himself. The ship is long gone, and nobody needs it, but he lights it anyway, and he does it well.",
+     "needs": [
+      "i_dark"
+     ],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "He sees your lantern, and then he sees the other light, the steady one on the cliff, and the ship makes for the steady one. A small light cannot argue with a bright one. The grinding sound that follows goes on for a long time.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": true
+    }
+   ],
+   "gives": [],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": []
+  },
+  {
+   "id": "p_end_flare",
+   "name": "End flare",
+   "heading": "Red Over Gull Rock",
+   "ending": true,
+   "valence": "good",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "You lean out over the balcony rail and fire the flare. It goes up with a crack like a snapped board and hangs above the sea, red and wide and furious. Everyone in the world understands a red flare.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "The ship’s horn stops. For ninety seconds the whole reef stands out in the red light, black teeth in white foam, and then the ship begins, slowly, to turn away.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "Out in the fog, where the tide carried him, Pell sees the flare too, and knows what it means. A smack picks him up two days later, and he is not in a talking mood.",
+     "needs": [
+      "i_pell"
+     ],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "On the cliff, Pell sees the flare and knows the game is over. By the time the cutter arrives, the rowboat is gone and so is he.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": true
+    },
+    {
+     "text": "The great lamp stays dark until morning, when Ames lights it himself, long after anyone needed it, and he does it well.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    }
+   ],
+   "gives": [],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": []
+  },
+  {
+   "id": "p_end_sleep",
+   "name": "End sleep",
+   "heading": "Fog Over Gull Rock",
+   "ending": true,
+   "valence": "bad",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "You sit on the cold floor and close your eyes for a moment. The horn sounds once. Then comes a long grinding sound from the rocks, and then only waves.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "In the morning the keeper finds you where you sat. The men with the boat are long gone. You never quite forgive yourself.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    }
+   ],
+   "gives": [],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": []
+  },
+  {
+   "id": "p_end_taken",
+   "name": "End taken",
+   "heading": "The Dark Coast",
+   "ending": true,
+   "valence": "bad",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "The door bursts in, and Pell is on you before you have finished turning. You are not a fighting person, and the bar is still hanging on its hooks.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "The lamp has burned perhaps four minutes. That is long enough for the ship to see it, and not long enough to matter. Pell puts it out with his hat and sits you in a corner with your own belt around your wrists. The horn sounds once more, much too close, and then there is a long grinding sound from the rocks.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "At dawn the sea is full of timber, and Pell, who is not a greedy man, takes only what he can carry. Far below you, patient as a clock, the keeper goes on knocking.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    }
+   ],
+   "gives": [],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": []
+  },
+  {
+   "id": "p_end_bought",
+   "name": "End bought",
+   "heading": "A Share in the Wreck",
+   "ending": true,
+   "valence": "bad",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "Pell’s hand is warm and dry, and the coins in it are cold. “Good,” he says. “Sit in the hall. Drink the old man’s tea. You were never here.”",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "You sit in the keeper’s hall and you drink his tea. At midnight you hear the ship’s horn, nearer, and then a long grinding sound, and then voices a long way off that are not talking, exactly. You do not go to the window.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "At dawn Ames, whom you cut loose yourself, stands in the hall doorway. He looks at your hands, and then at your face, and says nothing to you, then or ever.",
+     "needs": [
+      "i_key"
+     ],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "In the morning you go down to the cellar. The keeper looks up at you for a long time and says nothing, then or ever.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": true
+    },
+    {
+     "text": "The money is real. It spends well. In the years afterward you are never short, and you never again sleep with a window open.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    }
+   ],
+   "gives": [],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": []
+  },
+  {
+   "id": "p_end_flee",
+   "name": "End flee",
+   "heading": "The Quiet Way Out",
+   "ending": true,
+   "valence": "bad",
+   "todo": false,
+   "blocks": [
+    {
+     "text": "You loose the rope, ease the boat off the post, and take the oars. The tide does half the work. Behind you the rock disappears into the fog, and the lamp that was never lit goes with it.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "You think, once, of the pole on the cliff standing dark, and wonder whether that was enough.",
+     "needs": [
+      "i_dark"
+     ],
+     "forbid": [],
+     "orPrev": false
+    },
+    {
+     "text": "You do not look back.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": true
+    },
+    {
+     "text": "Hours later a distant boom rolls across the water, and then nothing at all. You never find out whose ship it was.",
+     "needs": [],
+     "forbid": [],
+     "orPrev": false
+    }
+   ],
+   "gives": [],
+   "takes": [],
+   "adds": {},
+   "sends": {},
+   "choices": []
+  }
+ ],
+ "game": {
+  "back": "off",
+  "tracker": false,
+  "comfort": true,
+  "odds": true,
+  "place": false,
+  "pal": "paper"
+ }
+}

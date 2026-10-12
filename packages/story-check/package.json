@@ -1,0 +1,49 @@
+{
+  "name": "story-check",
+  "version": "1.0.0",
+  "description": "Exact checker for branching stories with items, numbers and dice: dead ends, unreachable pages, endings no player can reach. Zero dependencies.",
+  "license": "MIT",
+  "author": "JNFoo",
+  "type": "module",
+  "main": "dist/story-check.mjs",
+  "module": "dist/story-check.mjs",
+  "types": "index.d.ts",
+  "unpkg": "dist/story-check.global.js",
+  "jsdelivr": "dist/story-check.global.js",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./dist/story-check.mjs"
+    },
+    "./global": "./dist/story-check.global.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "bin",
+    "index.d.ts",
+    "README.md",
+    "AGENTS.md",
+    "examples"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JNFoo/p-see-story-editor.git",
+    "directory": "packages/story-check"
+  },
+  "homepage": "https://github.com/JNFoo/p-see-story-editor/tree/main/packages/story-check",
+  "keywords": [
+    "interactive-fiction",
+    "static-analysis",
+    "linter",
+    "story"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  }
+}

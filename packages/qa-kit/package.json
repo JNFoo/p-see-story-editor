@@ -1,0 +1,14 @@
+{
+  "name": "qa-kit",
+  "version": "0.1.0",
+  "description": "A small tiered test runner, and a Playwright-style call surface over Puppeteer's WebDriver BiDi so suites written for Playwright also run on stock Firefox.",
+  "license": "MIT",
+  "author": "JNFoo",
+  "main": "src/bidi.js",
+  "bin": { "qa-kit-run": "src/runner.js" },
+  "files": ["src", "README.md", "AGENTS.md"],
+  "scripts": { "test": "node --test test/" },
+  "engines": { "node": ">=18" },
+  "peerDependencies": { "puppeteer": ">=23", "playwright": ">=1.40" },
+  "peerDependenciesMeta": { "puppeteer": { "optional": true }, "playwright": { "optional": true } }
+}

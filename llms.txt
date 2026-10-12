@@ -1,0 +1,26 @@
+# p-see-story-editor
+
+> A single-file, offline editor for branching interactive stories ("choose your own path"), and small zero-dependency JavaScript packages cut from its sources: a story data model with JSON Schema, an exact story checker, a game builder and headless player, story-graph layout with simulated players, a self-unzipping page packer, and a Playwright-style shim for stock Firefox. MIT License, Copyright (c) 2026 JNFoo.
+
+The editor: https://jnfoo.github.io/p-see-story-editor/ (also `index.html` in this repository; double-click it to run, nothing to install).
+
+## Packages (each: README.md, AGENTS.md, index.d.ts, examples/quickstart.mjs, tests)
+- [story-format](packages/story-format/README.md): create, clean, import, export, search and measure stories as JSON. `story.schema.json` is the JSON Schema. Start here to write a story.
+- [story-check](packages/story-check/README.md): `analyze(project)` finds dead ends and endings no player can reach, exactly, over items, numbers and dice.
+- [story-player](packages/story-player/README.md): `buildGame(project)` makes one offline HTML game; `createSession(project)` plays a story from code; `bin/story-player.mjs` builds or plays from a terminal.
+- [story-map](packages/story-map/README.md): `layoutStory`, `toSvg`, `playtest` (seeded simulated players), `mapMetrics`.
+- [zip-page](packages/zip-page/README.md): `zipPage(html)`; a readable pure-JS inflater.
+- [qa-kit](packages/qa-kit/README.md): tiered test runner; Playwright-style API over Puppeteer WebDriver BiDi for stock Firefox; seeded random-story generator.
+- [ai-collab-kit](packages/ai-collab-kit/README.md): a process for a person and an AI assistant building software together, with templates.
+
+## Machine-readable
+- [packages/index.json](packages/index.json): package list with entry files and one-line summaries.
+- [packages/story-format/story.schema.json](packages/story-format/story.schema.json): JSON Schema of a story.
+
+## Rules for changing the repository
+- [AGENTS.md](AGENTS.md): generated files (`packages/*/src/generated.js`, `packages/*/dist/*`) come from `editor/*.js` via `npm run build`; never edit them by hand.
+- `npm test` needs no browser; browser suites are in `editor/qa`.
+
+## Related
+- [JS-modules](https://github.com/JNFoo/JS-modules): small pieces for single-file browser games (https://jnfoo.github.io/JS-modules/)
+- [Apple Press](https://github.com/JNFoo/apple-press), [Fancy, the Banana](https://github.com/JNFoo/fancy-banana): the games.

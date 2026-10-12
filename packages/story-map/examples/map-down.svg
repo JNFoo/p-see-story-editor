@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -24 732 774" width="732" height="774" font-family="system-ui, sans-serif" font-size="13">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#667"/></marker></defs>
+<path d="M312 76 C312 108 210 108 210 140" fill="none" stroke="#667" stroke-width="1.4" marker-end="url(#arrow)"/>
+<path d="M312 76 C312 108 414 108 414 140" fill="none" stroke="#667" stroke-width="1.4" marker-end="url(#arrow)"/>
+<path d="M210 196 C210 228 312 228 312 260" fill="none" stroke="#667" stroke-width="1.4" marker-end="url(#arrow)"/>
+<path d="M414 196 C414 228 312 228 312 260" fill="none" stroke="#667" stroke-width="1.4" marker-end="url(#arrow)"/>
+<path d="M312 316 C312 348 108 348 108 380" fill="none" stroke="#667" stroke-width="1.4" marker-end="url(#arrow)"/>
+<path d="M312 316 C312 348 312 348 312 380" fill="none" stroke="#667" stroke-width="1.4" marker-end="url(#arrow)"/>
+<path d="M312 316 C312 348 516 348 516 380" fill="none" stroke="#667" stroke-width="1.4" marker-end="url(#arrow)"/>
+<path d="M108 436 C108 468 210 468 210 500" fill="none" stroke="#667" stroke-width="1.4" marker-end="url(#arrow)"/>
+<path d="M312 436 C312 468 210 468 210 500" fill="none" stroke="#667" stroke-width="1.4" marker-end="url(#arrow)"/>
+<path d="M210 556 C210 588 108 588 108 620" fill="none" stroke="#667" stroke-width="1.4" marker-end="url(#arrow)"/>
+<path d="M210 556 C210 588 312 588 312 620" fill="none" stroke="#667" stroke-width="1.4" marker-end="url(#arrow)"/>
+<g><title>Opening</title><rect x="224" y="20" width="176" height="56" rx="8" fill="#ffffff" stroke="#2b6cb0" stroke-width="2.4"/><text x="312" y="52" text-anchor="middle" fill="#223">Opening</text></g>
+<g><title>The fast road</title><rect x="122" y="140" width="176" height="56" rx="8" fill="#ffffff" stroke="#667" stroke-width="1.2"/><text x="210" y="172" text-anchor="middle" fill="#223">The fast road</text></g>
+<g><title>The quiet road</title><rect x="326" y="140" width="176" height="56" rx="8" fill="#ffffff" stroke="#667" stroke-width="1.2"/><text x="414" y="172" text-anchor="middle" fill="#223">The quiet road</text></g>
+<g><title>The gate</title><rect x="224" y="260" width="176" height="56" rx="8" fill="#ffffff" stroke="#667" stroke-width="1.2"/><text x="312" y="292" text-anchor="middle" fill="#223">The gate</text></g>
+<g><title>The guard’s way</title><rect x="20" y="380" width="176" height="56" rx="8" fill="#ffffff" stroke="#667" stroke-width="1.2"/><text x="108" y="412" text-anchor="middle" fill="#223">The guard’s way</text></g>
+<g><title>The side way</title><rect x="224" y="380" width="176" height="56" rx="8" fill="#ffffff" stroke="#667" stroke-width="1.2"/><text x="312" y="412" text-anchor="middle" fill="#223">The side way</text></g>
+<g><title>The tower</title><rect x="122" y="500" width="176" height="56" rx="8" fill="#ffffff" stroke="#667" stroke-width="1.2"/><text x="210" y="532" text-anchor="middle" fill="#223">The tower</text></g>
+<g><title>Inside</title><rect x="20" y="620" width="176" height="56" rx="8" fill="#d7efd9" stroke="#667" stroke-width="1.2"/><text x="108" y="652" text-anchor="middle" fill="#223">Inside</text></g>
+<g><title>Left outside</title><rect x="224" y="620" width="176" height="56" rx="8" fill="#f6d8d4" stroke="#667" stroke-width="1.2"/><text x="312" y="652" text-anchor="middle" fill="#223">Left outside</text></g>
+<g><title>Home again</title><rect x="428" y="380" width="176" height="56" rx="8" fill="#ffffff" stroke="#667" stroke-width="1.2"/><text x="516" y="412" text-anchor="middle" fill="#223">Home again</text></g>
+</svg>

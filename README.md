@@ -6,7 +6,35 @@ works, see your story as a map, and turn each story into one small game file tha
 **Open the editor:** https://jnfoo.github.io/p-see-story-editor/
 (or download `index.html` from this page and double-click it; nothing needs installing).
 
-Copyright (c) 2026 JNFoo. All Rights Reserved. A license will be chosen later (see `NOTICE.txt`). This is a beta.
+MIT License · Copyright (c) 2026 JNFoo (see [LICENSE](LICENSE) and [NOTICE.md](NOTICE.md)). This is a beta.
+
+## Code you can reuse
+
+Everything is MIT-licensed and has no dependencies. The editor's logic was cut out into small packages, **generated from the editor's own sources** (so there is one copy to maintain, and a test fails if they drift apart). Each folder has a README (what it does, how it differs from what already exists, its limits), an `AGENTS.md` for AI helpers, TypeScript types, an example you can run, and tests that require **identical answers to the editor** on hundreds of random stories.
+
+| Package | One line |
+|---|---|
+| [story-format](packages/story-format/README.md) | The data model for branching stories as plain JSON, with a JSON Schema, a safe sanitizer for any input, a plain-text story syntax, find/replace, Markdown manuscript. |
+| [story-check](packages/story-check/README.md) | An exact checker: explores every combination of items, numbers and dice to find dead ends and endings no player can reach, and says why. |
+| [story-player](packages/story-player/README.md) | One story in, one small offline HTML game out; plus a "play it from code" session and a terminal player. |
+| [story-map](packages/story-map/README.md) | Layered, arc, matrix and shape drawings of a story graph, choke points, simulated players, drawing metrics, SVG output. |
+| [zip-page](packages/zip-page/README.md) | Shrinks one HTML page into a self-unzipping page, with a small readable inflater as fallback. |
+| [qa-kit](packages/qa-kit/README.md) | A tiered test runner and a Playwright-style call surface over Puppeteer's WebDriver BiDi, so suites also run on stock Firefox; a seeded random-story generator. |
+| [ai-collab-kit](packages/ai-collab-kit/README.md) | A written process for a person and an AI assistant building software together: ten habits, test and speed recipes, pitfalls, templates. |
+| [editor/](editor/README.md) | The full editor sources, its build, and its browser test suites ([editor/qa](editor/qa/README.md)). |
+
+Only pieces that are not already well covered by open source were split out; each README names the closest existing projects and says honestly how this one differs. Small pieces for browser games (curtains, saves, frame pacing and more) live in the sibling repository [JS-modules](https://github.com/JNFoo/JS-modules).
+
+## Build and test from source
+
+```
+npm install                 # esbuild and prettier, for the package build
+npm run build               # regenerate packages/*/src/generated.js and dist/ from editor/*.js
+npm test                    # packages up to date, README samples, every package's tests, the editor's contract test (no browser needed)
+npm run editor              # build the editor: editor/story-editor.html (needs Python 3; "pip install zopfli" makes it about 4% smaller)
+```
+
+The browser suites (Firefox and Chromium) are in `editor/qa`; see its README. For people and AI helpers: [AGENTS.md](AGENTS.md), [llms.txt](llms.txt), [CONTRIBUTING.md](CONTRIBUTING.md). History and measurements: [docs/](docs/README.md).
 
 ## Your stories stay yours
 
@@ -52,10 +80,10 @@ editor does (roughly Chrome/Edge 80, Firefox 74, iOS 13.4 for games; Chrome/Edge
 
 ## Fonts
 
-The Inter Tight typeface is used under the SIL Open Font License.
+The Inter Tight typeface is used under the SIL Open Font License (it is not covered by the MIT License; see NOTICE.md).
 
 ## More from JNFoo
 
-- [Fancy, the Banana](https://jnfoo.github.io/fancy-banana/): a one-tap flying arcade game ([code](https://github.com/JNFoo/fancy-banana))
-- [Apple Press](https://jnfoo.github.io/apple-press/): a clicker game ([code](https://github.com/JNFoo/apple-press))
-- [JS-modules](https://github.com/JNFoo/JS-modules): small open-source (MIT) JavaScript building blocks for single-file web games and offline pages
+- [Apple Press](https://github.com/JNFoo/apple-press): a clicker game for kids ([play](https://jnfoo.github.io/apple-press/))
+- [Fancy, the Banana](https://github.com/JNFoo/fancy-banana): a one-tap flying-banana arcade game ([play](https://jnfoo.github.io/fancy-banana/))
+- [JS-modules](https://github.com/JNFoo/JS-modules): small dependency-free pieces for single-file browser games ([demos](https://jnfoo.github.io/JS-modules/))

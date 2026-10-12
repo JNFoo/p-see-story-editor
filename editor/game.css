@@ -1,0 +1,122 @@
+/* ============================================================================
+   STORY STYLES
+   ----------------------------------------------------------------------------
+   Warm paper on stone, following the reader's light or dark setting.
+   Type: Inter Tight, embedded in the file, so nothing is ever downloaded.
+   Everything is scoped to .kl so it never leaks into a page that hosts the story.
+   ============================================================================ */
+
+/* PARTS. A line that says @part and a name starts a section that belongs to one optional feature (back, dice, locks, bars,
+   tracker, place, comfort); "@part base" returns to the styles every game needs. build-game.mjs splits this file at those lines, and an exported
+   game carries only the parts for the features its story uses (see klFeatures in core.js).
+
+   Colors: the palettes are written by paletteCss() in core.js (light by default, dark when the device prefers it, or one of the
+   author's chosen palettes) and added when a game is exported. Here: the typeface only. */
+.kl{--font:"Inter Tight","Inter",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--display:var(--font);--dw:650}
+
+/* The reading surface */
+.kl{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:17px;line-height:1.65;-webkit-text-size-adjust:100%;
+  padding:24px 16px 48px;padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right));box-sizing:border-box;min-height:100vh}
+.kl *{box-sizing:border-box}
+.kl-page{max-width:40rem;margin:0 auto;background:var(--paper);border:1px solid var(--line);border-top:6px solid var(--lamp);padding:28px 24px;animation:kl-in .28s ease-out}
+.kl-page:focus{outline:none}
+@keyframes kl-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.kl-page{animation:none}}
+.kl-title{margin:0 0 6px;font:500 .73em/1.3 var(--font);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.kl-head{margin:0 0 16px;font:var(--dw) 1.6em/1.2 var(--display);color:var(--fg);text-wrap:balance}
+.kl-page p{margin:0 0 1em;white-space:pre-line;letter-spacing:.01em}   /* a touch more air for long reading in the tighter typeface */
+.kl-have{margin:0 0 1em;font-size:.85em;color:var(--muted);border-left:3px solid var(--lamp);padding-left:10px}
+
+/* Choice buttons */
+.kl-choices{list-style:none;margin:1.6em 0 0;padding:0;display:flex;flex-direction:column;gap:10px}
+.kl-choices button{font:600 .94em/1.4 var(--font);text-align:left;width:100%;cursor:pointer;color:var(--lamp);background:transparent;border:1px solid var(--line);border-left:4px solid var(--lamp);padding:12px 14px;touch-action:manipulation}
+.kl-choices button:hover{background:var(--lampbg);color:var(--signal)}
+.kl-choices button:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
+
+/* Endings: the top edge and title take the ending's color (ordinary pages use the amber edge and plain title) */
+.kl-end{margin:1.6em 0 0;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-style:italic}
+.kl-page.end-good{border-top-color:var(--good)}.kl-page.end-good .kl-head{color:var(--good)}
+.kl-page.end-bad{border-top-color:var(--signal)}.kl-page.end-bad .kl-head{color:var(--signal)}
+.kl-page.end-neutral{border-top-color:var(--muted)}
+
+/* "Start over" link (asks once more before it acts) */
+.kl-bar{max-width:40rem;margin:14px auto 0;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.kl-bar-l,.kl-bar-r{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.kl-bar button,.kl-aa summary{font:400 .8em var(--font);color:var(--muted);background:none;border:0;text-decoration:underline;cursor:pointer;padding:6px}
+.kl-bar button.armed{color:var(--signal);font-weight:600}
+.kl-bar button:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
+
+/* The recap shown on every ending: the player's own path, told in the story's words */
+.kl-recap{margin:1.8em 0 0;border-top:1px solid var(--line);padding-top:.9em}
+.kl-recap summary{cursor:pointer;font:var(--dw) .9em/1.4 var(--font);color:var(--muted)}
+.kl-recap ol{margin:.7em 0 0;padding-left:1.4em;font-size:.9em;line-height:1.55}
+.kl-recap li{margin:0 0 .55em}
+.kl-took{color:var(--lamp);font-weight:600}
+
+/*@part bars*/
+/* Numbers (stats): a labeled bar */
+.kl-stats{margin:0 0 1em;display:flex;flex-direction:column;gap:6px}
+.kl-stat{display:grid;grid-template-columns:minmax(5em,max-content) 1fr max-content;align-items:center;gap:10px;font-size:.85em;color:var(--muted)}
+.kl-sn{color:var(--fg);font-weight:600}
+.kl-track{display:block;height:.7em;border:1px solid var(--line);background:var(--bg);border-radius:.4em;overflow:hidden}
+.kl-track i{display:block;height:100%;background:var(--lamp)}
+.kl-sv{font-variant-numeric:tabular-nums}
+
+/*@part dice*/
+/* What the dice just did, shown on the page it led to */
+.kl-page p.kl-roll{margin:0 0 1em;padding:8px 12px;font-size:.85em;color:var(--fg);background:var(--lampbg);border-left:3px solid var(--lamp);white-space:normal}
+
+/* The odds under a skill check, and what the screen reader is told */
+.kl-choices button .kl-odds{display:block;font-weight:400;font-size:.82em;color:var(--muted);margin-top:2px}
+.kl-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/*@part locks*/
+/* Locked choices: greyed out, with the reason under the label */
+.kl-choices button .kl-why{display:block;font-weight:400;font-size:.82em;color:var(--muted);margin-top:2px}
+.kl-choices button.locked{cursor:not-allowed;color:var(--muted);border-left-color:var(--line);background:transparent}
+.kl-choices button.locked:hover{background:transparent;color:var(--muted)}
+.kl-choices button.locked .kl-why{color:var(--muted);font-style:italic}
+
+/*@part tracker*/
+.kl-found{font-size:.8em;color:var(--muted)}
+
+/*@part back*/
+.kl-bar button[aria-disabled]{opacity:.45;cursor:default;text-decoration:none}
+
+/*@part place*/
+/* The Place code panel: copy a code for where you are, or paste one */
+.kl-pl{position:relative}
+.kl-pl summary{list-style:none;cursor:pointer;color:var(--muted);text-decoration:underline;padding:6px;font:400 .8em var(--font)}
+.kl-pl summary::-webkit-details-marker{display:none}
+.kl-pl[open] summary{color:var(--fg)}
+.kl-pl-box{position:absolute;right:0;bottom:2.4em;z-index:5;width:17em;max-width:80vw;background:var(--paper);border:1px solid var(--line);padding:10px 12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+.kl-pl-box input{font:400 .85em var(--font);color:var(--fg);background:var(--paper);border:1px solid var(--line);padding:6px 8px;min-width:0}
+.kl-pl-box button{font:600 .8em var(--font);color:var(--fg);background:transparent;border:1px solid var(--line);padding:6px 10px;cursor:pointer;text-decoration:none}
+.kl-pl-msg{font-size:.78em;color:var(--signal)}
+.kl-pl summary:focus-visible,.kl-pl-box button:focus-visible,.kl-pl-box input:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
+
+/*@part comfort*/
+/* The Aa panel (reader comfort) */
+.kl-aa{position:relative}
+.kl-aa summary{list-style:none;cursor:pointer;color:var(--muted);text-decoration:underline;padding:6px}
+.kl-aa summary::-webkit-details-marker{display:none}
+.kl-aa[open] summary{color:var(--fg)}
+.kl-aa-box{position:absolute;right:0;bottom:2.4em;z-index:5;min-width:17em;max-width:calc(100vw - 24px);background:var(--paper);border:1px solid var(--line);padding:10px 12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+.kl-aa-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.kl-aa-name{flex:1 0 100%;font-size:.78em;color:var(--muted)}
+.kl-aa-box button{font:600 .8em var(--font);color:var(--fg);background:transparent;border:1px solid var(--line);padding:6px 10px;cursor:pointer;text-decoration:none}
+.kl-aa-box button[aria-pressed=true]{background:var(--lamp);color:var(--paper);border-color:var(--lamp)}
+.kl-aa-clear{align-self:flex-start;color:var(--signal)!important}
+.kl-aa-box button:focus-visible,.kl-aa summary:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
+
+/* The reader's choices from Aa: bigger text, roomier lines, less motion, visible choice numbers */
+.kl.cf-s1{font-size:20px}
+.kl.cf-s2{font-size:24px}
+.kl.cf-roomy{line-height:1.95;letter-spacing:.03em;word-spacing:.12em}
+.kl.cf-roomy .kl-page p{margin-bottom:1.4em}
+.kl.cf-calm .kl-page{animation:none}
+.kl.cf-calm *{transition:none!important}
+.kl.cf-nums .kl-choices button[data-n]::before{content:attr(data-n) ". ";font-variant-numeric:tabular-nums}
+.kl.cf-hc .kl-choices button{border-width:2px}
+/*@part base*/
+@media (prefers-reduced-motion:reduce){.kl *{transition:none!important}}

@@ -1,0 +1,13 @@
+{
+  "name": "story-editor",
+  "private": true,
+  "description": "Builds the single-file Story Editor (see README.md).",
+  "scripts": {
+    "build": "python3 build.py",
+    "format": "prettier --write *.js *.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "prettier": "^3.9.9"
+  }
+}

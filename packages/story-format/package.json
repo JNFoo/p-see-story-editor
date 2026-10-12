@@ -1,0 +1,51 @@
+{
+  "name": "story-format",
+  "version": "1.0.0",
+  "description": "Data model and file format for branching interactive stories: create, clean, import, export, search and measure. Zero dependencies.",
+  "license": "MIT",
+  "author": "JNFoo",
+  "type": "module",
+  "main": "dist/story-format.mjs",
+  "module": "dist/story-format.mjs",
+  "types": "index.d.ts",
+  "unpkg": "dist/story-format.global.js",
+  "jsdelivr": "dist/story-format.global.js",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./dist/story-format.mjs"
+    },
+    "./global": "./dist/story-format.global.js",
+    "./package.json": "./package.json",
+    "./schema": "./story.schema.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "bin",
+    "index.d.ts",
+    "README.md",
+    "AGENTS.md",
+    "examples",
+    "story.schema.json"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JNFoo/p-see-story-editor.git",
+    "directory": "packages/story-format"
+  },
+  "homepage": "https://github.com/JNFoo/p-see-story-editor/tree/main/packages/story-format",
+  "keywords": [
+    "interactive-fiction",
+    "choose-your-own-adventure",
+    "json-schema",
+    "story"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  }
+}

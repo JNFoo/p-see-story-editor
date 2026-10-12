@@ -1,0 +1,52 @@
+{
+  "name": "story-player",
+  "version": "1.0.0",
+  "description": "Builds one offline HTML game from a story, plays stories from code, and plays them in a terminal. Zero dependencies.",
+  "license": "MIT",
+  "author": "JNFoo",
+  "type": "module",
+  "main": "dist/story-player.mjs",
+  "module": "dist/story-player.mjs",
+  "types": "index.d.ts",
+  "unpkg": "dist/story-player.global.js",
+  "jsdelivr": "dist/story-player.global.js",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./dist/story-player.mjs"
+    },
+    "./global": "./dist/story-player.global.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "bin",
+    "index.d.ts",
+    "README.md",
+    "AGENTS.md",
+    "examples"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JNFoo/p-see-story-editor.git",
+    "directory": "packages/story-player"
+  },
+  "homepage": "https://github.com/JNFoo/p-see-story-editor/tree/main/packages/story-player",
+  "keywords": [
+    "interactive-fiction",
+    "game-builder",
+    "single-file",
+    "offline"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "bin": {
+    "story-player": "bin/story-player.mjs"
+  }
+}

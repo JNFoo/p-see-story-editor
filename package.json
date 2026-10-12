@@ -1,0 +1,22 @@
+{
+  "name": "p-see-story-editor",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A single-file offline editor for interactive stories, and the reusable packages cut from its sources.",
+  "license": "MIT",
+  "author": "JNFoo",
+  "homepage": "https://jnfoo.github.io/p-see-story-editor/",
+  "repository": { "type": "git", "url": "https://github.com/JNFoo/p-see-story-editor.git" },
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "build": "node tools/extract-packages.mjs && node tools/docs.mjs",
+    "test": "node tools/test-all.mjs",
+    "test:editor": "node editor/contract.mjs 400 1",
+    "editor": "cd editor && python3 build.py"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "prettier": "^3.9.9"
+  }
+}

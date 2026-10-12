@@ -1,0 +1,7 @@
+node_modules
+editor/story-editor.html
+editor/qa/logs/
+editor/qa/work/
+editor/qa/.stamp
+editor/qa/counts.json
+*.whl

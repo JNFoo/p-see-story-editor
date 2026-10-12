@@ -1,0 +1,75 @@
+{
+  "format": "story-editor",
+  "version": 1,
+  "id": "s_op58zxut",
+  "title": "The Lantern",
+  "author": "",
+  "start": "p_0vahyjut",
+  "items": [],
+  "givens": [],
+  "passages": [
+    {
+      "id": "p_0vahyjut",
+      "name": "The shore",
+      "heading": "",
+      "ending": false,
+      "valence": "",
+      "todo": false,
+      "blocks": [
+        {
+          "text": "A lighthouse glows on the far rocks. The tide is coming in.",
+          "needs": [],
+          "forbid": [],
+          "orPrev": false
+        }
+      ],
+      "gives": [],
+      "takes": [],
+      "adds": {},
+      "sends": {},
+      "choices": [
+        {
+          "label": "Wade out to the lighthouse",
+          "to": "p_a1jg25ut",
+          "needs": [],
+          "forbid": [],
+          "gives": [],
+          "takes": [],
+          "adds": {},
+          "check": null,
+          "lock": false,
+          "why": ""
+        }
+      ]
+    },
+    {
+      "id": "p_a1jg25ut",
+      "name": "The rocks",
+      "heading": "",
+      "ending": true,
+      "valence": "good",
+      "todo": false,
+      "blocks": [
+        {
+          "text": "You reach the lighthouse as the first wave breaks behind you.",
+          "needs": [],
+          "forbid": [],
+          "orPrev": false
+        }
+      ],
+      "gives": [],
+      "takes": [],
+      "adds": {},
+      "sends": {},
+      "choices": []
+    }
+  ],
+  "game": {
+    "back": "off",
+    "tracker": false,
+    "comfort": true,
+    "odds": true,
+    "place": false,
+    "pal": "paper"
+  }
+}

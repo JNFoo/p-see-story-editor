@@ -1,0 +1,49 @@
+{
+  "name": "story-map",
+  "version": "1.0.0",
+  "description": "Layered, arc, matrix and shape drawings of a story graph, choke points, simulated players, drawing metrics, SVG output. Zero dependencies.",
+  "license": "MIT",
+  "author": "JNFoo",
+  "type": "module",
+  "main": "dist/story-map.mjs",
+  "module": "dist/story-map.mjs",
+  "types": "index.d.ts",
+  "unpkg": "dist/story-map.global.js",
+  "jsdelivr": "dist/story-map.global.js",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./dist/story-map.mjs"
+    },
+    "./global": "./dist/story-map.global.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "bin",
+    "index.d.ts",
+    "README.md",
+    "AGENTS.md",
+    "examples"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JNFoo/p-see-story-editor.git",
+    "directory": "packages/story-map"
+  },
+  "homepage": "https://github.com/JNFoo/p-see-story-editor/tree/main/packages/story-map",
+  "keywords": [
+    "graph-layout",
+    "sugiyama",
+    "interactive-fiction",
+    "svg"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  }
+}

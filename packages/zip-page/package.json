@@ -1,0 +1,52 @@
+{
+  "name": "zip-page",
+  "version": "1.0.0",
+  "description": "Shrinks one HTML page into a self-unzipping page; includes a small pure-JavaScript inflate fallback. Zero dependencies.",
+  "license": "MIT",
+  "author": "JNFoo",
+  "type": "module",
+  "main": "dist/zip-page.mjs",
+  "module": "dist/zip-page.mjs",
+  "types": "index.d.ts",
+  "unpkg": "dist/zip-page.global.js",
+  "jsdelivr": "dist/zip-page.global.js",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./dist/zip-page.mjs"
+    },
+    "./global": "./dist/zip-page.global.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "bin",
+    "index.d.ts",
+    "README.md",
+    "AGENTS.md",
+    "examples"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JNFoo/p-see-story-editor.git",
+    "directory": "packages/zip-page"
+  },
+  "homepage": "https://github.com/JNFoo/p-see-story-editor/tree/main/packages/zip-page",
+  "keywords": [
+    "single-file",
+    "compression",
+    "deflate",
+    "html"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "bin": {
+    "zip-page": "bin/zip-page.mjs"
+  }
+}

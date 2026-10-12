@@ -1,0 +1,77 @@
+{
+  "name": "p-see-story-editor packages",
+  "license": "MIT",
+  "copyright": "JNFoo",
+  "repository": "https://github.com/JNFoo/p-see-story-editor",
+  "pages": "https://jnfoo.github.io/p-see-story-editor/",
+  "packages": [
+    {
+      "id": "story-format",
+      "summary": "Data model and file format for branching interactive stories: create, clean, import, export, search and measure. Zero dependencies.",
+      "esm": "packages/story-format/dist/story-format.mjs",
+      "global": "packages/story-format/dist/story-format.global.js",
+      "types": "packages/story-format/index.d.ts",
+      "readme": "packages/story-format/README.md",
+      "example": "packages/story-format/examples/quickstart.mjs",
+      "dependencies": "none"
+    },
+    {
+      "id": "story-check",
+      "summary": "Exact checker for branching stories with items, numbers and dice: dead ends, unreachable pages, endings no player can reach. Zero dependencies.",
+      "esm": "packages/story-check/dist/story-check.mjs",
+      "global": "packages/story-check/dist/story-check.global.js",
+      "types": "packages/story-check/index.d.ts",
+      "readme": "packages/story-check/README.md",
+      "example": "packages/story-check/examples/quickstart.mjs",
+      "dependencies": "none"
+    },
+    {
+      "id": "story-player",
+      "summary": "Builds one offline HTML game from a story, plays stories from code, and plays them in a terminal. Zero dependencies.",
+      "esm": "packages/story-player/dist/story-player.mjs",
+      "global": "packages/story-player/dist/story-player.global.js",
+      "types": "packages/story-player/index.d.ts",
+      "readme": "packages/story-player/README.md",
+      "example": "packages/story-player/examples/quickstart.mjs",
+      "dependencies": "none",
+      "bin": {
+        "story-player": "bin/story-player.mjs"
+      }
+    },
+    {
+      "id": "story-map",
+      "summary": "Layered, arc, matrix and shape drawings of a story graph, choke points, simulated players, drawing metrics, SVG output. Zero dependencies.",
+      "esm": "packages/story-map/dist/story-map.mjs",
+      "global": "packages/story-map/dist/story-map.global.js",
+      "types": "packages/story-map/index.d.ts",
+      "readme": "packages/story-map/README.md",
+      "example": "packages/story-map/examples/quickstart.mjs",
+      "dependencies": "none"
+    },
+    {
+      "id": "zip-page",
+      "summary": "Shrinks one HTML page into a self-unzipping page; includes a small pure-JavaScript inflate fallback. Zero dependencies.",
+      "esm": "packages/zip-page/dist/zip-page.mjs",
+      "global": "packages/zip-page/dist/zip-page.global.js",
+      "types": "packages/zip-page/index.d.ts",
+      "readme": "packages/zip-page/README.md",
+      "example": "packages/zip-page/examples/quickstart.mjs",
+      "dependencies": "none",
+      "bin": {
+        "zip-page": "bin/zip-page.mjs"
+      }
+    },
+    {
+      "id": "qa-kit",
+      "summary": "Tiered test runner, Playwright-style API over Puppeteer WebDriver BiDi for stock Firefox, seeded random-story generator.",
+      "readme": "packages/qa-kit/README.md",
+      "dependencies": "peer: puppeteer and/or playwright (optional)"
+    },
+    {
+      "id": "ai-collab-kit",
+      "summary": "A written process and templates for a person and an AI assistant building software together.",
+      "readme": "packages/ai-collab-kit/README.md",
+      "dependencies": "none (documents only)"
+    }
+  ]
+}

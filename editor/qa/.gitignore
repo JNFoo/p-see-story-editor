@@ -1,0 +1,5 @@
+# made by the suites and the runner
+logs/
+work/
+.stamp
+counts.json

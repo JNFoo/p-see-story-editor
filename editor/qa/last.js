@@ -1,0 +1,27 @@
+const which=process.argv[2]||'firefox';const chromium=require('./engine').pick(which);const {devices}=require('./engine');
+const fs=require('fs');
+const ok=(c,m)=>console.log((c?'PASS ':'FAIL ')+m);
+(async () => {
+  const b = await chromium.launch(); const pg = await b.newPage({viewport:{width:1440,height:900}});
+  const errs=[]; pg.on('pageerror',e=>errs.push(e.message));
+  const txt=fs.readFileSync(__dirname+'/fixtures/sample.story.json','utf8');
+  await pg.addInitScript(t=>{ if(!sessionStorage.x){localStorage.clear(); localStorage.setItem('story-editor-v1', t); localStorage.setItem('story-editor-v1-settings', JSON.stringify({chosen:true,remember:true,advanced:{write:true,map:true,items:true}})); sessionStorage.x=1;} window.__g=[]; window.showSaveFilePicker = async o => ({ name:o.suggestedName, createWritable: async()=>({ write: async blob=>{ window.__g.push(await blob.text()); }, close: async()=>{} }) }); }, txt);
+  await pg.goto(require('url').pathToFileURL(require('path').join(__dirname, '..', 'story-editor.html')).href); await pg.waitForFunction(()=>window.__editor&&!document.getElementById('splash'),null,{timeout:20000});
+  await pg.locator('#export').click(); await pg.waitForTimeout(500);
+  await pg.locator('#optbtn').click(); await pg.locator('#optpop button:has-text("font - Export")').click(); await pg.waitForTimeout(300);
+  await pg.waitForTimeout(1600); await pg.locator('#export').click(); await pg.waitForTimeout(500);
+  const sizes = await pg.evaluate(()=>window.__g.map(t=>new Blob([t]).size));
+  ok(sizes.length===2 && sizes[1] < sizes[0]-15000, 'device font game is smaller: '+sizes);
+  await pg.locator('#optbtn').click(); 
+  console.log('  menu label:', await pg.locator('#optpop button:has-text("font - Export")').innerText()); await pg.keyboard.press('Escape');
+  await pg.locator('#tabs [data-tab=map]').click(); await pg.waitForTimeout(300);
+  await pg.click('[aria-label="Map view"] button[aria-label="Arc diagram"]'); await pg.waitForTimeout(300);
+  ok(await pg.locator('button[aria-label="Merge"]').isDisabled(), 'Merge greyed in Arc');
+  await pg.locator('button[aria-label="Size by traffic"]').click(); await pg.waitForTimeout(300);
+  const st = await pg.evaluate(()=>getComputedStyle(document.querySelector('g.node.dot.start circle')).stroke);
+  ok(st==='rgb(166, 82, 0)', 'Arc start keeps its colour with Size on: '+st);
+  await pg.locator('#help').click(); await pg.waitForTimeout(300);
+  await pg.locator('dialog summary:has-text("Objects and states")').click(); await pg.waitForTimeout(200);
+  await pg.screenshot({path:'work/shots/guide-c.png'});
+  console.log('errors', errs); process.exit(0);
+})();

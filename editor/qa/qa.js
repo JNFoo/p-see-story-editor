@@ -24,7 +24,7 @@ const LOGS = HERE + 'logs/';
 fs.mkdirSync(LOGS, { recursive: true });
 fs.mkdirSync(HERE + 'work/shots', { recursive: true });
 
-const SOURCES = ['zipwrap.mjs', 'core.js', 'player.js', 'maplayout.js', 'game.css', 'ui.css', 'ui1-state.js', 'ui2-widgets.js', 'ui3-write.js', 'ui4-map.js', 'ui4-views.js', 'ui4-speed.js', 'ui5-app.js', 'build.py', 'build-game.mjs', 'minify.mjs', 'contract.mjs'];
+const SOURCES = ['core.js', 'player.js', 'maplayout.js', 'game.css', 'ui.css', 'ui1-state.js', 'ui2-widgets.js', 'ui3-write.js', 'ui4-map.js', 'ui4-views.js', 'ui4-speed.js', 'ui5-app.js', 'build.py', 'build-game.mjs', 'minify.mjs', 'contract.mjs'];
 const EDITOR = SOURCES.filter(f => f !== 'contract.mjs');
 const GAME = ['core.js', 'player.js', 'game.css', 'build-game.mjs'];
 
@@ -35,6 +35,7 @@ const SUITES = [
   S('top5-new', 'top5-new.js', ['core.js', 'player.js', 'ui4-map.js', 'ui4-speed.js', 'ui5-app.js', 'game.css'], true),
   S('tools8', 'tools8.js', EDITOR, true),
   S('ffsmoke', 'ffsmoke.js', EDITOR, true, ['firefox']),
+  S('packed', 'packed-check.js', ['build.py', 'lzma/lzma_pack.py', 'lzma/lzma-decode.js'], true),
   S('touch1', 'touch1.js', EDITOR, true, ['chromium']),
   S('top10-export', 'top10-export.js', ['core.js', 'player.js', 'game.css', 'ui5-app.js'], true),
   S('top10-player', 'top10-player.js', ['core.js', 'player.js', 'game.css'], true),

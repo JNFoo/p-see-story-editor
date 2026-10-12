@@ -4,14 +4,15 @@ A single-file, offline editor for interactive (choose-your-own-adventure) storie
 choices, check that every path works, and export each story as one small HTML file that anyone can play in a
 browser, online or off.
 
-`build.py` puts the parts below together into **`story-editor.html`**. That file is *zipped*: the whole editor is stored
-compressed (Zopfli) inside a tiny page that unzips itself when it is opened, so it is about half the size on disk and opens about
-30 ms slower. Two companions are written beside it: `story-editor.plain.html` (the same editor, readable; the size budgets and
+`build.py` puts the parts below together into **`story-editor.html`**. That file is *packed*: the whole editor is stored
+compressed with LZMA (as base64 text) inside a tiny page that unpacks itself when it is opened and checks a hash of the result first, so it
+is under half the size on disk (224 KB for a 536 KB editor) and works from a file or any web server. The packer and decoder in `lzma/`
+are copied from [JS-modules](https://github.com/JNFoo/JS-modules) (`tools/lzma-pack`, `modules/lzma-decode`). Two companions are written beside it: `story-editor.plain.html` (the same editor, readable; the size budgets and
 the checks that read the text use it) and `story-editor.artifact.html` (the same page without its `<html>`/`<head>`, for hosts that
 wrap it). Edit the parts, never the built files.
 
-Exported games are zipped the same way by the Export button (`zipPage` in `core.js`; the browser's own `CompressionStream`, a
-little less tight than Zopfli). A browser without `DecompressionStream` still opens them: the page carries a small unzipper
+Exported games are zipped by the Export button (`zipPage` in `core.js`; the browser's own `CompressionStream`; the browser can
+zip but has no LZMA compressor, so games do not use LZMA). A browser without `DecompressionStream` still opens them: the page carries a small unzipper
 (`zipInflate`), which `contract.mjs` checks against zlib's output on every build. "Show the code" in the Export box shows the
 readable page; the downloaded file is the zipped one.
 
@@ -42,9 +43,9 @@ build; raise the ceiling in `BUDGETS` (build.py) on purpose, with a reason, or t
 | `ui1-state.js` … `ui5-app.js` | Part 3, the editor screens, wrapped in one function: state and undo; widgets; Write; Map; Items, Check and Play; the speed report (`ui4-speed.js`); File menu, guide and start-up. |
 | `ui.css`, `game.css` | Editor styles; game styles (used by the Play tab and exports). All colors are tokens with light and dark values. |
 | `contract.mjs` | The test that ties the checker to the game. `build.py` runs it before every build and stops if it fails (see Design notes). |
+| `lzma/` | The LZMA packer (`lzma_pack.py`, Python standard library) and decoder (`lzma-decode.js`) that pack the editor itself; copied from JS-modules. |
 | `build-game.mjs` | Builds the pieces exported games are made from: the rules and core player, one code piece and one style piece per optional feature, each minified by esbuild from the very functions the Play tab runs. |
 | `minify.mjs` | Shrinks the editor's own script and styles (comments and spacing only) for the finished file. |
-| `zipwrap.mjs` | Wraps the zipped editor in its self-unzipping page, with the same `zippedPage` the Export button uses. |
 | `budget.mjs` | Measures the size budget (see Building). |
 | `keepers-light.project.json` | The built-in example story. |
 | `fonts/` | Inter Tight (SIL Open Font License): the full subset and a smaller one for games whose story uses only plain English characters; recipes in `build.py`. |

@@ -31,7 +31,7 @@ Only pieces that are not already well covered by open source were split out; eac
 npm install                 # esbuild and prettier, for the package build
 npm run build               # regenerate packages/*/src/generated.js and dist/ from editor/*.js
 npm test                    # packages up to date, README samples, every package's tests, the editor's contract test (no browser needed)
-npm run editor              # build the editor: editor/story-editor.html (needs Python 3; "pip install zopfli" makes it about 4% smaller)
+npm run editor              # build the editor: editor/story-editor.html (needs Python 3 and one npm install)
 ```
 
 The browser suites (Firefox and Chromium) are in `editor/qa`; see its README. For people and AI helpers: [AGENTS.md](AGENTS.md), [llms.txt](llms.txt), [CONTRIBUTING.md](CONTRIBUTING.md). History and measurements: [docs/](docs/README.md).

@@ -2,12 +2,12 @@
 """Builds the single-file editor from its source parts.
 
 Outputs (next to this script):
-  story-editor.html            the finished editor, ZIPPED: one self-contained, offline file that unzips itself when opened
+  story-editor.html            the finished editor, PACKED with LZMA: one self-contained, offline file that unpacks itself when opened
   story-editor.plain.html      the same editor, readable (size budgets and text-reading checks use this one)
   story-editor.artifact.html   the same page without <html>/<head>, for pages that wrap it
 
-Needs Python 3.9+ and Node.js 18+ with esbuild (run "npm install" once in this folder). The zipping uses the python package
-"zopfli" if it is installed (pip install zopfli), otherwise zlib (about 4% larger).
+Needs Python 3.9+ and Node.js 18+ with esbuild (run "npm install" once in this folder). The packing is LZMA from Python's standard
+library (see lzma/); nothing else to install.
 
 Sources, in the order they appear in the finished file:
   fonts/                        Inter Tight, embedded as data in <style id="font-ui"> (also copied into exported games)
@@ -20,7 +20,7 @@ Sources, in the order they appear in the finished file:
   player.js                     PART 2: plays a story (global function)
   ui1-state.js ... ui5-app.js   PART 3, wrapped in one function so it leaks nothing
 """
-import base64, json, os, re, datetime, subprocess
+import base64, json, os, re, sys, datetime, subprocess
 from zoneinfo import ZoneInfo
 
 HERE = os.path.dirname(os.path.abspath(__file__)) + "/"
@@ -200,24 +200,21 @@ standalone = """<!doctype html>
 
 artifact = "<title>Story Editor</title>\n" + STYLE + BODY + "\n" + DATA + SCRIPT
 
-# ---- the editor as delivered is a ZIPPED page: the plain page above, deflate-compressed with Zopfli (a slower, tighter squeezer than zip;
-#      it only costs build time, about 4 seconds) inside a tiny page that unzips itself when opened. About 54% smaller, about 30 ms slower to
-#      open (measured Oct 2026 in Firefox 158 and Chromium; the opening splash lasts 3.7 s anyway). story-editor.plain.html keeps the plain
-#      page: size budgets and the tests that read the text use it. Exported games are zipped the same way by the Export button (core.js).
+# ---- the editor as delivered is a PACKED page: the plain page above, compressed with LZMA (much tighter than zip; it costs build time, a few
+#      seconds) inside a tiny page that unpacks itself when opened and checks a hash of the result first. The compressed bytes are stored as
+#      base64 text, which works from a file and from any web server (the smaller "raw bytes" form fails on a server that sends a UTF-8 header,
+#      such as GitHub Pages). The packer and the decoder in lzma/ are copied from https://github.com/JNFoo/JS-modules (tools/lzma-pack).
+#      story-editor.plain.html keeps the plain page: size budgets and the tests that read the text use it. Exported games are still zipped by
+#      the Export button (core.js), because the browser can zip but has no LZMA compressor.
 open(HERE + "story-editor.plain.html", "w", encoding="utf8").write(standalone)
 _raw = standalone.encode("utf8")
-try:
-    import zopfli.zlib
-    _packed = zopfli.zlib.compress(_raw, numiterations=60)[2:-4]   # zlib wrapper (2 bytes in front, 4 behind) removed: the page wants raw deflate
-    _how = "Zopfli"
-except ImportError:
-    import zlib as _z
-    _c = _z.compressobj(9, _z.DEFLATED, -15)
-    _packed = _c.compress(_raw) + _c.flush()
-    _how = "zlib level 9 (install the zopfli package for about 4% tighter: pip install zopfli)"
-_zipped = subprocess.run(["node", HERE + "zipwrap.mjs", "Story Editor"], input=base64.b64encode(_packed).decode("ascii"), capture_output=True, text=True, check=True).stdout
+sys.path.insert(0, HERE + "lzma")
+import lzma_pack
+os.environ.setdefault("ESBUILD", HERE + "node_modules/.bin/esbuild")   # shrinks the unpacking script; build.py must give the same bytes every run
+_page, _info = lzma_pack.pack(_raw, title="Story Editor", encoding="base64", minifier="esbuild", tune=True)
+_zipped = _page.decode("latin-1")
 open(HERE + "story-editor.html", "w", encoding="utf8").write(_zipped)
-print("zipped story-editor.html with %s: %d KB plain -> %d KB" % (_how, len(_raw) // 1024, len(_zipped.encode("utf8")) // 1024))
+print("packed story-editor.html with LZMA (lc=%d pb=%d): %d KB plain -> %d KB" % (_info["lc"], _info["pb"], len(_raw) // 1024, len(_page) // 1024))
 open(HERE + "story-editor.artifact.html", "w", encoding="utf8").write(artifact)
 print("built story-editor.html (%d KB plain), stamped %s" % (len(standalone.encode("utf8")) // 1024, STAMP))
 
@@ -227,7 +224,7 @@ print("built story-editor.html (%d KB plain), stamped %s" % (len(standalone.enco
 #      "Change" is against the previous build (kept in sizes-last.json).
 BUDGETS = {  # name: ceiling in bytes (the file itself, not gzip)
     "Editor (story-editor.html)": 545000,   # the plain page (raised to 545,000 on Oct 8 night for the map icon toolbar, start-page rule, drag handles, first-time tour and many more checker rules; raised to 540,000 on Oct 8 evening for the Write-tab batches: page picker, history, side toggles, split, paste, templates, phone bar, wide layout; tightened to 520,000 when they were done; was 500,000 on Oct 8 for the Game tab with its live preview; was 490,000; raised from 470,000 for find and replace, unfinished flags, reach reports, the manuscript, Oct 8 2026; now about 2% headroom, so it stays)
-    "Editor as delivered (zipped)": 258000, # what the file on disk weighs
+    "Editor as delivered (packed)": 232000, # what the file on disk weighs
     "The Keeper\u2019s Light (the built-in example)": 57500,
     "Standard 25-page game": 49000,
     "Standard 25-page game, Place code on": 52500,
@@ -236,7 +233,7 @@ sizes = json.loads(subprocess.run(["node", HERE + "budget.mjs", HERE + "story-ed
 rows = [("Editor (story-editor.html)", sizes["editor"])] + [(g["name"], g) for g in sizes["games"]]
 import gzip as _gz
 _zb = _zipped.encode("utf8")
-rows.insert(1, ("Editor as delivered (zipped)", {"bytes": len(_zb), "gzip": len(_gz.compress(_zb, 9))}))
+rows.insert(1, ("Editor as delivered (packed)", {"bytes": len(_zb), "gzip": len(_gz.compress(_zb, 9))}))
 try:
     last = json.load(open(HERE + "sizes-last.json"))
 except (OSError, ValueError):

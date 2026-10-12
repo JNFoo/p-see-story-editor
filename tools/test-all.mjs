@@ -6,7 +6,7 @@
    The browser suites (editor/qa) need Firefox/Chromium and are run separately: see editor/qa/README.md.
 
    Copyright (c) 2026 JNFoo. MIT License. */
-import { spawnSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { readdirSync, existsSync } from 'node:fs';
 
 const root = new URL('../', import.meta.url).pathname;
@@ -18,14 +18,26 @@ const steps = [
     .map(p => [`${p} tests`, ['node', '--test', ...readdirSync(`${root}packages/${p}/test`).filter(f => f.endsWith('.test.mjs')).map(f => `packages/${p}/test/${f}`)]]),
   ['editor contract test', ['node', 'editor/contract.mjs', '200', '1']]
 ];
+/* Two at a time (the machine has two cores; the longest step, story-map, runs on its own worker from the start). */
+const run = ([name, cmd]) =>
+  new Promise(done => {
+    const t = Date.now();
+    const kid = spawn(cmd[0], cmd.slice(1), { cwd: root });
+    let out = '';
+    kid.stdout.on('data', d => (out += d));
+    kid.stderr.on('data', d => (out += d));
+    kid.on('close', code => done({ name, ok: code === 0, out, sec: (Date.now() - t) / 1000 }));
+  });
 let bad = 0;
-for (const [name, cmd] of steps) {
-  const t = Date.now();
-  const r = spawnSync(cmd[0], cmd.slice(1), { cwd: root, encoding: 'utf8' });
-  const ok = r.status === 0;
-  if (!ok) bad++;
-  console.log(`${ok ? 'pass' : 'FAIL'}  ${((Date.now() - t) / 1000).toFixed(1).padStart(5)} s  ${name}`);
-  if (!ok) console.log((r.stdout + r.stderr).split('\n').slice(-25).join('\n'));
-}
+const queue = steps.slice().sort((a, b) => (/story-map/.test(b[0]) ? 1 : 0) - (/story-map/.test(a[0]) ? 1 : 0));
+const worker = async () => {
+  for (let step; (step = queue.shift()); ) {
+    const r = await run(step);
+    if (!r.ok) bad++;
+    console.log(`${r.ok ? 'pass' : 'FAIL'}  ${r.sec.toFixed(1).padStart(5)} s  ${r.name}`);
+    if (!r.ok) console.log(r.out.split('\n').slice(-25).join('\n'));
+  }
+};
+await Promise.all([worker(), worker()]);
 console.log(bad ? `\n${bad} step(s) failed` : '\nall green');
 process.exit(bad ? 1 : 0);

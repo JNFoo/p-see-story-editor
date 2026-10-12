@@ -5,3 +5,4 @@ editor/qa/work/
 editor/qa/.stamp
 editor/qa/counts.json
 *.whl
+__pycache__/

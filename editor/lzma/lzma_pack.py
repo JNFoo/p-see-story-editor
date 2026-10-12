@@ -86,7 +86,7 @@ def decoder_source():
 
 def pack(data, title="", head="", encoding="bytes", minifier="auto", tune=False):
     best = None
-    grid = [(4, 0, 0)] if not tune else [(lc, 0, pb) for lc in range(0, 5) for pb in range(0, 3)]
+    grid = [(4, 0, 0)] if not tune else tune if isinstance(tune, list) else [(lc, 0, pb) for lc in range(0, 5) for pb in range(0, 3)]   # (editor copy) tune may also be a list of (lc, lp, pb) to try
     for lc, lp, pb in grid:
         z = lzma_raw(data, lc, lp, pb)
         if best is None or len(z) < len(best[0]):

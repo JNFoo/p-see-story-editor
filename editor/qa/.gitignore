@@ -3,3 +3,4 @@ logs/
 work/
 .stamp
 counts.json
+times.json

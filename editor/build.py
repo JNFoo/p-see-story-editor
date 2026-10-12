@@ -211,7 +211,7 @@ _raw = standalone.encode("utf8")
 sys.path.insert(0, HERE + "lzma")
 import lzma_pack
 os.environ.setdefault("ESBUILD", HERE + "node_modules/.bin/esbuild")   # shrinks the unpacking script; build.py must give the same bytes every run
-_page, _info = lzma_pack.pack(_raw, title="Story Editor", encoding="base64", minifier="esbuild", tune=True)
+_page, _info = lzma_pack.pack(_raw, title="Story Editor", encoding="base64", minifier="esbuild", tune=[(1, 0, 0), (2, 0, 0), (3, 0, 0)])   # three settings, 0.5 s; the full 15-setting search (2.7 s) saved at most 100 bytes more
 _zipped = _page.decode("latin-1")
 open(HERE + "story-editor.html", "w", encoding="utf8").write(_zipped)
 print("packed story-editor.html with LZMA (lc=%d pb=%d): %d KB plain -> %d KB" % (_info["lc"], _info["pb"], len(_raw) // 1024, len(_page) // 1024))

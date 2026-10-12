@@ -51,6 +51,7 @@ Environment:
 |---|---|
 | `FIREFOX_PATH` | Path to a stock Firefox binary (required to launch). `FIREFOX_158` is accepted as an alias. |
 | `QA_NODE_MODULES` | Extra `node_modules` folder searched for `puppeteer` / `playwright` if a normal `require` does not find them (`NODE_PATH` works too). |
+| `QA_FIREFOX_PREFS` | JSON of extra Firefox preferences for every browser the Firefox engine launches, for example `{"ui.prefersReducedMotion":1}` to skip animation work in tests. |
 | `PROFILE=1` | At exit, print where the time went per kind of call. |
 | `FIXED_WAITS=1` | Make `waitForTimeout` wait the full time instead of stopping early once the page has settled. |
 | `SHOTS=1` | Take screenshots (`page.screenshot` does nothing otherwise, because nobody looks at them in a routine run). |

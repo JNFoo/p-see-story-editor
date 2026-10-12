@@ -304,7 +304,7 @@ class Browser {
 
 exports.firefox = {
   async launch(o = {}) {
-    const b = await puppeteer.launch({ browser: 'firefox', executablePath: FIREFOX, headless: o.headless !== false, args: [] });
+    const b = await puppeteer.launch({ browser: 'firefox', executablePath: FIREFOX, headless: o.headless !== false, args: [], extraPrefsFirefox: { ...JSON.parse(process.env.QA_FIREFOX_PREFS || '{}'), ...(o.prefs || {}) } });
     return new Browser(b);
   }
 };

@@ -37,6 +37,7 @@ const SUITES = [
   S('ffsmoke', 'ffsmoke.js', EDITOR, true, ['firefox']),
   S('packed', 'packed-check.js', ['build.py', 'lzma/lzma_pack.py', 'lzma/lzma-decode.js'], true),
   S('nosave', 'nosave.js', ['player.js', 'game.css', 'core.js'], true),
+  S('motion', 'motion.js', ['ui5-app.js', 'ui2-widgets.js', 'ui.css'], true),
   S('touch1', 'touch1.js', EDITOR, true, ['chromium']),
   S('top10-export', 'top10-export.js', ['core.js', 'player.js', 'game.css', 'ui5-app.js'], true),
   S('top10-player', 'top10-player.js', ['core.js', 'player.js', 'game.css'], true),
@@ -80,6 +81,13 @@ const PORT = String(20000 + Math.floor(Math.random() * 20000)); /* a port of its
 process.env.QA_PORT = PORT;
 const server = spawn('python3', ['-m', 'http.server', PORT, '--bind', '127.0.0.1'], { cwd: HERE + 'work', stdio: 'ignore' });
 process.on('exit', () => { try { server.kill(); } catch (e) { /* gone */ } });
+/* the first suite to need the server must not start before it is listening (it used to fail once, then pass on the retry) */
+const waitForServer = async () => {
+  for (let i = 0; i < 100; i++) {
+    if (await new Promise(ok => { const c = require('net').connect(+PORT, '127.0.0.1'); c.on('connect', () => { c.destroy(); ok(true); }); c.on('error', () => ok(false)); })) return;
+    await new Promise(r => setTimeout(r, 100));
+  }
+};
 
 /* the jobs for this tier */
 const jobs = [];
@@ -121,15 +129,13 @@ const COUNTS = !args.includes('--reset-counts') && fs.existsSync(countsFile) ? J
 const rows = [];
 let bad = 0;
 const T0 = Date.now();
-/* two lanes (Firefox, Chromium) run side by side; inside a lane the suites run one after another, so a lane's printed lines stay in order */
-const lanes = {};
-for (const job of jobs) (lanes[job.lane || 'other'] = lanes[job.lane || 'other'] || []).push(job);
-/* without a Chromium lane (every tier but "full"), the single Firefox lane is split in two so both processor cores work */
-if (!lanes.chromium && lanes.firefox && lanes.firefox.length > 3) {
-  const all = lanes.firefox;
-  lanes.firefox = all.filter((_, i) => i % 2 === 0);
-  lanes.firefox2 = all.filter((_, i) => i % 2 === 1);
-}
+/* A pool of workers takes the longest suites first (by how long each took last time, in times.json), so no worker is left with one long suite at
+   the end. Suites spend most of their time waiting for the page (about 40% of the two cores were busy with two lanes), so three run at once;
+   QA_JOBS=n changes that. Each worker prints a line when its suite ends. */
+const timesFile = HERE + 'times.json';
+const TIMES = fs.existsSync(timesFile) ? JSON.parse(fs.readFileSync(timesFile, 'utf8')) : {};
+const queue = jobs.slice().sort((x, y) => (TIMES[y.label] ?? 40) - (TIMES[x.label] ?? 40));
+const WORKERS = Math.max(1, +process.env.QA_JOBS || 3);
 const report = (job, mark, r) => {
   fs.writeFileSync(LOGS + job.label.replace(/\W+/g, '-') + '.log', r.out);
   rows.push({ mark, sec: r.sec, label: job.label, passes: r.passes });
@@ -137,23 +143,24 @@ const report = (job, mark, r) => {
   if (verbose) console.log(r.out.split('\n').map(l => '        ' + l).join('\n'));
   if (mark === 'FAIL') console.log(r.fails.slice(0, 8).map(l => '        ' + l.slice(0, 200)).join('\n') + `\n        (full output: qa/logs/${job.label.replace(/\W+/g, '-')}.log)`);
 };
-const runLane = async list => {
-  for (const job of list) {
-    let r = await run(job);
-    let mark = 'pass';
-    if (!r.ok) {
-      fs.writeFileSync(LOGS + job.label.replace(/\W+/g, '-') + '.first-try.log', r.out); /* kept, so a flaky pass* can be looked into */
-      const r2 = await run(job);
-      r2.sec += r.sec;
-      if (r2.ok) mark = 'pass*';
-      else { mark = 'FAIL'; bad++; }
-      r = r2;
-    }
-    report(job, mark, r);
+const runOne = async job => {
+  let r = await run(job);
+  let mark = 'pass';
+  if (!r.ok) {
+    fs.writeFileSync(LOGS + job.label.replace(/\W+/g, '-') + '.first-try.log', r.out); /* kept, so a flaky pass* can be looked into */
+    const r2 = await run(job);
+    r2.sec += r.sec;
+    if (r2.ok) mark = 'pass*';
+    else { mark = 'FAIL'; bad++; }
+    r = r2;
   }
+  report(job, mark, r);
 };
+const worker = async () => { for (let job; (job = queue.shift()); ) await runOne(job); };
 (async () => {
-await Promise.all(Object.values(lanes).map(runLane));
+await waitForServer();
+await Promise.all(Array.from({ length: WORKERS }, worker));
+if (!bad) { rows.forEach(r => { TIMES[r.label] = Math.round(r.sec); }); fs.writeFileSync(timesFile, JSON.stringify(TIMES, null, 1)); }
 const slow = rows.slice().sort((a, b) => b.sec - a.sec).slice(0, 3).map(r => `${r.label} ${r.sec.toFixed(0)} s`).join(', ');
 console.log(`\n${tier}: ${rows.length} suites, ${rows.filter(r => r.mark === 'pass').length} pass, ${rows.filter(r => r.mark === 'pass*').length} pass* (flaky), ${bad} FAIL, ${((Date.now() - T0) / 1000).toFixed(0)} s in all. Slowest: ${slow}`);
 if (!bad && tier === 'full' && !only) { /* the check counts of this all-green full run are what later runs are held to */

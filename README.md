@@ -53,3 +53,9 @@ editor does (roughly Chrome/Edge 80, Firefox 74, iOS 13.4 for games; Chrome/Edge
 ## Fonts
 
 The Inter Tight typeface is used under the SIL Open Font License.
+
+## More from JNFoo
+
+- [Fancy, the Banana](https://jnfoo.github.io/fancy-banana/): a one-tap flying arcade game ([code](https://github.com/JNFoo/fancy-banana))
+- [Apple Press](https://jnfoo.github.io/apple-press/): a clicker game ([code](https://github.com/JNFoo/apple-press))
+- [JS-modules](https://github.com/JNFoo/JS-modules): small open-source (MIT) JavaScript building blocks for single-file web games and offline pages

@@ -129,6 +129,7 @@ function renderStatus() {
     if (!np && a.truncated) chip('gray', '?', 'Not fully checked', '', 'The story is too large to check completely, so some problems may not show. Open the Check tab.', () => setView('check'));
     else if (!np && !nw) chip('ok', '✓', `No problems found: ${a.endings.length ? `${a.endings.length} ending${a.endings.length === 1 ? '' : 's'}` : `${project.passages.length} pages`}`, '', 'Every ending can be reached and nothing traps a player', () => setView('check'));
   }
+  if (writing.length) chip('gray', '✎', `${writing.length} writing note${writing.length === 1 ? '' : 's'}`, '', 'Repeated words, names spelled two ways, long paragraphs and choices that read alike. Open the Check tab.', () => setView('check'));
   /* saving */
   if (!storageOk) {
     chip('bad', '⚠', 'Not kept in this browser. Save a file.', '', 'This browser refuses to keep the story between visits');

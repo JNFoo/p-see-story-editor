@@ -80,6 +80,7 @@ body.splashing #brandlogo{opacity:0}
 .schip{display:inline-flex;gap:4px;align-items:center;border:1px solid var(--line);border-radius:99px;padding:2px 9px;background:var(--node);color:var(--muted);font:inherit}
 .schip.ok{color:var(--ok);border-color:var(--ok);background:var(--okbg)}.schip.bad{color:var(--signal);border-color:var(--signal);background:var(--signalbg)}.schip.warn{color:var(--warn);border-color:var(--warn);background:var(--warnbg)}.schip.btn{padding:2px 9px;border-radius:4px;color:var(--fg)}
 button.schip{cursor:pointer}button.schip:hover{border-color:var(--lamp)}
+.wlims{align-items:center;gap:6px;flex-wrap:wrap}.wlim{display:inline-flex;align-items:center;gap:6px}.wgroup{font-weight:650;margin:12px 0 4px}.outprev{margin:8px 0;min-height:1.5em}.outprev .good{padding:6px 10px;border:1px solid var(--ok);background:var(--okbg);border-radius:4px;color:var(--ok)}
 .histlist{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:4px;margin:10px 0;max-height:50vh;overflow:auto}
 .histrow{display:flex;justify-content:space-between;gap:12px;text-align:start;border:0;border-bottom:1px solid var(--line);background:var(--node);color:var(--fg);padding:8px 12px;font:inherit;cursor:pointer}
 .histrow:last-child{border-bottom:0}.histrow:first-child{font-weight:600}.histrow:hover{background:var(--lampbg)}.histrow time{color:var(--muted);font-variant-numeric:tabular-nums}
@@ -294,7 +295,7 @@ textarea.in.mono{font:12px/1.4 ui-monospace,Menlo,Consolas,monospace}
 @media (max-width:820px){
   #tabs{padding-left:max(8px,env(safe-area-inset-left))}
   #tabrow{flex-wrap:wrap}#tabs{flex-basis:100%}
-  #statusline{flex:1 1 100%;padding:4px 12px;overflow-x:auto;border-top:1px solid var(--line)}.slong,.sfile{display:none}
+  #statusline{flex:1 1 100%;flex-wrap:wrap;padding:4px 12px;border-top:1px solid var(--line)}.slong,.sfile{display:none}
   #drawerbar{display:flex;gap:8px;padding:6px 12px;background:var(--panel);border-bottom:1px solid var(--line)}
   #drawerbar[hidden]{display:none}
   #side,#itemside{position:fixed;top:0;bottom:0;z-index:40;width:min(86vw,320px);box-shadow:var(--shadow);padding-top:env(safe-area-inset-top);transition:transform .2s ease;}
@@ -376,7 +377,8 @@ textarea.in.mono{font:12px/1.4 ui-monospace,Menlo,Consolas,monospace}
 .stats{display:flex;gap:2px 12px;flex-wrap:wrap;justify-content:flex-end;font-size:.78rem;color:var(--muted);white-space:nowrap}
 .stat{display:inline-flex;align-items:center;gap:4px;cursor:help}
 .stat b{color:var(--fg);font-weight:650;font-variant-numeric:tabular-nums}
-@media (max-width:1000px){.stats{order:20;flex:1 0 100%;justify-content:flex-start}}
+@media (max-width:1360px) and (min-width:1200px){#title{flex-basis:90px}.stats{gap:2px 9px;font-size:.74rem}}
+@media (max-width:1199px){.stats{order:20;flex:1 0 100%;justify-content:flex-start}}
 
 /* The splash always sits on white, so its icons use the light-theme colors in both themes. */
 #splash .ico-gift{color:#e06c00}#splash .ico-smile{color:#17934b}#splash .ico-frown{color:#d8332b}#splash .logo-heart{stroke:#c42f2a}

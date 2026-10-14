@@ -792,6 +792,7 @@ function scheduleCheck() {
 function runCheck() {
   const already = analysis && analysisFor === cur; // the map may have analyzed this exact version already
   freshAnalysis();
+  freshWriting();
   renderTop();
   if (view === 'write') {
     renderSide.list && renderSide.list();
@@ -940,6 +941,7 @@ function renderCheck(main) {
       wrap.appendChild(issue('warn', it));
     });
   }
+  wrap.appendChild(writingCard());
   const unfinished = project.passages.filter(p => p.todo);
   if (unfinished.length) {
     // the author's own bookmarks; never a problem, never shown to players

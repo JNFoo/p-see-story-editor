@@ -1,6 +1,6 @@
 # Interface ideas for the adult edition: what is built, what is next
 
-Source: the single-file UI research report (`knowledgebase-single-file/research/2026-10-14-single-file-ui/REPORT.md`, cards X01–X183) and its notes. That report was written for a children's product. This list keeps what helps adult authors and readers and drops the rest. Card numbers are the report's.
+Source: the single-file UI research report (in the knowledgebase repo, folder research/2026-10-14-single-file-ui; cards X01–X183) and its notes. That report was written for a children's product. This list keeps what helps adult authors and readers and drops the rest. Card numbers are the report's.
 
 Rules for every phase: no sound, no network, nothing added to the exported game unless it is an optional module, one phase at a time, each phase ends with its tests green and a size note in the CHANGELOG.
 
@@ -55,7 +55,14 @@ Each is an optional `klFeat` module, so a story that does not use it pays nothin
 
 ## Phase 5: Helper features (late; no network)
 
-Any feature that suggests or rewrites text works by copy and paste only: it shows a preview first, nothing changes until the author accepts, and one Undo removes it. It never contacts anything. The items for this phase get their own question round when the phase starts.
+Offline only: a helper reads text the author already has or pastes in, shows a preview where it changes anything, and one Undo reverses it. No AI, no network (chosen Oct 14).
+
+Round 1, built 2026.10.14:
+
+- **File → Paste an outline…** One page per line at the left edge; indented lines under it are choices ("Choice words → Page name", also `->` and `=>`) or, with no arrow, paragraphs; "(ending)", "(good ending)", "(bad ending)" after a page name. Bullets and numbers in front are ignored. A live preview counts pages and choices and lists what could not be used; pages named only in a choice are added empty; a name already in the story gets a number; in a story that has only the empty first page, the outline replaces it and its first page becomes the start.
+- **Writing notes in the Check tab** (collapsed section; count in the status line): words typed twice in a row, a word used again and again on one page, a name that may be a typo for a commonly used spelling (one letter off, never written as an everyday word), choices on a page that read almost alike, paragraphs and pages over a size set in the section (150 and 600 words by default). Each note has Open page and Ignore; ignored notes are remembered in this browser only, with a button to show them again.
+
+Later rounds get their own question round.
 
 ## Dropped (made for children, or about sound or networks)
 

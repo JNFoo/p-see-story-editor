@@ -74,6 +74,7 @@ function joinAnd(parts) {
      format: 'story-editor', version: 1, id, title, author, start,
      gameFont: 'system',     // optional: exported games use the device's own font instead of the embedded one (smaller file)
      game:     { back, tracker, comfort, odds, place, pal }, // optional reader options (see GAME_OPTIONS); only non-default values are kept
+     lang0c:   'en',         // optional: the story's own language code (en, es, ar...), used for the game's lang and direction
      lang0:    'English',    // optional: what the story's own language is called in the game's language picker
      langs:    [{ id, name, code, t: { 'source text': 'translation' } }],   // optional translations (see section "Translations"); the key is the exact source text
      items:    [{ id, name, kind: 'object' | 'state' | 'stat', show,
@@ -110,7 +111,7 @@ function joinAnd(parts) {
  * without the checker being taught about it: list the field below, then make analyze() use it.
  */
 const FIELD_CONTRACT = {
-  project: { rules: ['start', 'items', 'givens', 'passages'], display: ['format', 'version', 'id', 'title', 'author', 'gameFont', 'game', 'rev', 'savedAt', 'lang0', 'langs'] },
+  project: { rules: ['start', 'items', 'givens', 'passages'], display: ['format', 'version', 'id', 'title', 'author', 'gameFont', 'game', 'rev', 'savedAt', 'lang0', 'lang0c', 'langs'] },
   item: { rules: ['id', 'kind', 'show', 'lo', 'hi', 'start'], display: ['name', 'names'] },
   given: { rules: ['options'], display: ['id', 'question'] },
   passage: { rules: ['id', 'ending', 'blocks', 'gives', 'takes', 'adds', 'sends', 'choices'], display: ['name', 'heading', 'valence', 'todo', 'color', 'note'] },
@@ -660,6 +661,7 @@ function normalizeProject(raw) {
   const langs = cleanLangs(raw.langs);
   if (langs.length) p.langs = langs;
   if (typeof raw.lang0 === 'string' && raw.lang0.trim() && raw.lang0.trim() !== 'English') p.lang0 = raw.lang0.trim().slice(0, LANG_NAME_MAX);
+  if (typeof raw.lang0c === 'string' && LANG_CODE.test(raw.lang0c.trim()) && raw.lang0c.trim().toLowerCase() !== 'en') p.lang0c = raw.lang0c.trim();
   pruneVirtual(p);
   if (fileVersion > STORY_VERSION && !startFixNote) startFixNote = `This story was saved by a newer version of the editor (file format ${fileVersion}; this editor reads format ${STORY_VERSION}). It opened, but anything this editor does not know about was left out. Do not save over the original file.`;
   return p;
@@ -677,6 +679,8 @@ function normalizeProject(raw) {
 
 const LANG_MAX = 12;
 const LANG_NAME_MAX = 40;
+const LANG_CODE = /^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})?$/;
+const LANG_RTL = /^(ar|he|fa|ur|yi|ps|sd|ug|dv)$/i; // languages written right to left (the game sets dir from the code)
 const LANG_TEXT_MAX = 4000;
 const LANG_ENTRIES_MAX = 8000;
 /** The fixed words of the game itself that a translation can cover (the player calls T() on each). */
@@ -740,7 +744,7 @@ function cleanLangs(raw) {
         count++;
       });
     const code = String(L.code || '').trim();
-    out.push({ id, name: String(L.name || 'Language').trim().slice(0, LANG_NAME_MAX) || 'Language', code: /^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})?$/.test(code) ? code : '', t });
+    out.push({ id, name: String(L.name || 'Language').trim().slice(0, LANG_NAME_MAX) || 'Language', code: LANG_CODE.test(code) ? code : '', t });
   });
   return out;
 }
@@ -3193,6 +3197,7 @@ function exportStory(project) {
     if (g[k] !== GAME_DEFAULTS[k]) go[k] = g[k];
   });
   put(out, 'game', go);
+  if (project.lang0c) out.l0c = project.lang0c;
   if ((project.langs || []).length) {
     out.l0 = project.lang0 || 'English';
     out.langs = project.langs.map(L => xlCompile(project, L, out));
@@ -3455,12 +3460,13 @@ function buildGameHtml(project, assets) {
   return `<!doctype html>
 <!-- ${title.replace(/--/g, '- -')}: an interactive story. Open it in any web browser, on any device. It works offline and
      never contacts the internet; your place in the story is kept in this browser. Made with Story Editor. -->
-<html lang="en">
+<html lang="${LANG_CODE.test(project.lang0c || '') ? project.lang0c : 'en'}"${LANG_CODE.test(project.lang0c || '') && LANG_RTL.test(project.lang0c.split('-')[0]) ? ' dir="rtl"' : ''}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="${CSP_OFFLINE}">
 <meta name="color-scheme" content="light dark">
+<meta name="text-scale" content="scale">
 <meta name="generator" content="Story Editor">
 <link rel="icon" href="data:,">
 <title>${title}</title>

@@ -1002,6 +1002,7 @@ function renderTop() {
     }
     nav.appendChild(b);
   });
+  renderStatus();
   /* On narrow screens the two side lists are drawers; their buttons live in their own bar under the tabs. */
   const bar = $('#drawerbar');
   bar.textContent = '';
@@ -1728,6 +1729,7 @@ function init() {
   });
   $('#undo').addEventListener('click', undo);
   $('#redo').addEventListener('click', redo);
+  wireHistory();
   $('#help').addEventListener('click', showGuide);
   $('#export').addEventListener('click', quickExport);
   $('#savebtn').insertBefore(icon('save', 16), $('#savebtn').firstChild);

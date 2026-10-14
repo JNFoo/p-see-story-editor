@@ -81,7 +81,7 @@ await pg.click('#help');ok(await pg.isVisible('.dlg.guide'),'quick guide opens')
 // export and play offline
 await pg.click('#export');await pg.click('#export');          // a double click
 await pg.waitForTimeout(150);
-ok(await pg.evaluate(()=>window.__saves.length===0 && !document.querySelector('#toast:not([hidden]) .toastbtn')),'export writes nothing (and says nothing) while the Save window is open');
+ok(await pg.evaluate(()=>window.__saves.length===0 && ![...document.querySelectorAll('#toast:not([hidden]) .toastbtn')].some(b=>b.textContent.trim()!=='Redo')),'export writes nothing (and says nothing) while the Save window is open');
 await pg.waitForTimeout(700);
 ok(await pg.evaluate(()=>window.__saves.length===1 && window.__pickerOpen===1),'export saves exactly once, after the choice, even after a double click');
 ok(await pg.isVisible('#toast .toastbtn'),'one-click export offers "Show the code"');

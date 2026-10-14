@@ -958,6 +958,7 @@ function klFeatComfort(P) {
  * else in the player needs to know a second language exists.
  */
 function klFeatLang(P) {
+  const KL_RTL = /^(ar|he|fa|ur|yi|ps|sd|ug|dv)$/i; // languages written right to left (inside the module: only the function itself is exported)
   const S = P.story;
   const Ls = S.langs;
   if (!Ls || !Ls.length) return;
@@ -999,6 +1000,17 @@ function klFeatLang(P) {
     if (mine && j >= 0) cur = j;
   }
   set(cur);
+  /* the page says which language it is in and which way it reads, so a screen reader picks the right voice and a right-to-left language sits right */
+  const code = () => (cur < 0 ? S.l0c : Ls[cur].c) || '';
+  P.on('rendered', wrap => {
+    const c = code();
+    if (c) wrap.lang = c;
+    if (c && KL_RTL.test(c.split('-')[0])) wrap.dir = 'rtl';
+    if (P.opts.persist && c) {
+      document.documentElement.lang = c;
+      document.documentElement.dir = KL_RTL.test(c.split('-')[0]) ? 'rtl' : 'ltr';
+    }
+  });
   P.on('barRight', () => {
     const sel = P.el('select', 'kl-lang');
     sel.setAttribute('aria-label', 'Language');

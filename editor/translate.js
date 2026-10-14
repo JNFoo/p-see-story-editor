@@ -173,7 +173,15 @@ function translationsDialog() {
       else delete project.lang0;
       refresh();
     });
-    d.appendChild(h('label', { class: 'field' }, [h('span', { class: 'sl', text: 'The story’s own language is called' }), base]));
+    const base0 = h('input', { class: 'in chipnum', type: 'text', maxlength: '12', 'aria-label': 'The story’s own language code, like en or ar (sets the game’s language and reading direction)', placeholder: 'en', value: project.lang0c || '' });
+    base0.addEventListener('change', () => {
+      const v = base0.value.trim();
+      if (LANG_CODE.test(v) && v.toLowerCase() !== 'en') project.lang0c = v;
+      else delete project.lang0c;
+      base0.value = project.lang0c || '';
+      refresh();
+    });
+    d.appendChild(h('label', { class: 'field' }, [h('span', { class: 'sl', text: 'The story’s own language is called' }), h('div', { class: 'row' }, [base, base0])]));
     const list = h('div', { class: 'langlist' });
     (project.langs || []).forEach((L, n) => {
       const cov = xlCoverage(project, L);
@@ -186,7 +194,7 @@ function translationsDialog() {
       });
       code.addEventListener('change', () => {
         const v = code.value.trim();
-        L.code = /^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})?$/.test(v) ? v : '';
+        L.code = LANG_CODE.test(v) ? v : '';
         code.value = L.code;
         refresh();
       });

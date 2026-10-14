@@ -542,6 +542,7 @@ function normalizeProject(raw) {
   const langs = cleanLangs(raw.langs);
   if (langs.length) p.langs = langs;
   if (typeof raw.lang0 === 'string' && raw.lang0.trim() && raw.lang0.trim() !== 'English') p.lang0 = raw.lang0.trim().slice(0, LANG_NAME_MAX);
+  if (typeof raw.lang0c === 'string' && LANG_CODE.test(raw.lang0c.trim()) && raw.lang0c.trim().toLowerCase() !== 'en') p.lang0c = raw.lang0c.trim();
   pruneVirtual(p);
   if (fileVersion > STORY_VERSION && !startFixNote) startFixNote = `This story was saved by a newer version of the editor (file format ${fileVersion}; this editor reads format ${STORY_VERSION}). It opened, but anything this editor does not know about was left out. Do not save over the original file.`;
   return p;
@@ -561,6 +562,8 @@ function normalizeProject(raw) {
 const LANG_MAX = 12;
 
 const LANG_NAME_MAX = 40;
+
+const LANG_CODE = /^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})?$/;
 
 const LANG_TEXT_MAX = 4000;
 
@@ -590,7 +593,7 @@ function cleanLangs(raw) {
         count++;
       });
     const code = String(L.code || '').trim();
-    out.push({ id, name: String(L.name || 'Language').trim().slice(0, LANG_NAME_MAX) || 'Language', code: /^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})?$/.test(code) ? code : '', t });
+    out.push({ id, name: String(L.name || 'Language').trim().slice(0, LANG_NAME_MAX) || 'Language', code: LANG_CODE.test(code) ? code : '', t });
   });
   return out;
 }

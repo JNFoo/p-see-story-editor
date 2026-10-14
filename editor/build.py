@@ -16,7 +16,7 @@ Sources, in the order they appear in the finished file:
                                 -> <script type="application/json" id="game-parts"> (code and styles in one piece per optional feature)
   keepers-light.project.json    the built-in example story                -> <script type="application/json" id="starter-story">
   ui.css                        styles for the editor                     -> <style>
-  core.js, maplayout.js, twine.js, routes.js
+  core.js, maplayout.js, twine.js, routes.js, changes.js
                                 PART 1: story model, game rules, checker, export; map layout; Twine import (global functions)
   player.js                     PART 2: plays a story (global function)
   ui1-state.js ... ui5-app.js   PART 3, wrapped in one function so it leaks nothing
@@ -81,7 +81,7 @@ GAME = json.loads(subprocess.run(["node", HERE + "build-game.mjs"], capture_outp
 # "<" is escaped so no text can end the tag early. buildGameHtml (core.js) writes into each game only the pieces its story uses.
 GAME_PARTS = json.dumps(GAME, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
 
-UI_PARTS = ["ui1-state.js", "ui2-widgets.js", "ui3-write.js", "ui4-map.js", "ui4-views.js", "ui4-speed.js", "translate.js", "ui5-app.js"]
+UI_PARTS = ["ui1-state.js", "ui2-widgets.js", "ui3-write.js", "ui4-map.js", "ui4-views.js", "ui4-speed.js", "ui4-status.js", "translate.js", "ui5-app.js"]
 
 # ---- the example story, as compact JSON (it is data; the readable copy is keepers-light.project.json).
 #      "<" is escaped so no text can end the tag early.
@@ -90,7 +90,7 @@ starter = starter.replace("<", "\\u003c")
 
 # ---- the editor's script
 ui = "(function () {\n'use strict';\n\n" + "\n".join(read(f) for f in UI_PARTS) + "\n})();\n"
-script = "'use strict';\n\n" + read("core.js") + "\n" + read("maplayout.js") + "\n" + read("twine.js") + "\n" + read("routes.js") + "\n" + read("player.js") + "\n" + ui
+script = "'use strict';\n\n" + read("core.js") + "\n" + read("maplayout.js") + "\n" + read("twine.js") + "\n" + read("routes.js") + "\n" + read("changes.js") + "\n" + read("player.js") + "\n" + ui
 script = re.sub(r"</(script)", r"<\\/\1", script, flags=re.I)  # any capitalization ends a script tag in HTML
 # ---- the version stamp shown on the splash: when this file was built, as YYYY.MM.DD.HHMM in US Eastern time, 24-hour clock, e.g. "2026.10.08.2320" (the owner's format from Oct 8 2026 on)
 now = datetime.datetime.now(ZoneInfo("America/New_York"))
@@ -136,13 +136,14 @@ BODY = """<!-- Page frame. The editor fills #side, #main and #itemside with Java
     </div>
     <button class="btn" id="undo" type="button" title="Undo the last change (Ctrl+Z)" aria-label="Undo">↶<span class="lbl"> Undo</span></button>
     <button class="btn" id="redo" type="button" title="Redo (Ctrl+Y)" aria-label="Redo">↷<span class="lbl"> Redo</span></button>
+    <button class="btn" id="hist" type="button" title="History: the latest changes, and a way back to any of them" aria-label="History" style="padding-inline:7px">▾</button>
     <input id="title" aria-label="Story title" placeholder="Story title" maxlength="120" title="The title of your story. Players see it above each page.">
     <div class="stats" id="stats" role="group" aria-label="Story totals"></div>
     <button class="btn" id="help" type="button" title="Quick guide" aria-label="Quick guide">?</button>
     <button class="btn primary" id="export" type="button" title="Turn your story into one HTML file anyone can play">Export<span class="lbl"> game</span></button>
   </header>
   <div class="banner" id="nosave" hidden style="margin:0;border-width:0 0 1px">This browser is not keeping your work between visits. Press Save often to keep it in a file.</div>
-  <nav id="tabs" role="tablist" aria-label="Sections" aria-controls="main"></nav>
+  <div id="tabrow"><nav id="tabs" role="tablist" aria-label="Sections" aria-controls="main"></nav><div id="statusline" aria-label="Status"></div></div>
   <div id="drawerbar" hidden></div>
   <div id="body">
     <aside id="side" aria-label="Pages"></aside>

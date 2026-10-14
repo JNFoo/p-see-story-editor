@@ -222,7 +222,7 @@ function edgeMenu(from, ci) {
       fn() {
         c.to = '';
         refresh();
-        toast('The choice now leads nowhere. Undo is in the top bar.');
+        toast('The choice now leads nowhere.', 'Undo', undo);
       }
     },
     {
@@ -231,7 +231,7 @@ function edgeMenu(from, ci) {
       fn() {
         p.choices.splice(ci, 1);
         refresh();
-        toast('Choice deleted. Undo is in the top bar.');
+        toast('Choice deleted.', 'Undo', undo);
       }
     }
   ];

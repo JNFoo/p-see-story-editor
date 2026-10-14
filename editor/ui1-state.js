@@ -254,6 +254,7 @@ const BACKUP_KEY = `${STORE}-backup`; // the spare copy: the story as it was bef
 const DAMAGED_KEY = `${STORE}-damaged`; // an unreadable save, kept so nothing is destroyed by the spare taking over
 const BACKUP_EVERY = 10 * 60 * 1000;
 let lastBackup = 0;
+let lastLocalSave = 0; // when the autosave last wrote to this browser (shown in the status line)
 /** Is this text a whole story the editor could open? Checked before every save so a broken state never overwrites a good one. */
 function savable(text) {
   try {
@@ -294,6 +295,8 @@ function persistNow(forceSpare) {
       localStorage.setItem(STORE, cur);
     }
     keepSpare(before);
+    lastLocalSave = Date.now();
+    if (typeof renderStatus === 'function') renderStatus();
     if (!storageOk) {
       storageOk = true; // it works again (room was freed, or the browser let go)
       const w = $('#nosave');
@@ -302,6 +305,7 @@ function persistNow(forceSpare) {
   } catch (e) {
     storageOk = false;
     logError('autosave', e);
+    if (typeof renderStatus === 'function') renderStatus();
     const w = $('#nosave');
     if (w) w.hidden = false;
   }
@@ -336,7 +340,7 @@ document.addEventListener('visibilitychange', () => {
 let epoch = 0;
 let epochs = 0;
 /** The story as it is now, as a snapshot. */
-const snap = () => ({ s: cur, e: epoch });
+const snap = () => ({ s: cur, e: epoch, t: Date.now() });
 
 /** Adds a snapshot to the undo list, dropping the oldest ones when over budget. */
 function pushUndo(x) {
@@ -397,15 +401,38 @@ function restore(x) {
 }
 function undo() {
   if (!undoStack.length) return;
+  const said = stepInfo(undoStack.length - 1); // what this undo takes back, worked out before the story changes
   redoStack.push(snap());
+  if (said.pid) selId = said.pid;
   restore(popUndo());
   lastKey = '';
+  afterTimeTravel(`Undid: ${said.text}.`, said.pid);
 }
 function redo() {
   if (!redoStack.length) return;
+  const said = describeChange(cur, redoStack[redoStack.length - 1].s);
   pushUndo(snap());
+  if (said.pid) selId = said.pid;
   restore(redoStack.pop());
   lastKey = '';
+  afterTimeTravel(`Redid: ${said.text}.`, said.pid);
+}
+/** Goes back `k` steps in one move (the History list); Redo brings them back one by one. */
+function undoMany(k) {
+  k = Math.min(k, undoStack.length);
+  if (k < 1) return;
+  const said = stepInfo(undoStack.length - 1);
+  let x;
+  for (let i = 0; i < k; i++) {
+    redoStack.push(snap());
+    x = popUndo();
+    cur = x.s;
+    epoch = x.e;
+  }
+  if (said.pid) selId = said.pid;
+  restore(x);
+  lastKey = '';
+  afterTimeTravel(`Went back ${k} step${k === 1 ? '' : 's'}. Redo brings them back.`, '');
 }
 
 /** Swaps in a whole new story (open file, new story, example). Undo can bring the old one back. */

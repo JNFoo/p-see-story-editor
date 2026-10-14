@@ -1237,7 +1237,7 @@ function deletePage(p) {
     }
     if (selId === p.id || !byId(selId)) selId = project.passages[Math.max(0, i - 1)].id; // deleting some other page leaves the open page alone
     refresh();
-    toast('Page deleted. Undo is in the top bar.');
+    toast(`Deleted page ${chgName(p.name)}.`, 'Undo', undo);
   });
 }
 /** Makes a copy of a page just after it. */

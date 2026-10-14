@@ -32,7 +32,7 @@ export interface GameOptions { back: 'off' | 'remember' | 'reroll' | 'block'; tr
 export interface Lang { id: string; name: string; code: string; t: Record<string, string> }
 export interface Project {
   format: 'story-editor'; version: number; id: string; title: string; author: string; start: string; rev?: number; savedAt?: string;
-  gameFont?: 'system'; lang0?: string; langs?: Lang[]; game: GameOptions; items: Item[]; givens: Given[]; passages: Passage[];
+  gameFont?: 'system'; lang0?: string; lang0c?: string; langs?: Lang[]; game: GameOptions; items: Item[]; givens: Given[]; passages: Passage[];
 }
 
 export function makeProject(title?: string): Project;

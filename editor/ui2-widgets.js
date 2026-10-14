@@ -1204,6 +1204,8 @@ const ICON_PARTS = {
     ['path', { d: 'M2.3 9.3C3.6 10.9 5 12.6 6.4 14.4M6.2 9.1C4.9 10.8 3.6 12.5 2.4 14.4' }],
     ['path', { d: 'M9.8 9.2C10.5 10.2 11.1 11 11.8 11.8M13.9 9C13.1 10.3 12.5 11.1 11.8 11.8C11.7 12.8 11.8 13.7 11.9 14.6' }]
   ],
+  /* a check mark in a ring: the Check tab */
+  check: [['circle', { cx: 8, cy: 8, r: 6 }], ['path', { d: 'M5.2 8.2L7.2 10.2L11 5.9' }]],
   /* a bookmark: the author's "unfinished" flag on a page (filled when on, by the .on rule in ui.css) */
   todo: [['path', { d: 'M4 2.2H12V14L8 10.9L4 14Z' }]],
   /* a small folded note: the author's private note on a page */

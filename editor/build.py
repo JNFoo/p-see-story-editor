@@ -81,7 +81,7 @@ GAME = json.loads(subprocess.run(["node", HERE + "build-game.mjs"], capture_outp
 # "<" is escaped so no text can end the tag early. buildGameHtml (core.js) writes into each game only the pieces its story uses.
 GAME_PARTS = json.dumps(GAME, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
 
-UI_PARTS = ["ui1-state.js", "ui2-widgets.js", "ui3-write.js", "ui4-map.js", "ui4-views.js", "ui4-speed.js", "ui4-status.js", "ui4-helpers.js", "translate.js", "ui5-app.js"]
+UI_PARTS = ["ui1-state.js", "ui2-widgets.js", "ui3-write.js", "ui4-map.js", "ui4-views.js", "ui4-speed.js", "ui4-status.js", "ui4-helpers.js", "ui4-phone.js", "translate.js", "ui5-app.js"]
 
 # ---- the example story, as compact JSON (it is data; the readable copy is keepers-light.project.json).
 #      "<" is escaped so no text can end the tag early.
@@ -130,7 +130,7 @@ BODY = """<!-- Page frame. The editor fills #side, #main and #itemside with Java
       <div class="pop" id="menupop" hidden></div>
     </div>
     <button class="btn" id="savebtn" type="button" title="Save your story to a file (Ctrl+S)" aria-label="Save"><span class="lbl">Save</span></button>
-    <div class="menu">
+    <div class="menu mopt">
       <button class="btn" id="optbtn" type="button" title="Quick guide, shortcuts, light/dark, fonts, preferences and advanced features" aria-label="Options">⚙<span class="lbl"> Options</span></button>
       <div class="pop" id="optpop" hidden></div>
     </div>
@@ -141,6 +141,10 @@ BODY = """<!-- Page frame. The editor fills #side, #main and #itemside with Java
     <div class="stats" id="stats" role="group" aria-label="Story totals"></div>
     <button class="btn" id="help" type="button" title="Quick guide" aria-label="Quick guide">?</button>
     <button class="btn primary" id="export" type="button" title="Turn your story into one HTML file anyone can play">Export<span class="lbl"> game</span></button>
+    <div class="menu mmore">
+      <button class="btn" id="morebtn" type="button" title="More: history, options, the quick guide and Export" aria-label="More">⋯</button>
+      <div class="pop" id="morepop" hidden></div>
+    </div>
   </header>
   <div class="banner" id="nosave" hidden style="margin:0;border-width:0 0 1px">This browser is not keeping your work between visits. Press Save often to keep it in a file.</div>
   <div id="tabrow"><nav id="tabs" role="tablist" aria-label="Sections" aria-controls="main"></nav><div id="statusline" aria-label="Status"></div></div>
@@ -151,6 +155,7 @@ BODY = """<!-- Page frame. The editor fills #side, #main and #itemside with Java
     <aside id="itemside" aria-label="Items"></aside>
   </div>
   <div id="scrim"></div>
+  <div id="keyrow" hidden></div>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
 <div id="tip" role="tooltip" aria-hidden="true"></div>
@@ -187,7 +192,7 @@ standalone = """<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <meta http-equiv="Content-Security-Policy" content="%s">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="data:,">

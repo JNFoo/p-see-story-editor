@@ -1028,6 +1028,12 @@ function itemMenu(it) {
   return [
     { header: it.name },
     {
+      label: it.kind === 'stat' ? 'Add a change to this number on the open page' : 'Gets: the player gets it on the open page',
+      fn: () => giveToPage(it, false)
+    },
+    it.kind === 'stat' ? null : { label: 'Loses: the player loses it on the open page', fn: () => giveToPage(it, true) },
+    { sep: true },
+    {
       label: 'Move up',
       disabled: project.items.indexOf(it) === 0,
       fn: function () {
@@ -1067,7 +1073,7 @@ function renderItemSide() {
   side.textContent = '';
   side.appendChild(
     h('div', { class: 'sidehd' }, [
-      h('span', { class: 'sidehd-t' }, ['Items ', h('span', { class: 'hint tip', text: 'click = Gets · Shift+click = Loses · or drag' })]),
+      h('span', { class: 'sidehd-t' }, ['Items ', h('span', { class: 'hint tip', text: touchOnly() ? 'tap = Gets · press and hold = more' : 'click = Gets · Shift+click = Loses · or drag' })]),
       sideToggle('items')
     ])
   );
@@ -1113,11 +1119,14 @@ function renderItemSide() {
             onclick: function (e) {
               giveToPage(it, e.shiftKey);
             },
-            title:
-              (it.kind === 'stat'
-                ? 'Click to add a change to this number on the open page (Numbers row). '
-                : 'Click to put it in this page’s Gets box; Shift+click for Loses. ') +
-              'Or drag it onto a paragraph, a choice or an effects box. Drag within this list to reorder.',
+            title: touchOnly()
+              ? it.kind === 'stat'
+                ? 'Tap to add a change to this number on the open page. Press and hold for more.'
+                : 'Tap to put it in this page’s Gets box. Press and hold to choose Loses instead.'
+              : (it.kind === 'stat'
+                  ? 'Click to add a change to this number on the open page (Numbers row). '
+                  : 'Click to put it in this page’s Gets box; Shift+click for Loses. ') +
+                'Or drag it onto a paragraph, a choice or an effects box. Drag within this list to reorder.',
             ondragstart: function (e) {
               e.dataTransfer.setData(DRAGI, it.id);
               e.dataTransfer.setData('text/plain', it.name);
@@ -1753,12 +1762,19 @@ function renderWrite(main) {
   const p = byId(selId) || project.passages[0];
   selId = p.id;
   histVisit();
+  drawerNav();
   const wrap = h('div', { class: 'wrap sheet' });
   wrap.appendChild(pageBar(p));
   /* the page type and the three effect boxes share one line when there is room, and wrap when there is not */
   const fx = effectsRow(p);
   fx.prepend(pageBar.seg);
-  wrap.appendChild(fx);
+  if (phoneLayout()) {
+    /* on a phone the type and effect boxes fold away behind one line, so the page opens onto its words */
+    const fold = h('details', { class: 'fxfold' }, [h('summary', { text: fxSummary(p), title: 'The page type (page or ending) and what the player gets or loses on arriving' }), fx]);
+    fold.open = fxOpen;
+    fold.addEventListener('toggle', () => (fxOpen = fold.open));
+    wrap.appendChild(fold);
+  } else wrap.appendChild(fx);
   wrap.appendChild(textSection(p));
   wrap.appendChild(choicesSection(p));
   wrap.appendChild(reachedFrom(p));
@@ -1793,6 +1809,18 @@ function renderWrite(main) {
   );
   autosizeAll(wrap.querySelectorAll('textarea'));
   renderPageNotes();
+}
+
+/** Whether the phone's folded "page type and effects" line is open; kept while you move between pages. */
+let fxOpen = false;
+/** The words on that folded line: the page type, then what the page gives, takes and changes. */
+function fxSummary(p) {
+  const bits = [p.ending ? (p.valence === 'good' ? 'Good ending' : p.valence === 'bad' ? 'Bad ending' : 'Ending') : 'Page'];
+  if (p.gives.length) bits.push(`Gets ${p.gives.length}`);
+  if (p.takes.length) bits.push(`Loses ${p.takes.length}`);
+  const n = Object.keys(p.adds || {}).length;
+  if (n) bits.push(`Numbers ${n}`);
+  return `Page type and effects: ${bits.join(' · ')}`;
 }
 
 /** Whether the folded "things to look at" line is open; kept while you move between pages. */

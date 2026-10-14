@@ -768,6 +768,7 @@ function showGuide() {
   let first = true;
   /** A guide line: {name} stands for that icon, drawn as it appears in the editor. */
   function line(text) {
+    if (Array.isArray(text)) text = touchOnly() ? text[1] : text[0]; // [for keyboard and mouse, for touch]
     const li = h('li');
     text.split(/\{(\w+)\}/).forEach((part, i) => {
       if (!(i % 2)) {
@@ -792,6 +793,15 @@ function showGuide() {
     d.appendChild(h('div', { class: 'hint', text: `Version ${BUILT} (year.month.day.time, 24-hour, US Eastern)` }));
     []
       .concat(
+        touchOnly()
+          ? sec('Using a phone or tablet', [
+              'The icons along the bottom switch tabs: Write, Map, Items, Check, Game and Play. A red number on Check counts the problems.',
+              'In Write, the page name bar stays at the top while the page scrolls under it. Tap the name to jump to any page; ‹ › step back and forward through the pages you came from; ↑ scrolls to the page’s name, flags and type (folded as “Page type and effects”). Swipe the bar left or right for the next or previous page.',
+              'While you type, only a slim row of keys stays above the keyboard: + Paragraph, + Choice, Undo, Redo and Done. Done puts the tabs and the page bar back.',
+              'The ⋯ menu at the top right holds Export game, History…, the options and the story’s size and problems.',
+              'Press and hold anything that has a right-click menu: a page in the list or on the map, an item, a choice.'
+            ])
+          : [],
         sec('How a story works', [
           'A story is a set of pages. Each page has some text and choices. A choice is a button that leads to another page.',
           'An ending is a page that stops the story: a good ending {smile}, a bad ending {frown} or a plain one. The checkered flag {flag} marks the first page, which can never be an ending.',
@@ -799,12 +809,18 @@ function showGuide() {
           'Tabs: {pen} Write to build pages, {mapi} Map to see the shape, {items} Items for objects and states, Check to find problems, {play} Play to try it, then Export game.'
         ]),
         sec('The Write tab, top to bottom', [
-          'Getting around: Ctrl+K (or Go to… above the page list) jumps to any page by typing part of its name. Choosing where a choice leads works the same way: click the page name on the choice, type, press Enter. Go › opens that page and ‹ › at the top step back and forward through the pages you have been on. “From” shows which pages lead to this one. The panel buttons at the top of each side list hide it to give the writing more room.',
-          'Quicker writing: click an item in the right-hand list to put it in the open page’s Gets box, Shift+click for Loses. Paste a scene whose choice lines start with -, • or > and they become choices. Ctrl+Shift+Enter in a paragraph splits the page at the cursor. Drag the ⋮⋮ grip to reorder choices and paragraphs (or press Alt+↑ or Alt+↓ inside one). “Next to write” opens the next empty page. Options holds smart quotes and the writing text size.',
-          'Find (Ctrl+Shift+F, or Find… above the page list) searches every page name, heading, paragraph, choice and “why locked” text, with Match case and Whole words. Go jumps to a match; Replace changes one; Replace all (N) changes them all and Undo puts them back. The bookmark button on a page marks it unfinished; unfinished pages are listed on the Check tab.',
+          ['Getting around: Ctrl+K (or Go to… above the page list) jumps to any page by typing part of its name. Choosing where a choice leads works the same way: click the page name on the choice, type, press Enter. Go › opens that page and ‹ › at the top step back and forward through the pages you have been on. “From” shows which pages lead to this one. The panel buttons at the top of each side list hide it to give the writing more room.',
+          'Getting around: the page name bar at the top stays put. Tap the name to jump to any page by typing part of its name, ‹ › to step back and forward through the pages you have been on, or swipe the bar left or right for the next or previous page in the list. Pages opens the full list, Items the objects. Choosing where a choice leads works the same way: tap the page name on the choice, type, and tap a match. “From” shows which pages lead to this one.'],
+          ['Quicker writing: click an item in the right-hand list to put it in the open page’s Gets box, Shift+click for Loses. Paste a scene whose choice lines start with -, • or > and they become choices. Ctrl+Shift+Enter in a paragraph splits the page at the cursor. Drag the ⋮⋮ grip to reorder choices and paragraphs (or press Alt+↑ or Alt+↓ inside one). “Next to write” opens the next empty page. Options holds smart quotes and the writing text size.',
+          'Quicker writing: tap an item in the Items list to put it in the open page’s Gets box; press and hold it for Loses. Paste a scene whose choice lines start with -, • or > and they become choices. Drag the ⋮⋮ grip with a finger to reorder choices and paragraphs. To split a page, put the cursor where the next page should begin and choose “Split this page at the cursor” in the page’s ⋯ menu. “Next to write” opens the next empty page. Options holds smart quotes and the writing text size.'],
+          ['Find (Ctrl+Shift+F, or Find… above the page list) searches every page name, heading, paragraph, choice and “why locked” text, with Match case and Whole words. Go jumps to a match; Replace changes one; Replace all (N) changes them all and Undo puts them back. The bookmark button on a page marks it unfinished; unfinished pages are listed on the Check tab.',
+          'Find (Find… above the page list) searches every page name, heading, paragraph, choice and “why locked” text, with Match case and Whole words. Go jumps to a match; Replace changes one; Replace all (N) changes them all and Undo puts them back. The bookmark button on a page marks it unfinished; unfinished pages are listed on the Check tab.'],
           'The page name (only you see it) and an optional big heading, then the flag {flag} to make it the first page, {play} to play from here, and ⋯ for more.',
           'Next, on one line when there is room: the page type (page, ending, good ending, bad ending) and two boxes for what happens when the player arrives: Gets and Loses. Their colors are not wins or losses; losing an item is not a losing ending.',
-          'Then Text and Choices. The + buttons add a paragraph, an alternative text or a choice. In a choice, Enter starts the next one; Ctrl+Enter (Cmd+Enter on a Mac) jumps to the page it leads to, making it if needed.',
+          [
+            'Then Text and Choices. The + buttons add a paragraph, an alternative text or a choice. In a choice, Enter starts the next one; Ctrl+Enter (Cmd+Enter on a Mac) jumps to the page it leads to, making it if needed.',
+            'Then Text and Choices. The + buttons add a paragraph, an alternative text or a choice. In a choice, the keyboard’s Enter starts the next one; the Go › button beside a choice jumps to the page it leads to, making it if needed.'
+          ],
           'Each choice has “if”: show it only when the player has, or lacks, something. With Write’s advanced features on, it also has {items}: picking it gives or takes an object or state on the spot, without a new page.',
           'Anything the checker finds on this page is listed under the page name. The strip at the bottom shows which pages lead here.'
         ]),
@@ -812,7 +828,10 @@ function showGuide() {
           'Drag a page from the left list onto a choice to link it, or anywhere in Choices to add a choice that leads there.',
           'Drag a page onto “Reached from” to make that page lead here (a new choice with no words yet; the checker reminds you).',
           'Drag an item from the right list onto a paragraph or choice to show it only when the player has it, or into Gets or Loses.',
-          'Right-click a page, in the list or on the map, for quick actions; on a phone or tablet press and hold. “+ New page…” and “New object…” in any menu make one on the spot.'
+          [
+            'Right-click a page, in the list or on the map, for quick actions; on a phone or tablet press and hold. “+ New page…” and “New object…” in any menu make one on the spot.',
+            'Press and hold a page, in the list or on the map, for quick actions. “+ New page…” and “New object…” in any menu make one on the spot.'
+          ]
         ]),
         sec('Objects and states', [
           'An object {gift} is something the player carries or can hand over: a key, a wallet, a lantern. A state {heart} is something the player is: sick, brave, exhausted.',
@@ -854,8 +873,8 @@ function showGuide() {
           'Pages that simply follow one another (one way in, one way out) fold into one box. Click it to open it; an opened run shows a Fold card to close it again. (Advanced) “As:” draws the map as a player who gave that Given answer sees it, and Playtest results shows what simulated players do.',
           'Merge (on unless you switch it off) draws several choices between the same two pages as one arrow marked ×2, ×3; right-click it to edit each. Arc, Matrix and River always merge. Size draws a page bigger the larger the share of routes through it (a folded run takes its busiest page) and outlines choke points in bold.',
           '(Advanced) Color: ending odds tints each page green where most simulated players go on to end well and red where most end badly; playtest heat deepens with how many see it and grays pages almost nobody reaches; “Track: …” follows one object or state, outlining where it is given (green), needed (blue) and taken (red). With either playtest color, the bar above the map shows the players’ results; “Full results” lists where they end, the most-seen and rarely-seen pages, and where they get stuck.',
-          'The toolbar is all small icons: hover or long-press one for its name and what it does. A lit icon is on.',
-          'Hover a page (or tap it once) to light up the pages that lead to it and on from it; click (or tap again) to edit it; Esc clears. Search lights matching pages; Good path and Bad path show the shortest route to each good or bad ending.',
+          ['The toolbar is all small icons: hover or long-press one for its name and what it does. A lit icon is on.', 'The toolbar is all small icons, in two rows on a phone: press and hold one for its name and what it does. A lit icon is on.'],
+          ['Hover a page (or tap it once) to light up the pages that lead to it and on from it; click (or tap again) to edit it; Esc clears. Search lights matching pages; Good path and Bad path show the shortest route to each good or bad ending.', 'Tap a page once to light up the pages that lead to it and on from it; tap it again to edit it, or tap empty space to clear. Search lights matching pages; Good path and Bad path show the shortest route to each good or bad ending.'],
           'Arrows: solid is a choice, dashed appears only sometimes (it needs or is blocked by something). A badge {gift} {heart} in the middle of an arrow means picking it gives (or, faded, takes) something. A dotted page is a side page: on no shortest route to a good or bad ending.',
           'The score beside the paths counts crossing arrows and arrows pointing backwards. Click it to compare every view on crossings, neighbors, groups, stability, flow, compactness and speed, weighed for three tasks. The same story always draws the same way, so editing does not reshuffle your map, and Undo puts pages back.',
           'Build from the map: right-click a page to add a choice, change its type, give or take items, rename, duplicate, delete or play from there; an arrow to change its words, where it leads and when it appears. Double-click empty space to add a page.'
@@ -877,14 +896,17 @@ function showGuide() {
         sec('Saving, exporting, privacy', [
           'File → Save manuscript (.md) writes all the words of the story, page by page with each choice and where it leads, as one text file for proofreading in another program. It has no rules and cannot be loaded back.',
           'Your story is kept in this browser as you work. Nothing is ever sent over the internet; the editor works fully offline.',
-          '{save} Save (or Ctrl+S) writes your story to a .story.json file: the first time you choose where, then it saves straight there. An orange dot means unsaved changes. File → Save as… picks a new file. (Firefox and Safari download a copy instead.) To move a story to another device, open that file there.',
+          ['{save} Save (or Ctrl+S) writes your story to a .story.json file: the first time you choose where, then it saves straight there. An orange dot means unsaved changes. File → Save as… picks a new file. (Firefox and Safari download a copy instead.) To move a story to another device, open that file there.', '{save} Save writes your story to a .story.json file: the first time you choose where, then it saves straight there. An orange dot means unsaved changes. File → Save as… picks a new file. (Firefox and Safari download a copy instead.) To move a story to another device, open that file there.'],
           'Export game saves one small HTML file anyone can open, online or offline: about 44 KB for a 25-page story, or about 27 KB if you check “Use system font” (in the export window, or Options → Use system font - Export). That setting is saved with the story. A game carries only what its story uses: no dice, number bars, greyed-out choices, Back button, endings count or Given questions code unless the story has them, and only the color preset you chose.',
           'Every ending offers Play again and, folded underneath, a recap of the path the player took. A player’s place is kept in their browser, so they can come back later.'
         ]),
         sec('Look, keys and phones', [
-          'Options (⚙ beside Save) holds the quick guide, keyboard shortcuts and light / dark (the Play tab follows it). It also switches games from this story, or the editor itself, to the system font (Use system font - Export, Use system font - Editor) instead of the built-in Inter Tight, and turns remembering your preferences in this browser on or off. Options → Speed report records how smoothly the editor runs on your device, with an “It stuttered!” button, and gives a report to paste into the chat (adding #report to the address starts it at once).',
-          'Options → Keyboard shortcuts lists every shortcut. Arrow keys move between the tabs. Click the logo at the top left to see the opening again.',
-          'On a phone, the Pages and Items buttons open the side lists, and the map’s tools scroll sideways in one row. Every drag has a menu equivalent.'
+          ['Options (⚙ beside Save) holds the quick guide, keyboard shortcuts and light / dark (the Play tab follows it). It also switches games from this story, or the editor itself, to the system font (Use system font - Export, Use system font - Editor) instead of the built-in Inter Tight, and turns remembering your preferences in this browser on or off. Options → Speed report records how smoothly the editor runs on your device, with an “It stuttered!” button, and gives a report to paste into the chat (adding #report to the address starts it at once).', 'The ⋯ menu at the top right holds the quick guide, light / dark, the tour and the other options, Export game, History… and the story’s size and problems. Options also switches games from this story, or the editor itself, to the system font instead of the built-in Inter Tight, and turns remembering your preferences in this browser on or off.'],
+          ['Options → Keyboard shortcuts lists every shortcut. Arrow keys move between the tabs. Click the logo at the top left to see the opening again.', 'Click the logo at the top left, or use the ⋯ menu → Take the tour, to see the opening again.'],
+          [
+            'On a phone, the Pages and Items buttons open the side lists, and the map’s tools scroll sideways in one row. Every drag has a menu equivalent.',
+            'Pages and Items open the side lists. Every drag has a menu equivalent: press and hold.'
+          ]
         ])
       )
       .forEach(n => d.appendChild(n));
@@ -925,6 +947,51 @@ function toggleDrawer(which) {
 }
 function closeDrawers() {
   document.body.classList.remove('show-side', 'show-items');
+}
+/** Back or Forward through the pages visited (the ‹ › of the pinned page bar on a phone; the same list as the buttons in the page header). */
+function histStep(d) {
+  const j = histTarget(d);
+  if (j < 0) return;
+  hist.i = j;
+  hist.nav = true;
+  selId = hist.list[j];
+  renderAll();
+  const m = $('#main');
+  if (m) m.scrollTop = 0;
+}
+/** Greys the pinned bar's ‹ › when there is no earlier or later page to go to, and names the page in the tooltip. */
+function drawerNav() {
+  swipeTip();
+  [['.dback', -1, 'Back to'], ['.dfwd', 1, 'Forward to']].forEach(([sel, d, word]) => {
+    const b = $(`#drawerbar ${sel}`);
+    if (!b) return;
+    const j = histTarget(d);
+    b.disabled = j < 0;
+    b.title = j < 0 ? (d < 0 ? 'Back: no earlier page' : 'Forward: no later page') : `${word} “${pname(byId(hist.list[j]))}”`;
+  });
+}
+/** Said once, on a touch phone: the page-name bar can be swiped. */
+function swipeTip() {
+  if (prefs.swipeTip || !phoneLayout() || !touchOnly()) return;
+  prefs.swipeTip = true;
+  savePrefs();
+  setTimeout(() => {
+    if (!document.querySelector('dialog[open], #tour') && view === 'write') toast('Tip: swipe the page name bar left or right to go to the next or previous page in the list.');
+  }, 5200);
+}
+/** The ⋯ in the phone's pinned page bar: back to the top of the page, where its name, heading, flags and type are, with a brief flash. */
+function pageSettings() {
+  const m = $('#main');
+  if (!m) return;
+  m.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  const fold = m.querySelector('.fxfold');
+  if (fold) fold.open = true; // the type and effects are part of the page's settings
+  const bar = m.querySelector('.pagebar');
+  if (bar) {
+    bar.classList.remove('flash');
+    void bar.offsetWidth;
+    bar.classList.add('flash');
+  }
 }
 
 /** Draws the title, undo/redo state, tabs (with the problem badge) and the phone drawer buttons. */
@@ -979,7 +1046,9 @@ function renderTop() {
               ? icon('play', 17)
               : t[0] === 'game'
                 ? icon('dice', 17)
-                : null;
+                : t[0] === 'check'
+                  ? icon('check', 17)
+                  : null;
     const b = h(
       'button',
       {
@@ -994,7 +1063,7 @@ function renderTop() {
           setView(t[0]);
         }
       },
-      [ti, t[1]]
+      [ti, h('span', { class: 'tl', text: t[1] })]
     );
     if (t[0] === 'check' && analysis) {
       const n = analysis.problems.length;
@@ -1008,28 +1077,19 @@ function renderTop() {
   bar.textContent = '';
   bar.hidden = view !== 'write';
   if (view === 'write') {
+    const cp = byId(selId) || project.passages[0];
     bar.appendChild(
       h('button', {
         type: 'button',
-        class: 'btn small',
-        text: '☰ Pages',
+        class: 'btn small dbtn',
+        'aria-label': 'Pages',
         title: 'Show the list of pages',
         onclick: function () {
           toggleDrawer('side');
         }
-      })
+      }, ['☰', h('span', { class: 'dl', text: ' Pages' })])
     );
-    bar.appendChild(
-      h('button', {
-        type: 'button',
-        class: 'btn small',
-        text: 'Items ▸',
-        title: 'Show the list of objects and states',
-        onclick: function () {
-          toggleDrawer('items');
-        }
-      })
-    );
+    bar.appendChild(h('button', { type: 'button', class: 'btn small dbtn dstep dback', text: '‹', 'aria-label': 'Back to the page before', onclick: () => histStep(-1) }));
     /* one-tap page switching on phones: the same type-to-find box as Ctrl+K */
     bar.appendChild(
       h(
@@ -1038,16 +1098,39 @@ function renderTop() {
           type: 'button',
           class: 'in pagepick',
           'aria-haspopup': 'listbox',
-          'aria-label': `Go to page (now ${pname(byId(selId) || project.passages[0])})`,
-          title: 'Go to a page: type part of its name',
+          'aria-label': `Go to page (now ${pname(cp)})`,
+          title: 'Go to a page: type part of its name. Swipe left or right here for the next or previous page.',
           onclick: goToPage
         },
-        [h('span', { class: 'cd-nm', text: pname(byId(selId) || project.passages[0]) }), h('span', { class: 'cd-car', 'aria-hidden': 'true', text: '▾' })]
+        [h('span', { class: 'cd-nm', text: pname(cp) }), h('span', { class: 'cd-car', 'aria-hidden': 'true', text: '▾' })]
       )
+    );
+    bar.appendChild(h('button', { type: 'button', class: 'btn small dbtn dstep dfwd', text: '›', 'aria-label': 'Forward', onclick: () => histStep(1) }));
+    bar.appendChild(
+      h('button', {
+        type: 'button',
+        class: 'btn small dbtn dsettings',
+        text: '↑',
+        'aria-label': 'Page settings: name, flags and type',
+        title: 'Back to the top of the page: its name, heading, flags and type',
+        onclick: pageSettings
+      })
+    );
+    bar.appendChild(
+      h('button', {
+        type: 'button',
+        class: 'btn small dbtn',
+        'aria-label': 'Items',
+        title: 'Show the list of objects and states',
+        onclick: function () {
+          toggleDrawer('items');
+        }
+      }, [icon('gift', 16), h('span', { class: 'dl', text: ' Items ▸' })])
     );
   }
   const warn = $('#nosave');
   if (warn) warn.hidden = storageOk;
+  if (typing) renderKeyrow(); // Undo and Redo may have changed
 }
 /** Switches tab. */
 function setView(v) {
@@ -1131,23 +1214,27 @@ const TOUR = [
     title: 'Your pages',
     at: '#side',
     drawer: 'side',
-    text: 'Every page of the story is listed here. Click one to edit it, press + New page to add one, and use Go to… (Ctrl+K) to jump to any page by typing part of its name.'
+    text: 'Every page of the story is listed here. Click one to edit it, press + New page to add one, and use Go to… (Ctrl+K) to jump to any page by typing part of its name.',
+    touch: 'Every page of the story is listed here. Tap one to edit it, tap + New page to add one, and tap Go to… to jump to any page by typing part of its name. You can also swipe the page name bar left or right to go to the next or previous page.'
   },
   {
     title: 'Write a page',
     at: '#main',
-    text: 'Give the page a name and write what the player reads. Below the text are its choices. Each choice leads to another page: pick one from the list, or type a new name to create that page on the spot.'
+    text: 'Give the page a name and write what the player reads. Below the text are its choices. Each choice leads to another page: pick one from the list, or type a new name to create that page on the spot.',
+    phone: 'Write what the player reads; its choices come below. Each choice leads to another page: pick one from the list, or type a new name to create it. The page’s own name, flags and type scroll away as you write; the bar above stays. Tap ‹ › for the pages you came from, the name to jump to any page, ↑ to get back to the top. While the keyboard is up, one slim row of keys is all that stays: + Paragraph, + Choice, Undo, Redo and Done.'
   },
   {
     title: 'Objects and states',
     at: '#itemside',
     drawer: 'items',
-    text: 'Things players can gain or lose, such as a key or “hurt”. Click one to give it on a choice, Shift+click to take it away, or drag it onto a choice. Skip this until your story needs it.'
+    text: 'Things players can gain or lose, such as a key or “hurt”. Click one to give it on a choice, Shift+click to take it away, or drag it onto a choice. Skip this until your story needs it.',
+    touch: 'Things players can gain or lose, such as a key or “hurt”. Tap one to give it on this page, or press and hold it to choose Loses instead. Skip this until your story needs it.'
   },
   {
     title: 'The tabs',
     at: '#tabs',
-    text: 'Write is where you spend most of your time. Map draws the whole story as a picture, Items renames and sets up objects, and Game changes how exported games look.'
+    text: 'Write is where you spend most of your time. Map draws the whole story as a picture, Items renames and sets up objects, and Game changes how exported games look.',
+    phone: 'The icons along the bottom switch between the parts: Write is where you spend most of your time, Map draws the whole story as a picture, Items sets up objects, Check finds problems, Game changes how exported games look, and Play lets you try it.'
   },
   {
     title: 'Check',
@@ -1157,22 +1244,28 @@ const TOUR = [
   {
     title: 'Play',
     at: '#tabs [data-tab="play"]',
-    text: 'Try the story as a player would. If something feels wrong, click the page name to jump back to it in Write.'
+    text: 'Try the story as a player would. If something feels wrong, click the page name to jump back to it in Write.',
+    touch: 'Try the story as a player would. If something feels wrong, tap the page name to jump back to it in Write.'
   },
   {
     title: 'Save',
     at: '#savebtn',
-    text: 'Your work is kept in this browser automatically. Save also writes it to a file you choose (Ctrl+S), which is the copy to back up or send to someone.'
+    text: 'Your work is kept in this browser automatically. Save also writes it to a file you choose (Ctrl+S), which is the copy to back up or send to someone.',
+    touch: 'Your work is kept in this browser automatically. Save also writes it to a file you choose, which is the copy to back up or send to someone.'
   },
   {
     title: 'Export',
     at: '#export',
-    text: 'Turns the story into one HTML file that anyone can play in a browser, with nothing to install. Run Check first so players do not get stuck.'
+    phoneAt: '#morebtn',
+    text: 'Turns the story into one HTML file that anyone can play in a browser, with nothing to install. Run Check first so players do not get stuck.',
+    phone: 'Export game, in this ⋯ menu, turns the story into one HTML file that anyone can play in a browser, with nothing to install. Run Check first so players do not get stuck.'
   },
   {
     title: 'That is the tour',
     at: '#optbtn',
-    text: 'Replay it any time from Options → Take the tour. The Quick guide (the ? button) lists every shortcut and idea. Good luck with your story.'
+    phoneAt: '#morebtn',
+    text: 'Replay it any time from Options → Take the tour. The Quick guide (the ? button) lists every shortcut and idea. Good luck with your story.',
+    phone: 'Replay it any time from this ⋯ menu → Take the tour. The Quick guide is in the same menu. Good luck with your story.'
   }
 ];
 let tourOpen = false;
@@ -1230,7 +1323,7 @@ function startTour() {
   let token = 0;
   /** The areas of a step that can be seen right now. */
   function areas(st) {
-    return [].concat(st.at || []).map(sel => $(sel)).filter(el => el && el.getClientRects().length);
+    return [].concat((phone() && st.phoneAt) || st.at || []).map(sel => $(sel)).filter(el => el && el.getClientRects().length);
   }
   function place() {
     if (!cur) return;
@@ -1281,13 +1374,13 @@ function startTour() {
     if (st.drawer && phone()) document.body.classList.add(`show-${st.drawer}`);
     const settle = () => {
       if (my !== token) return;
-      if (st.at && !areas(st).length) return show(n + dir, dir); // hidden right now (a collapsed list): skip it
+      if ((st.at || st.phoneAt) && !areas(st).length) return show(n + dir, dir); // hidden right now (a collapsed list): skip it
       i = n;
       cur = st;
       areas(st).forEach(el => el.scrollIntoView?.({ block: 'nearest', inline: 'nearest' }));
       count.textContent = `Step ${n + 1} of ${TOUR.length}`;
       title.textContent = st.title;
-      body.textContent = st.text;
+      body.textContent = (phone() && st.phone) || (touchOnly() && st.touch) || st.text;
       back.disabled = n === 0;
       next.textContent = n === TOUR.length - 1 ? 'Done' : 'Next';
       place();
@@ -1453,6 +1546,7 @@ function adviseAdvanced(p) {
 
 let fileMenu = null;
 let optionsMenu = null;
+let moreMenu = null; // the ⋯ menu that holds what the phone's one-row top bar has no room for
 /**
  * Makes a drop-down menu for button `btn` and panel `pop`. `entries()` is called each time it opens, so labels
  * with check marks are always current: [label, fn, tooltip?] or null for a divider. Arrow keys move through it,
@@ -1483,7 +1577,7 @@ function dropMenu(btn, pop, entries) {
   };
   function set(open, focusFirst) {
     if (open) {
-      (btn === $('#menubtn') ? optionsMenu : fileMenu)?.set(false);
+      [fileMenu, optionsMenu, moreMenu].forEach(m => m && m.pop !== pop && m.set(false));
       fill();
     }
     pop.hidden = !open;
@@ -1528,7 +1622,7 @@ function dropMenu(btn, pop, entries) {
   document.addEventListener('click', () => {
     if (!pop.hidden) set(false);
   });
-  return { set, isOpen: () => !pop.hidden };
+  return { set, pop, isOpen: () => !pop.hidden };
 }
 
 /* ----- one window at a time -----
@@ -1688,10 +1782,10 @@ function init() {
     ['Save test script (.md)…', exportTestScript, 'Save a checklist of routes through the story that together take every choice at least once, with a box to tick for each step. For testers and proofreaders.'],
     ['Copy game code…', exportGame, 'Copy the finished game’s HTML, to paste somewhere else.']
   ]);
-  optionsMenu = dropMenu($('#optbtn'), $('#optpop'), () =>
+  const optionEntries = () =>
     [
       ['Quick guide', showGuide],
-      ['Keyboard shortcuts', showShortcuts],
+      touchOnly() ? undefined : ['Keyboard shortcuts', showShortcuts],
       ['Take the tour', startTour, 'A short spotlight tour of the main areas and the usual order of work.'],
       ['Light / dark', toggleTheme, 'Switch between the light and dark look.'],
       null,
@@ -1720,8 +1814,17 @@ function init() {
       ['Safety…', showSafety, 'Where your story is kept, when it was last saved to a file, and whether the browser promises to keep the autosave.'],
       ['Advanced…', showAdvanced, 'Choose which advanced features each tab shows.'],
       ['Speed report…', showSpeedReport, 'For troubleshooting: record how smoothly the editor runs on this device and copy a report to paste into the chat.']
-    ].filter(x => x !== undefined)
-  );
+    ].filter(x => x !== undefined);
+  optionsMenu = dropMenu($('#optbtn'), $('#optpop'), optionEntries);
+  /* On a phone the top bar is one row: File, Save, Undo, Redo and the title. The rest lives here. */
+  moreMenu = dropMenu($('#morebtn'), $('#morepop'), () => [
+    ...statusLines().map(s => [s.text, s.fn || (() => {}), s.tip]),
+    null,
+    ['History…', historyDialog, 'The latest changes, and a way back to any of them.'],
+    ['Export game', quickExport, 'Turn your story into one HTML file anyone can play.'],
+    null,
+    ...optionEntries()
+  ]);
 
   /* Top bar buttons */
   $('#title').addEventListener('input', e => {
@@ -1731,6 +1834,7 @@ function init() {
   $('#undo').addEventListener('click', undo);
   $('#redo').addEventListener('click', redo);
   wireHistory();
+  wirePhone();
   $('#help').addEventListener('click', showGuide);
   $('#export').addEventListener('click', quickExport);
   $('#savebtn').insertBefore(icon('save', 16), $('#savebtn').firstChild);
@@ -1758,9 +1862,10 @@ function init() {
     if (e.key === 'Escape') {
       // an open dialog closes itself on Esc
       if (document.querySelector('dialog[open]')) return;
-      if (fileMenu.isOpen() || optionsMenu.isOpen()) {
+      if (fileMenu.isOpen() || optionsMenu.isOpen() || moreMenu.isOpen()) {
         fileMenu.set(false); // a menu, however it was opened
         optionsMenu.set(false);
+        moreMenu.set(false);
         return;
       }
       closeDrawers();
@@ -1785,7 +1890,7 @@ function init() {
     }
     if (t === 'INPUT' || t === 'TEXTAREA' || t === 'SELECT') return;
     /* Undo rebuilds the story, so a dialog, a menu or the picker still open would act on pages that no longer exist: leave Ctrl+Z / Ctrl+Y for after they close */
-    if (document.querySelector('dialog[open], .ctx, .picker') || fileMenu?.isOpen() || optionsMenu?.isOpen()) return;
+    if (document.querySelector('dialog[open], .ctx, .picker') || fileMenu?.isOpen() || optionsMenu?.isOpen() || moreMenu?.isOpen()) return;
     const k = (e.key || '').toLowerCase();
     if ((e.ctrlKey || e.metaKey) && !e.shiftKey && k === 'z') {
       e.preventDefault();
@@ -1835,6 +1940,8 @@ function init() {
     get guard() {
       return guardState;
     },
+    typing: setTyping, // for the test suites: typing mode on or off without a real keyboard
+    touch: v => (touchForce = v), // force touch wording (true or false), or null for the device's own answer
     persistNow, // so a test can ask for the autosave a paused window would attempt
     get project() {
       return project;

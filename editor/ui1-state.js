@@ -79,7 +79,7 @@ let storageOk = true; // false if this browser refuses to save (private mode, et
 const SETTINGS_KEY = `${STORE}-settings`;
 const PREF_KEYS = [`${STORE}-theme`, `${STORE}-map`, `${STORE}-prefs`];
 const settings = { remember: true, chosen: false, advanced: { write: false, map: false, items: false, game: false } };
-const prefs = { editorFont: 'ui', wpm: 230, sort: 'written', quotes: false, wsize: 'm', pagesOpen: true, itemsOpen: true, paraMax: 150, pageMax: 600, writingIgnore: [] };
+const prefs = { editorFont: 'ui', wpm: 230, sort: 'written', quotes: false, wsize: 'm', pagesOpen: true, itemsOpen: true, paraMax: 150, pageMax: 600, writingIgnore: [], swipeTip: false };
 /** Saves the preferences (kept between visits only while "Remember preferences" is on). */
 function savePrefs() {
   savePref(`${STORE}-prefs`, JSON.stringify(prefs));
@@ -101,6 +101,7 @@ function loadSettings() {
     if (['s', 'm', 'l', 'x'].includes(p?.wsize)) prefs.wsize = p.wsize; // 'x' is Extra large (it used to fail to come back after a reload)
     if (p?.pagesOpen === false) prefs.pagesOpen = false;
     if (p?.itemsOpen === false) prefs.itemsOpen = false;
+    if (p?.swipeTip === true) prefs.swipeTip = true;
     if (Number.isFinite(p?.paraMax)) prefs.paraMax = Math.max(30, Math.min(2000, Math.round(p.paraMax)));
     if (Number.isFinite(p?.pageMax)) prefs.pageMax = Math.max(100, Math.min(20000, Math.round(p.pageMax)));
     if (Array.isArray(p?.writingIgnore)) prefs.writingIgnore = p.writingIgnore.filter(k => typeof k === 'string' && k.length < 200).slice(-300);
@@ -114,6 +115,19 @@ function saveSettings() {
   } catch {
     /* storage off: lasts until the page closes */
   }
+}
+/**
+ * True on a device used by touch alone (a phone or tablet): the guide, the tour and the menus then say "tap" and leave out keyboard
+ * shortcuts. A test can force it with window.__editor.touch(true / false / null).
+ */
+let touchForce = null;
+function touchOnly() {
+  if (touchForce !== null) return touchForce;
+  return typeof matchMedia === 'function' && matchMedia('(hover: none) and (pointer: coarse)').matches;
+}
+/** True while the narrow-screen (phone) layout is in use. */
+function phoneLayout() {
+  return typeof matchMedia === 'function' && matchMedia('(max-width: 820px)').matches;
 }
 /** Keeps a preference in this browser, but only while "Remember preferences" is on. */
 function savePref(key, value) {

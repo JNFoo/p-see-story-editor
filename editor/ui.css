@@ -834,3 +834,73 @@ input.chipnum.in{width:4.4em}
 .tour-gap{flex:1}
 .tour-card.sheet{width:auto;left:8px!important;right:8px}
 @media (prefers-reduced-motion:reduce){.tour-hole{transition:none}}
+
+/* ---- 16. Phones: a one-row top bar, tabs along the bottom, a pinned page-name bar, and typing mode ------------------
+   The Write screen's chrome used to take about half of a phone screen (more with the keyboard up). Now: top bar 1 row, page-name bar 1 row, tab
+   bar and the +Choice / Play bar at the bottom where thumbs rest; the page's own header scrolls away; while typing, only a slim row of keys shows. */
+.mmore,.dbtn,#keyrow{display:none}
+@media (max-width:820px){
+  :root{--tabh:50px}
+  #app{padding-bottom:calc(var(--tabh) + env(safe-area-inset-bottom,0px))}
+  #top{flex-wrap:nowrap;gap:5px;padding:5px 8px;padding-left:max(8px,env(safe-area-inset-left));padding-right:max(8px,env(safe-area-inset-right));padding-top:max(5px,env(safe-area-inset-top));border-top-width:4px}
+  #top .brandwrap,#top .mopt,#hist,#help,#export,#stats{display:none}
+  #top .mmore{display:block}
+  #top .btn{padding:8px 10px;min-height:40px}
+  #title{flex:1 1 40px;font-size:1rem;padding:6px 4px;min-width:0}
+  /* tabs: six icons with a tiny label, along the bottom edge */
+  #tabrow{position:fixed;left:0;right:0;bottom:0;z-index:35;border-top:1px solid var(--line);border-bottom:0;flex-wrap:nowrap;padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+  #tabrow #tabs{flex:1 1 auto;padding:0 2px;gap:0;overflow:visible}
+  #tabrow #tabs button{flex:1 1 0;min-width:0;flex-direction:column;justify-content:center;gap:1px;padding:7px 1px 5px;font-size:.68rem;line-height:1.2;border-bottom:0;border-top:3px solid transparent;position:relative}
+  #tabrow #tabs button[aria-selected="true"]{border-top-color:var(--lamp)}
+  #tabrow #tabs .badge{position:absolute;top:3px;left:calc(50% + 6px);margin:0;font-size:.6rem;min-width:1.25em;padding:0 4px;line-height:1.35}
+  #statusline{display:none}
+  /* the page-name bar: pinned under the top bar (only the page below it scrolls) */
+  #drawerbar{gap:4px;padding:4px 8px;touch-action:pan-y;align-items:center}
+  #drawerbar .dbtn{display:inline-flex;align-items:center;justify-content:center;min-width:40px;min-height:40px;padding:4px 8px}
+  #drawerbar .dstep{font-size:1.25rem;line-height:1;min-width:34px;padding:4px 6px}
+  #drawerbar .pagepick{flex:1 1 auto;min-width:0;min-height:40px;font-size:1rem;font-weight:600}
+  .pagebar{position:static}
+  .pbrow .histbtn{display:none}
+  .pinbar{bottom:calc(var(--tabh) + env(safe-area-inset-bottom,0px));padding:6px 8px;gap:6px}
+  .pinbar .btn{min-height:40px}
+  #toast{bottom:calc(var(--tabh) + 66px + env(safe-area-inset-bottom,0px))}
+  /* the page's own header: tighter, and it scrolls away */
+  .pagebar{padding:6px 0 4px;gap:4px}
+  .pbrow{gap:6px}
+  .seg label{padding:7px 6px}
+  .eff{padding:2px 8px}
+}
+body.typing #toast{bottom:calc(64px + var(--kb,0px))}
+@media (max-width:520px){#drawerbar .dl{display:none}}
+/* typing mode: the keyboard is up, so only the text and one slim row of keys */
+body.typing #top,body.typing #drawerbar,body.typing #tabrow,body.typing .pinbar{display:none}
+body.typing #app{padding-bottom:calc(52px + var(--kb,0px))}
+body.typing #keyrow{display:flex;gap:6px;align-items:center;position:fixed;left:0;right:0;bottom:var(--kb,0px);z-index:60;padding:6px 8px;padding-left:max(8px,env(safe-area-inset-left));padding-right:max(8px,env(safe-area-inset-right));background:var(--panel);border-top:1px solid var(--line)}
+#keyrow .btn{min-height:40px;white-space:nowrap;min-width:0}
+#keyrow .kicon{min-width:44px;font-size:1.1rem}
+#keyrow .kgap{flex:1}
+body.typing #main.v-write{padding-bottom:20px}
+@media (max-width:360px){#keyrow{gap:4px;padding-left:4px;padding-right:4px}#keyrow .btn{padding:8px 7px;font-size:.82rem}#keyrow .kicon{min-width:38px}}
+/* phone map: the toolbar wraps onto a second row instead of scrolling sideways */
+@media (max-width:700px){
+  .maptools{flex-wrap:wrap;overflow:visible;gap:4px}
+  .maptools>*{order:3}
+  .maptools>.mapgrp{order:1}
+  .maptools>.row.tight{order:2;margin-left:auto}
+  .maptools .searchwrap{order:4;flex:1 1 100%;width:auto;min-width:0}
+  .maptools .mapsearch{min-width:0}
+  .maptools .scorechip,.maptools .critpills{font-size:.76rem;padding:3px 8px}
+  .mapico{width:31px;height:30px}
+}
+
+/* the phone's folded "page type and effects" line */
+.fxfold{border:1px solid var(--line);border-radius:6px;background:var(--paper)}
+.fxfold>summary{cursor:pointer;padding:10px 12px;font-weight:600;font-size:.9rem;min-height:40px;display:flex;align-items:center}
+.fxfold[open]>summary{border-bottom:1px solid var(--line)}
+.fxfold>.effects{padding:8px}
+/* touch screens: the few remaining small targets (map icons and chips, checkboxes, segmented buttons) */
+@media (hover:none) and (pointer:coarse){
+  .mapico{width:38px;height:36px}
+  .pg,.pb,.scorechip,.fktoggle,.seg>button,.seg>label{min-height:36px}
+  input[type=checkbox],input[type=radio]{width:20px;height:20px}
+}

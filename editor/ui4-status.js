@@ -101,21 +101,10 @@ function nextProblem() {
   toast(`Problem ${problemAt + 1} of ${list.length}: ${it.msg}`);
 }
 
-/** One short line: is my work kept, how old is the file copy, and what the checker says right now. */
-function renderStatus() {
-  const el = $('#statusline');
-  if (!el) return;
-  el.textContent = '';
-  const chip = (cls, ico, text, longText, tip, fn) => {
-    const parts = [h('span', { class: 'sico', 'aria-hidden': 'true', text: ico }), longText ? h('span', { class: 'slong', text: longText }) : null, text ? h('span', { text }) : null];
-    const a = h(fn ? 'button' : 'span', { class: `schip ${cls}`, title: tip || '' }, parts);
-    if (fn) {
-      a.type = 'button';
-      a.addEventListener('click', fn);
-    }
-    el.appendChild(a);
-    return a;
-  };
+/** What the status line says, as a list: { cls, ico, text, longText, tip, fn } (is my work kept, how old is the file copy, what the checker says right now). */
+function statusParts() {
+  const out = [];
+  const chip = (cls, ico, text, longText, tip, fn) => out.push({ cls, ico, text, longText, tip, fn });
   /* the checker */
   const a = analysis && analysisFor === cur ? analysis : null;
   if (!a) {
@@ -140,6 +129,31 @@ function renderStatus() {
   }
   const at = project.savedAt ? Date.parse(project.savedAt) : NaN;
   if (Number.isFinite(at)) chip('gray sfile', '', agoText(Date.now() - at), 'File copy: ', fileSaveLine());
+  return out;
+}
+
+/** The status in plain lines for the phone's ⋯ menu: { text, tip, fn }. */
+function statusLines() {
+  const st = storyStats(project);
+  return [{ text: `${st.pages} page${st.pages === 1 ? '' : 's'} · ${st.choices} choice${st.choices === 1 ? '' : 's'} · ${st.words.toLocaleString('en')} words`, tip: '' }].concat(
+    statusParts().map(c => ({ text: `${c.ico ? `${c.ico} ` : ''}${c.longText || ''}${c.text}`.trim(), tip: c.tip, fn: c.fn }))
+  );
+}
+
+/** Draws the status line at the right end of the tab row. */
+function renderStatus() {
+  const el = $('#statusline');
+  if (!el) return;
+  el.textContent = '';
+  statusParts().forEach(c => {
+    const parts = [h('span', { class: 'sico', 'aria-hidden': 'true', text: c.ico }), c.longText ? h('span', { class: 'slong', text: c.longText }) : null, c.text ? h('span', { text: c.text }) : null];
+    const a = h(c.fn ? 'button' : 'span', { class: `schip ${c.cls}`, title: c.tip || '' }, parts);
+    if (c.fn) {
+      a.type = 'button';
+      a.addEventListener('click', c.fn);
+    }
+    el.appendChild(a);
+  });
 }
 
 /** Hooks up the Undo, Redo and History buttons. */

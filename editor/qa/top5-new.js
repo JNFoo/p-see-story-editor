@@ -3,7 +3,7 @@
 const which=process.argv[2]||'firefox';const B=require('./engine').pick(which);
 const fs=require('fs');
 const D=__dirname+'/work/';fs.mkdirSync(D,{recursive:true});
-const FILE=require('url').pathToFileURL(require('path').join(__dirname, '..', 'story-editor.html')).href;
+const FILE=require('url').pathToFileURL((process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html'))).href;
 let fails=0;const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)fails++};
 (async()=>{
 const b=await B.launch();
@@ -34,6 +34,8 @@ ok(chk.samples.length>0&&chk.samples.every(s=>/Courage \d+/.test(s.held)),'Test 
 await ed.click('#optbtn');await ed.click('#optpop >> text=Speed report…');await ed.waitForTimeout(200);
 let rep=await ed.inputValue('dialog textarea');
 ok(/Story Editor speed report/.test(rep)&&/Version:/.test(rep)&&/Browser:/.test(rep)&&/Start-up:/.test(rep),'speed report has version, browser, start-up lines');
+{ const m=rep.match(/Opened in (\d+) ms: the file arrived at (\d+) ms, the editor's code started at (\d+) ms \((\d+) ms unpacking and reading the page\), the first screen was drawn at (\d+) ms \((\d+) ms setting up\)/);
+  ok(!!m&&+m[1]>0&&+m[5]>=+m[3]&&+m[3]>=+m[2],'speed report says how long the editor took to open, in order (arrived <= code started <= drawn): '+(m?m.slice(1,7).join(' / '):rep.split('\n').find(l=>/Opened/.test(l)))); }
 ok(/Timings \(count/.test(rep)&&/draw tab|checker/.test(rep),'speed report lists timings');
 ok(!/Courage|Keeper|lighthouse/i.test(rep),'speed report holds no story words');
 await ed.click('dialog button:text-is("Start recording")');await ed.waitForTimeout(150);

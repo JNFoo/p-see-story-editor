@@ -9,7 +9,7 @@ const current=fs.readFileSync(up+'sample.story.json','utf8'), older=fs.readFileS
   await pg.addInitScript(([a,c])=>{ if(!sessionStorage.x){ localStorage.clear(); localStorage.setItem('story-editor-v1', a); localStorage.setItem('story-editor-v1-settings', JSON.stringify({chosen:true,remember:true,advanced:{write:true,map:true,items:true}})); sessionStorage.x=1; } window.__open=c; window.__saves=[];
     window.showSaveFilePicker = async o => ({ name:o.suggestedName, createWritable: async()=>({ write: async blob=>{ window.__saves.push([o.suggestedName, await blob.text()]); }, close: async()=>{} }), queryPermission: async()=>'granted' });
     window.showOpenFilePicker = async () => [{ name:'older.story.json', getFile: async()=>({ size: window.__open.length, text: async()=>window.__open }), createWritable: async()=>({ write: async blob=>{ window.__saves.push(['older.story.json', await blob.text()]); }, close: async()=>{} }), queryPermission: async()=>'granted' }]; }, [current, older]);
-  await pg.goto(require('url').pathToFileURL(require('path').join(__dirname, '..', 'story-editor.html')).href); await pg.waitForFunction(()=>window.__editor&&!document.getElementById('splash'),null,{timeout:20000});
+  await pg.goto(require('url').pathToFileURL((process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html'))).href); await pg.waitForFunction(()=>window.__editor&&!document.getElementById('splash'),null,{timeout:20000});
   const pos = async () => pg.evaluate(()=>[...document.querySelectorAll('.mapbox g.node[data-id]')].map(g=>g.dataset.id+':'+g.getAttribute('transform')).join('|'));
   await pg.locator('#tabs [data-tab=map]').click(); await pg.waitForTimeout(300);
   const p1 = await pos();
@@ -53,7 +53,7 @@ const current=fs.readFileSync(up+'sample.story.json','utf8'), older=fs.readFileS
   // phone
   const ctx = await b.newContext({...devices['iPhone 13']}); const ph = await ctx.newPage();
   await ph.addInitScript(t=>{ localStorage.setItem('story-editor-v1', t); localStorage.setItem('story-editor-v1-settings', JSON.stringify({chosen:true,remember:true,advanced:{write:true,map:true,items:true}})); }, fs.readFileSync(up+'sample.story.json','utf8'));
-  await ph.goto(require('url').pathToFileURL(require('path').join(__dirname, '..', 'story-editor.html')).href); await ph.waitForFunction(()=>window.__editor&&!document.getElementById('splash'),null,{timeout:20000});
+  await ph.goto(require('url').pathToFileURL((process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html'))).href); await ph.waitForFunction(()=>window.__editor&&!document.getElementById('splash'),null,{timeout:20000});
   await ph.locator('#tabs [data-tab=map]').click(); await ph.waitForTimeout(400);
   const hb = await ph.evaluate(()=>{ const r=document.querySelector('.mapbox').getBoundingClientRect(); return [Math.round(r.height), innerHeight]; });
   ok(hb[0] > hb[1]*0.55, 'phone map height '+hb);

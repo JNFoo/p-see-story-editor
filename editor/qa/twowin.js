@@ -4,7 +4,7 @@
    Usage: node twowin.js [chromium|firefox]   Copyright (c) 2026 JNFoo. MIT License. */
 const which = process.argv[2] || 'firefox'; const B = require('./engine').pick(which);
 const D = __dirname + '/work/';
-require('child_process').execSync('cp "' + require('path').join(__dirname, '..', 'story-editor.html') + '" ' + D + 'ed.html');
+require('child_process').execSync('cp "' + (process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html')) + '" ' + D + 'ed.html');
 const FILE = 'http://127.0.0.1:' + (process.env.QA_PORT || 8765) + '/ed.html';
 let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };
 const STORE = 'story-editor-v1', SPARE = 'story-editor-v1-backup';

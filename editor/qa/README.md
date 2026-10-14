@@ -10,7 +10,21 @@ node qa.js smart     quick, plus every suite whose watched files changed since t
 node qa.js full      about 5.5 minutes  the check before a file is delivered: everything on Firefox and on Chromium
 node qa.js full --only lite     only suites with "lite" in the name        --verbose  also print each suite's own output
 node qa.js full --reset-counts  accept a smaller number of checks on purpose (see "lost checks" below)
+node qa.js sample    about 1 minute  a cheap look between edits: the contract test, a rotating quarter of the quick suites and any suite whose files changed
+node qa.js quick --against <rev> [--expect-fail]   run against the editor as built from an older git revision (see below)
+node qa.js --history  how each suite has done over the recorded runs
 ```
+
+**Three helpers added 2026-10-14.**
+- **Fail first, then pass** (`--against <rev>`): builds the editor as it was at git revision `<rev>` in a temporary copy, and points the browser suites at it.
+  A new regression check should FAIL there (it notices the bug the fix removed) and pass on the working tree; `--expect-fail` makes the exit code 0 only when every
+  selected suite fails. Game suites still use `packages/story-player` from the working tree. Nothing is written to `.stamp`, `counts.json` or `times.json`.
+- **The flake ledger** (`ledger.jsonl`, not in git): every suite result of every run. `--history` prints runs, failures, retried passes ("flaky") and the average time
+  per suite. `smart` uses it: a suite is skipped for a changed file it has never failed on in 5 or more runs; until a pair has 5 recorded runs nothing is skipped.
+  A full check always runs everything. The first line of a run says how many jobs and about how long, and a failure prints a `next:` line with the log to read.
+- **Smallest failing case** (`fuzz3.mjs`): when a damaged story breaks something, the fuzzer undoes the damage one change at a time and prints the smallest set of
+  changes that still fails ("smallest damage that still fails (1 change(s) ...)"). Checked with a planted bug: a 5,000-character junk string was found and cut down to one change.
+  `fuzz1.js` (random clicks in the live page) is not wired to a shrinker; the engine for that is `tools/fuzz-kit` in JS-modules (`Fuzzer.shrink`).
 
 It prints one line per suite (`pass`, `pass*` = failed once then passed on a retry, so look at it, or `FAIL`), the failing lines, and a
 summary naming the slowest suites. Each suite's whole output is in `logs/<suite>.log` (and `.first-try.log` for a retry), so nothing
@@ -41,11 +55,12 @@ Chromium does the native one). `PROFILE=1 node <suite> firefox` prints where a s
 
 | Suite | What it covers |
 |---|---|
-| `top5-safe`, `top5-new` | Save safety (the spare copy, a place kept across reloads), short ids, fingerprinted saves, the Map |
+| `top5-safe`, `top5-new` | Save safety (the spare copy, a place kept across reloads), short ids, fingerprinted saves, the Map, the Speed report (including the "Opened in N ms" start-up line) |
 | `packed` | The packed editor file opens from a file and from a web server that sends a UTF-8 header, and a damaged copy shows the plain message instead of running |
 | `nosave` | A game says so when the browser will not keep its save (blocked from the start, or full later), and says nothing when saving works |
 | `twowin` | One window at a time: a second editor window (or a second copy on this computer) is paused with a box; "Use this window instead" takes over and the first window saves its last edit and pauses; without Web Locks a save by another window asks which version to keep |
-| `gamefeel` | The game's already-taken check mark, back swipe / back button / Esc doing Back (CloseWatcher) without also closing the Aa panel twice, and contrast that follows the system until the reader chooses |
+| `safety` | Options → Safety (what the autosave is, when the story was last saved to a file, space used, "ask the browser to keep it"), the revision number and time every file save writes (picked file and plain download), the once-a-week reminder to save a file (7 days, at most once a day, never for an almost empty story), and File → Save test script (.md) |
+| `gamefeel` | The game's already-taken check mark, the ending recap's "Roads not taken" (only choices open to anyone, none that need or forbid an item), back swipe / back button / Esc doing Back (CloseWatcher) without also closing the Aa panel twice, and contrast that follows the system until the reader chooses |
 | `textstress` | Every page of two sample stories at 320 px with Larger text, Roomy spacing, choice numbers and the WCAG 1.4.12 spacing values: nothing cut off, nothing scrolling sideways, the Aa panel on screen (full tier only) |
 | `motion` | With real animation (every other suite asks for reduced motion), the opening splash plays its full time and leaves |
 | `ffsmoke` | The editor and an exported game load without errors in Firefox |

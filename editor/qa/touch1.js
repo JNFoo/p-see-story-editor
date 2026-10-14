@@ -4,7 +4,7 @@ let fails=0;const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)fails++};
 (async()=>{const b=await pw.chromium.launch();const ctx=await b.newContext({...pw.devices['Pixel 7']});
 await ctx.addInitScript(()=>{if(!sessionStorage.t1){sessionStorage.t1=1;localStorage.setItem('story-editor-v1-settings',JSON.stringify({chosen:true,remember:true,advanced:{write:true,map:true,items:true,game:true}}))}});
 const pg=await ctx.newPage();const errs=[];pg.on('pageerror',e=>errs.push(e.message));
-await pg.goto(require('url').pathToFileURL(require('path').join(__dirname, '..', 'story-editor.html')).href);await pg.waitForFunction(()=>window.__editor&&!document.getElementById('splash'),null,{timeout:20000});await pg.waitForTimeout(300);
+await pg.goto(require('url').pathToFileURL((process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html'))).href);await pg.waitForFunction(()=>window.__editor&&!document.getElementById('splash'),null,{timeout:20000});await pg.waitForTimeout(300);
 const cdp=await ctx.newCDPSession(pg);const t=(type,x,y)=>cdp.send('Input.dispatchTouchEvent',{type,touchPoints:type==='touchEnd'?[]:[{x,y}]});
 const names=(pn,k)=>pg.evaluate(([pn,k])=>{const p=window.__editor.project.passages.find(x=>x.name===pn);return k==='c'?p.choices.map(c=>c.label.slice(0,10)):p.blocks.map(c=>c.text.slice(0,10))},[pn,k]);
 const rect=(s,n)=>pg.evaluate(([s,n])=>{const r=document.querySelectorAll(s)[n].getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2,h:r.height}},[s,n]);

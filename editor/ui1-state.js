@@ -22,6 +22,10 @@
    3a. State, DOM helper, saving and undo
    --------------------------------------------------------------------------- */
 
+/* Start-up timing for the Speed report: the moment the editor's own code began (milliseconds since the page was asked for; with the packed page
+   this includes unpacking it) and the moment the first screen was drawn, set at the end of init(). */
+const BOOT_AT = performance.now();
+let READY_AT = 0;
 const STORE = 'story-editor-v1'; // localStorage key for the autosaved story
 const UNDO_STEPS = 150; // most undo steps kept
 const UNDO_BYTES = 24e6; // ...and at most this many characters of undo history

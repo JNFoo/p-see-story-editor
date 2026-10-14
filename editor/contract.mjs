@@ -52,7 +52,7 @@ let seed = Number(process.argv[3] || 1);
 
 const ctx = createContext({ console, TextDecoder });
 runInContext(
-  `${read('core.js')}\n${read('player.js')}\nthis.C = { zipInflate, zippedPage, analyze, analyzeStructure, STARTERS, normalizeProject, exportStory, makeProject, makeItem, makePassage, makeChoice, makeBlock, cleanGame,
+  `${read('core.js')}\n${read('player.js')}\nthis.C = { storyTestRoutes, storyTestScript, zipInflate, zippedPage, analyze, analyzeStructure, STARTERS, normalizeProject, exportStory, makeProject, makeItem, makePassage, makeChoice, makeBlock, cleanGame,
   FIELD_CONTRACT, KL_RULES, PALETTES, PALETTE_KEYS, GAME_DEFAULTS, GAME_OPTIONS, paletteCss, klHas, klCondOk, klVisibleBlocks, klStatMap, klInit, klAdd, klChoose, klVisibleChoices,
   klShown, klArrive, klTarget, klOdds, klPlayer, klShortIds, klFingerprint, KL_FEATURE_ORDER, KL_FEATS, klFeatures, gameCss,
   modules: KL_FEATURE_ORDER.map(n => [n, eval('klFeat' + n[0].toUpperCase() + n.slice(1))]) };`,
@@ -517,6 +517,58 @@ for (let t = 0; t < N; t++) {
           fail(`A “Test from here” sample for page ${pg.id} does not replay (${JSON.stringify(sm)} vs ${JSON.stringify(f)}). ${ctxMsg()}`);
       });
     });
+    /* the test script (File → Save test script): every route must replay with the game's rules, and together the routes must take every choice the
+       brute-force play-out found usable (and, for a skill check, every outcome it found possible) */
+    {
+      const r = C.storyTestRoutes(P, a);
+      if (!r) fail(`storyTestRoutes gave nothing for a story the checker completed. ${ctxMsg()}`);
+      else {
+        const taken = new Set();
+        r.routes.forEach((rt, ri) => {
+          let f = C.klInit({}, st);
+          let page = null;
+          let ok = true;
+          let why = '';
+          rt.steps.forEach(step => {
+            if (!ok) return;
+            if (step.given) {
+              const g = P.givens.find(x => x.question === step.question);
+              const id = g && g.options.find(o => P.items.find(i => i.id === o).name === step.label);
+              f[id] = true;
+              return;
+            }
+            if (!page) ((page = byId[E.start]), (f = C.klArrive(f, page, st)));
+            const label = step.label.replace(/ \(fails the roll\)$/, '');
+            const here = C.klVisibleChoices(page, f).filter(x => x.label === label);
+            if (here.length !== 1) {
+              if (here.length > 1) return void (page = null, ok = null); // two choices share the words: the routes cannot be told apart by label (the checker warns about it)
+              return void ((ok = false), (why = `“${label}” is not offered on ${page.id}`));
+            }
+            const c = here[0];
+            const dest = C.klTarget(f, c, step.fail ? 2 : 12);
+            if (dest !== step.to) return void ((ok = false), (why = `“${label}” on ${page.id} leads to ${dest}, not ${step.to}`));
+            taken.add(`${page.id}:${label}:${step.fail ? 'fail' : 'pass'}`);
+            f = C.klArrive(C.klChoose(f, c, st), byId[dest], st);
+            page = byId[dest];
+          });
+          if (ok === false) fail(`Test script route ${ri + 1} does not replay: ${why}. ${ctxMsg()}`);
+        });
+        const dupLabels = P.passages.some(p => new Set(p.choices.map(c => c.label)).size !== p.choices.length);
+        if (!dupLabels) {
+          b.usable.forEach(key => {
+            const [pid, ...rest] = key.split(':');
+            const label = rest.join(':');
+            const rl = b.roll.get(key);
+            const need = rl === undefined ? ['pass'] : [rl & 1 ? 'pass' : null, rl & 2 ? 'fail' : null].filter(Boolean);
+            need.forEach(k => {
+              if (!taken.has(`${pid}:${label}:${k}`)) fail(`The test script never takes “${label}” on ${pid} (${k}), though a player can. Routes: ${r.routes.length}, unbuilt: ${r.unbuilt.length}. ${ctxMsg()}`);
+            });
+          });
+        }
+        const text = C.storyTestScript(P, a);
+        if (!/^# Test script: /.test(text) || (r.routes.length && !/- \[ \] Choose /.test(text))) fail(`The test script text is malformed. ${ctxMsg()}`);
+      }
+    }
     P.passages
       .filter(p => p.ending && b.endings.has(p.id))
       .forEach(e => {

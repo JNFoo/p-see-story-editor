@@ -6,7 +6,7 @@ const ok=(c,m)=>console.log((c?'PASS ':'FAIL ')+m);
   const errs=[]; pg.on('pageerror',e=>errs.push(e.message+' '+(e.stack||'').split('\n')[1]));
   const txt=fs.readFileSync(__dirname+'/fixtures/sample-rich.story.json','utf8');
   await pg.addInitScript(t=>{ if(!sessionStorage.getItem('x')){ localStorage.clear(); localStorage.setItem('story-editor-v1', t); localStorage.setItem('story-editor-v1-settings', JSON.stringify({chosen:true,remember:true,advanced:{write:true,map:true,items:true}})); sessionStorage.setItem('x','1'); } }, txt);
-  await pg.goto(require('url').pathToFileURL(require('path').join(__dirname, '..', 'story-editor.html')).href); await pg.waitForFunction(()=>window.__editor&&!document.getElementById('splash'),null,{timeout:20000});
+  await pg.goto(require('url').pathToFileURL((process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html'))).href); await pg.waitForFunction(()=>window.__editor&&!document.getElementById('splash'),null,{timeout:20000});
   await pg.locator('#tabs button:has-text("Map")').click(); await pg.waitForTimeout(300);
   // hover highlight
   const hog = pg.locator('g.node[data-id="p_hall"]');
@@ -65,7 +65,7 @@ const ok=(c,m)=>console.log((c?'PASS ':'FAIL ')+m);
   const ctx = await b.newContext({...devices['Pixel 7']}); const ph = await ctx.newPage();
   ph.on('pageerror',e=>errs.push('phone '+e.message));
   await ph.addInitScript(t=>{ localStorage.setItem('story-editor-v1', t); localStorage.setItem('story-editor-v1-settings', JSON.stringify({chosen:true,remember:true,advanced:{write:true,map:true,items:true}})); }, txt);
-  await ph.goto(require('url').pathToFileURL(require('path').join(__dirname, '..', 'story-editor.html')).href); await ph.waitForFunction(()=>window.__editor&&!document.getElementById('splash'),null,{timeout:20000});
+  await ph.goto(require('url').pathToFileURL((process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html'))).href); await ph.waitForFunction(()=>window.__editor&&!document.getElementById('splash'),null,{timeout:20000});
   await ph.locator('#tabs button:has-text("Map")').click(); await ph.waitForTimeout(400);
   ok(await ph.evaluate(()=>document.documentElement.scrollWidth - innerWidth)===0, 'phone: no sideways scroll');
   await ph.screenshot({path:'work/shots/phone-map.png'});

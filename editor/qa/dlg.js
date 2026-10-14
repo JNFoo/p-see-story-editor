@@ -8,7 +8,7 @@ const ok=(c,m)=>console.log((c?'PASS ':'FAIL ')+m);
   await pg.addInitScript(()=>{ window.__saves=[]; window.showSaveFilePicker = async o => { const h={ name:o.suggestedName, createWritable: async()=>({ write: async blob=>{ window.__saves.push([o.suggestedName, await blob.text()]); }, close: async()=>{} }), queryPermission: async()=>'granted' }; return h; };
     window.showOpenFilePicker = async () => [{ name:'sample.story.json', getFile: async()=>({ size: window.__bol.length, text: async()=>window.__bol }), createWritable: async()=>({ write: async blob=>{ window.__saves.push(['sample.story.json', await blob.text()]); }, close: async()=>{} }), queryPermission: async()=>'granted' }]; });
   await pg.addInitScript(t=>{ window.__bol=t; try{ localStorage.setItem('story-editor-v1-toured','1'); }catch(e){} }, bol); /* no first-time tour popping up 4.6 s in (it used to be hidden by the wait for the opening) */
-  await pg.goto(require('url').pathToFileURL(require('path').join(__dirname, '..', 'story-editor.html')).href); await pg.waitForFunction(()=>window.__editor&&!document.getElementById('splash'),null,{timeout:20000});
+  await pg.goto(require('url').pathToFileURL((process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html'))).href); await pg.waitForFunction(()=>window.__editor&&!document.getElementById('splash'),null,{timeout:20000});
   // Esc on a prompt resolves; focus returns
   await pg.locator('#menubtn').click(); await pg.locator('button:has-text("New story")').click(); await pg.waitForTimeout(200);
   ok(await pg.locator('dialog[open]').count()===1, 'ask dialog open');

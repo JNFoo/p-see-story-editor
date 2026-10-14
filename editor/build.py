@@ -223,11 +223,11 @@ print("built story-editor.html (%d KB plain), stamped %s" % (len(standalone.enco
 #      budget.mjs makes the numbers from the finished file, using the same function the Export button uses.
 #      "Change" is against the previous build (kept in sizes-last.json).
 BUDGETS = {  # name: ceiling in bytes (the file itself, not gzip)
-    "Editor (story-editor.html)": 545000,   # the plain page (raised to 545,000 on Oct 8 night for the map icon toolbar, start-page rule, drag handles, first-time tour and many more checker rules; raised to 540,000 on Oct 8 evening for the Write-tab batches: page picker, history, side toggles, split, paste, templates, phone bar, wide layout; tightened to 520,000 when they were done; was 500,000 on Oct 8 for the Game tab with its live preview; was 490,000; raised from 470,000 for find and replace, unfinished flags, reach reports, the manuscript, Oct 8 2026; now about 2% headroom, so it stays)
-    "Editor as delivered (packed)": 232000, # what the file on disk weighs
-    "The Keeper\u2019s Light (the built-in example)": 58000,   # raised from 57,500 on Oct 14 with the next two (about 400 bytes: back swipe, contrast follows the system, already-taken check mark)
-    "Standard 25-page game": 49500,                           # was 49,000
-    "Standard 25-page game, Place code on": 53000,            # was 52,500
+    "Editor (story-editor.html)": 520000,   # the plain page (lowered to 520,000 on Oct 14: shortening local names took 42 KB off, which more than paid for the Options → Safety box, its reminder, the revision stamp and the test script; was 545,000, raised to 545,000 on Oct 8 night for the map icon toolbar, start-page rule, drag handles, first-time tour and many more checker rules; raised to 540,000 on Oct 8 evening for the Write-tab batches: page picker, history, side toggles, split, paste, templates, phone bar, wide layout; tightened to 520,000 when they were done; was 500,000 on Oct 8 for the Game tab with its live preview; was 490,000; raised from 470,000 for find and replace, unfinished flags, reach reports, the manuscript, Oct 8 2026; now about 2% headroom, so it stays)
+    "Editor as delivered (packed)": 229000, # what the file on disk weighs
+    "The Keeper\u2019s Light (the built-in example)": 58600,   # raised to 58,600 on Oct 14 with the other two for the recap's "Roads not taken" (about 600 bytes); raised from 57,500 on Oct 14 with the next two (about 400 bytes: back swipe, contrast follows the system, already-taken check mark)
+    "Standard 25-page game": 50200,                           # was 49,500, 49,000
+    "Standard 25-page game, Place code on": 53500,            # was 53,000, 52,500
 }
 sizes = json.loads(subprocess.run(["node", HERE + "budget.mjs", HERE + "story-editor.plain.html"], capture_output=True, text=True, check=True).stdout)
 rows = [("Editor (story-editor.html)", sizes["editor"])] + [(g["name"], g) for g in sizes["games"]]

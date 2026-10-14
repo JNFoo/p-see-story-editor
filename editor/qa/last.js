@@ -6,7 +6,7 @@ const ok=(c,m)=>console.log((c?'PASS ':'FAIL ')+m);
   const errs=[]; pg.on('pageerror',e=>errs.push(e.message));
   const txt=fs.readFileSync(__dirname+'/fixtures/sample.story.json','utf8');
   await pg.addInitScript(t=>{ if(!sessionStorage.x){localStorage.clear(); localStorage.setItem('story-editor-v1', t); localStorage.setItem('story-editor-v1-settings', JSON.stringify({chosen:true,remember:true,advanced:{write:true,map:true,items:true}})); sessionStorage.x=1;} window.__g=[]; window.showSaveFilePicker = async o => ({ name:o.suggestedName, createWritable: async()=>({ write: async blob=>{ window.__g.push(await blob.text()); }, close: async()=>{} }) }); }, txt);
-  await pg.goto(require('url').pathToFileURL(require('path').join(__dirname, '..', 'story-editor.html')).href); await pg.waitForFunction(()=>window.__editor&&!document.getElementById('splash'),null,{timeout:20000});
+  await pg.goto(require('url').pathToFileURL((process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html'))).href); await pg.waitForFunction(()=>window.__editor&&!document.getElementById('splash'),null,{timeout:20000});
   await pg.locator('#export').click(); await pg.waitForTimeout(500);
   await pg.locator('#optbtn').click(); await pg.locator('#optpop button:has-text("font - Export")').click(); await pg.waitForTimeout(300);
   await pg.waitForTimeout(1600); await pg.locator('#export').click(); await pg.waitForTimeout(500);

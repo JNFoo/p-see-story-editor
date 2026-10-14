@@ -1,6 +1,6 @@
 /* Write-tab batch 3: drag grips, split page, paste a scene, word count, smart quotes, text size, wide layout. */
 const which=process.argv[2]||'firefox';const B=require('./engine').pick(which);
-const FILE=require('url').pathToFileURL(require('path').join(__dirname, '..', 'story-editor.html')).href;
+const FILE=require('url').pathToFileURL((process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html'))).href;
 let fails=0;const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)fails++};
 (async()=>{
 const b=await B.launch();

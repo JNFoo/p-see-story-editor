@@ -23,6 +23,7 @@ module.exports = {
     S('packed', 'packed-check.js', ['build.py', 'lzma/lzma_pack.py', 'lzma/lzma-decode.js'], true),
     S('nosave', 'nosave.js', ['player.js', 'game.css', 'core.js'], true),
     S('twowin', 'twowin.js', ['ui1-state.js', 'ui5-app.js', 'ui2-widgets.js'], true),
+    S('safety', 'safety.js', ['ui5-app.js', 'ui1-state.js', 'ui2-widgets.js', 'core.js'], true),
     S('gamefeel', 'gamefeel.js', ['player.js', 'game.css', 'core.js'], true),
     S('textstress', 'textstress.js', ['player.js', 'game.css', 'core.js'], false),
     S('motion', 'motion.js', ['ui5-app.js', 'ui2-widgets.js', 'ui.css'], true),

@@ -79,6 +79,21 @@ let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); 
   const forced = await pg.evaluate(() => [...document.styleSheets].some(s => { try { return [...s.cssRules].some(r => r.conditionText && /forced-colors/.test(r.conditionText)); } catch (e) { return false; } }));
   ok(forced, 'a forced-colors rule is in the game\'s styles');
   await t.ctx.close();
+  /* ---- 4. "Roads not taken" in the ending's recap ---- */
+  t = await open(); pg = t.pg;
+  let rnd = 12345; /* a seeded pseudo-random player, so the run is the same every time */
+  for (let n = 0; n < 300 && await pg.locator('.kl-end').count() === 0; n++) { const cn = await choices(pg).count(); rnd = (rnd * 1103515245 + 12345) % 2147483648; await choices(pg).nth(Math.floor(rnd / 2147483648 * cn)).click(); await pg.waitForTimeout(40); }
+  if (!(await pg.locator('.kl-end').count())) console.log('STUCK', (await pg.evaluate(() => document.body.innerText)).slice(0, 400));
+  ok(await pg.locator('.kl-end').count() === 1, 'a run that varies its choices reaches an ending');
+  const roads = await pg.evaluate(() => [...document.querySelectorAll('.kl-roads li .kl-skip')].map(x => x.textContent.replace(/^→ /, '')));
+  const open1 = await pg.evaluate(() => document.querySelector('.kl-recap summary').textContent);
+  ok(/^See the path you took/.test(open1), 'the recap keeps its title: ' + open1);
+  ok(roads.length > 0 && (await pg.locator('.kl-roads-h').textContent()) === 'Roads not taken', 'the recap lists roads not taken (' + roads.length + '): ' + roads.slice(0, 3).join(' | '));
+  const anyone = new Map(); story.passages.forEach(q => q.choices.forEach(c => { if (!(c.needs || []).length && !(c.forbid || []).length) anyone.set(c.label, 1); }));
+  ok(roads.every(r => anyone.has(r)), 'every listed road is a choice anyone could see: no choice that needs or forbids an item is listed');
+  const gated = []; story.passages.forEach(q => q.choices.forEach(c => { if ((c.needs || []).length || (c.forbid || []).length) gated.push(c.label); }));
+  ok(roads.every(r => !gated.includes(r) || anyone.has(r)), 'and no gated label leaks (' + gated.length + ' gated choices in this story)');
+  await t.ctx.close();
   ok(errs.length === 0, 'no page errors' + (errs.length ? ': ' + errs[0] : ''));
   await b.close(); console.log(fails ? 'FAILED' : 'ALL PASSED'); process.exit(fails ? 1 : 0);
 })().catch(e => { console.log('FAIL crashed: ' + e.message); process.exit(1); });

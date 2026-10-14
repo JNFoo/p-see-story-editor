@@ -2,7 +2,7 @@
    and dead numbers forgotten by the checker. Usage: node tools8.js [chromium|firefox] */
 const which=process.argv[2]||'firefox';const B=require('./engine').pick(which);
 const fs=require('fs'),vm=require('vm');
-const FILE=require('url').pathToFileURL(require('path').join(__dirname, '..', 'story-editor.html')).href;
+const FILE=require('url').pathToFileURL((process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html'))).href;
 let fails=0;const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)fails++};
 /* the model, for making test stories outside the page */
 const cx={console};vm.createContext(cx);

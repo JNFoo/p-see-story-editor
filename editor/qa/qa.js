@@ -5,8 +5,20 @@
      node qa.js quick     the fast suites that catch most breakage (about 1 minute)
      node qa.js smart     quick, plus every suite whose watched source files changed since the last all-green run
      node qa.js full      everything on Firefox, then everything again on Chromium (the check before a file goes out)
+     node qa.js sample    contract plus a rotating quarter of the quick suites (and any whose files changed): a cheap look between edits,
+                          never the check before delivery
      node qa.js <tier> --only lite      run only suites whose name contains "lite"
      node qa.js <tier> --verbose        print each suite's own output as well (it is always saved in logs/)
+     node qa.js <tier> --against <rev> [--expect-fail]
+                          run the browser suites against the editor as built from git revision <rev> (the build from before a fix).
+                          A suite that FAILS there notices the bug the fix removed; with --expect-fail the exit code is 0 only when every
+                          selected suite fails (the fail-first proof for a new regression check). Game suites still use packages/story-player
+                          from the working tree. Nothing is written to .stamp, counts.json or times.json.
+     node qa.js --history               how each suite has done over the recorded runs (runs, failures, flaky, average time)
+
+   First line of a run: how many jobs and about how long they take (from the last all-green run). On a failure, a "next:" line says which log
+   to read and the command that runs only that suite. Every suite result is appended to ledger.jsonl (kept out of git): that is the flake
+   ledger, and "smart" uses it: a suite is skipped for a changed file it has never failed on in 5 or more runs (a full check still runs it).
 
    What it prints: one line per suite (pass / pass* / FAIL, seconds, name), the failing lines of any failure, and a
    summary with the slowest suites. Each suite's full output is kept in logs/<name>.log, so nothing has to be pasted
@@ -38,6 +50,7 @@ const SUITES = [
   S('packed', 'packed-check.js', ['build.py', 'lzma/lzma_pack.py', 'lzma/lzma-decode.js'], true),
   S('nosave', 'nosave.js', ['player.js', 'game.css', 'core.js'], true),
   S('twowin', 'twowin.js', ['ui1-state.js', 'ui5-app.js', 'ui2-widgets.js'], true),
+  S('safety', 'safety.js', ['ui5-app.js', 'ui1-state.js', 'ui2-widgets.js', 'core.js'], true),
   S('gamefeel', 'gamefeel.js', ['player.js', 'game.css', 'core.js'], true),
   S('textstress', 'textstress.js', ['player.js', 'game.css', 'core.js'], false),
   S('motion', 'motion.js', ['ui5-app.js', 'ui2-widgets.js', 'ui.css'], true),
@@ -63,17 +76,60 @@ const FUZZ3 = { name: 'fuzz3', cmd: ['node', HERE + 'fuzz3.mjs', '1500', '1'], w
 const CONTRACT = { name: 'contract', cmd: ['node', ED + 'contract.mjs', '400', '1'], watch: ['core.js', 'player.js', 'contract.mjs'], quick: true, engine: '' };
 
 const args = process.argv.slice(2);
-const tier = args.find(a => ['quick', 'smart', 'full'].includes(a)) || 'quick';
+const tier = args.find(a => ['quick', 'smart', 'full', 'sample'].includes(a)) || 'quick';
 const verbose = args.includes('--verbose');
 const only = args.includes('--only') ? args[args.indexOf('--only') + 1] : '';
+const against = args.includes('--against') ? args[args.indexOf('--against') + 1] : '';
+const expectFail = args.includes('--expect-fail');
+const RUN = new Date().toISOString();
+
+/* ---- the ledger: one JSON line per suite per run ---- */
+const LEDGER = HERE + 'ledger.jsonl';
+const readLedger = () => {
+  if (!fs.existsSync(LEDGER)) return [];
+  return fs.readFileSync(LEDGER, 'utf8').split('\n').filter(Boolean).map(l => { try { return JSON.parse(l); } catch (e) { return null; } }).filter(Boolean);
+};
+const ledger = readLedger();
+if (args.includes('--history')) {
+  const by = {};
+  ledger.filter(e => !e.only && !e.against).forEach(e => {
+    const b = (by[e.label] = by[e.label] || { runs: 0, fail: 0, flaky: 0, sec: 0 });
+    b.runs++; b.sec += e.sec; if (e.mark === 'FAIL') b.fail++; if (e.mark === 'pass*') b.flaky++;
+  });
+  const names = Object.keys(by).sort((a, b) => (by[b].fail + by[b].flaky) - (by[a].fail + by[a].flaky) || a.localeCompare(b));
+  console.log(`${ledger.length} recorded results (ledger.jsonl)\n` + 'suite'.padEnd(26) + 'runs  FAIL  flaky  avg s');
+  names.forEach(n => console.log(n.padEnd(26) + String(by[n].runs).padStart(4) + String(by[n].fail).padStart(6) + String(by[n].flaky).padStart(7) + (by[n].sec / by[n].runs).toFixed(1).padStart(7)));
+  process.exit(0);
+}
+/* for a suite and a changed file: how many recorded runs had that file changed, and how many of them were not a clean pass */
+const pairStat = (label, file) => {
+  let n = 0, f = 0;
+  ledger.forEach(e => { if (e.label === label && !e.only && !e.against && (e.changed || []).includes(file)) { n++; if (e.mark !== 'pass') f++; } });
+  return { n, f };
+};
 const stampFile = HERE + '.stamp';
 const stamp = fs.existsSync(stampFile) ? fs.statSync(stampFile).mtimeMs : 0;
 const mtime = f => (fs.existsSync(ED + f) ? fs.statSync(ED + f).mtimeMs : 0);
 const changed = SOURCES.filter(f => mtime(f) > stamp);
 
+/* --against <rev>: build the editor as it was at that revision, in a temporary copy of the repository, and point the suites at it */
+let worktree = '';
+if (against) {
+  const top = spawnSync('git', ['rev-parse', '--show-toplevel'], { cwd: ED, encoding: 'utf8' }).stdout.trim();
+  worktree = require('fs').mkdtempSync(require('os').tmpdir() + '/qa-against-');
+  const add = spawnSync('git', ['worktree', 'add', '--detach', worktree + '/wt', against], { cwd: top, encoding: 'utf8' });
+  if (add.status !== 0) { console.log('--against: git could not check out ' + against + '\n' + add.stderr); process.exit(1); }
+  fs.symlinkSync(top + '/node_modules', worktree + '/wt/node_modules');
+  const b = spawnSync('python3', [worktree + '/wt/editor/build.py'], { cwd: worktree + '/wt/editor', encoding: 'utf8', env: { ...process.env, ESBUILD: process.env.ESBUILD || top + '/node_modules/.bin/esbuild' } });
+  if (b.status !== 0) { console.log('--against: the old build failed\n' + (b.stdout + b.stderr).split('\n').slice(-12).join('\n')); process.exit(1); }
+  process.env.QA_EDITOR = worktree + '/wt/editor/story-editor.html';
+  console.log(`running against the editor built from ${against} (${process.env.QA_EDITOR})`);
+  process.on('exit', () => { spawnSync('git', ['worktree', 'remove', '--force', worktree + '/wt'], { cwd: top }); try { fs.rmSync(worktree, { recursive: true, force: true }); } catch (e) { /* gone */ } });
+}
+
 /* rebuild if the built file is older than its sources */
 const builtAt = mtime('story-editor.html');
-if (SOURCES.some(f => mtime(f) > builtAt)) {
+if (!against && SOURCES.some(f => mtime(f) > builtAt)) {
   const b = spawnSync('python3', [ED + 'build.py'], { cwd: ED, encoding: 'utf8' });
   if (b.status !== 0) { console.log('BUILD FAILED\n' + (b.stdout + b.stderr).split('\n').slice(-12).join('\n')); process.exit(1); }
   console.log('rebuilt story-editor.html (sources were newer)');
@@ -94,20 +150,31 @@ const waitForServer = async () => {
 
 /* the jobs for this tier */
 const jobs = [];
-const want = s => (tier === 'full') || s.quick || (tier === 'smart' && s.watch.some(w => changed.includes(w)));
-if (!only || 'contract'.includes(only)) if (want(CONTRACT)) jobs.push({ label: 'contract', cmd: CONTRACT.cmd, lane: 'firefox' });
-if (tier === 'full' && (!only || 'fuzz3'.includes(only))) jobs.push({ label: 'fuzz3', cmd: FUZZ3.cmd, lane: 'firefox' });
-if (!only) jobs.push({ label: 'lines-selftest', cmd: ['node', 'lines.js'], lane: 'firefox' });
+const skipped = []; /* suites "smart" left out because their history says the changed files never broke them */
+const quickNames = SUITES.filter(x => x.quick).map(x => x.name).sort();
+const sampleTurn = new Set(ledger.filter(e => e.tier === 'sample').map(e => e.run)).size % 4;
+const watched = s => {
+  const hit = s.watch.filter(w => changed.includes(w));
+  if (!hit.length) return false;
+  const live = hit.some(w => { const p = pairStat(`${s.name} firefox`, w); return p.n < 5 || p.f > 0; });
+  if (!live) skipped.push(s.name);
+  return live;
+};
+const want = s => against ? true : tier === 'full' ? true : tier === 'sample' ? (s.quick ? quickNames.indexOf(s.name) % 4 === sampleTurn || watched(s) : watched(s)) : s.quick || (tier === 'smart' && watched(s));
+if (!against && (!only || 'contract'.includes(only))) if (want(CONTRACT) || tier === 'sample') jobs.push({ label: 'contract', cmd: CONTRACT.cmd, lane: 'firefox' });
+if (!against && tier === 'full' && (!only || 'fuzz3'.includes(only))) jobs.push({ label: 'fuzz3', cmd: FUZZ3.cmd, lane: 'firefox' });
+if (!only && !against) jobs.push({ label: 'lines-selftest', cmd: ['node', 'lines.js'], lane: 'firefox' });
 const lane = engine => SUITES.forEach(s => {
   if (!s.engines.includes(engine) || !want(s)) return;
-  if (engine === 'chromium' && tier !== 'full') return; /* Chromium only in the full check */
+  if (engine === 'chromium' && tier !== 'full' && !against) return; /* Chromium only in the full check */
   if (only && !s.name.includes(only)) return;
   jobs.push({ label: `${s.name} ${engine}`, cmd: ['node', s.file, engine], lane: engine });
 });
 lane('firefox');
 lane('chromium');
 
-if (tier === 'smart') console.log('changed since the last all-green run:', changed.join(', ') || 'nothing');
+if (tier === 'smart' || tier === 'sample') console.log('changed since the last all-green run:', changed.join(', ') || 'nothing');
+if (skipped.length) console.log('left out because their history shows the changed files never broke them (5 or more runs): ' + [...new Set(skipped)].join(', ') + ' (a full check still runs them)');
 /* Runs one job in the background (so two browsers can work at once) and resolves with its result. */
 const run = job => new Promise(done => {
   const t = Date.now();
@@ -139,17 +206,27 @@ const timesFile = HERE + 'times.json';
 const TIMES = fs.existsSync(timesFile) ? JSON.parse(fs.readFileSync(timesFile, 'utf8')) : {};
 const queue = jobs.slice().sort((x, y) => (TIMES[y.label] ?? 40) - (TIMES[x.label] ?? 40));
 const WORKERS = Math.max(1, +process.env.QA_JOBS || 3);
+{
+  const known = jobs.filter(j => TIMES[j.label] !== undefined);
+  const secs = jobs.reduce((t, j) => t + (TIMES[j.label] ?? 40), 0) / WORKERS;
+  console.log(`expected: ${jobs.length} jobs, about ${Math.round(secs)} s with ${WORKERS} at a time (${known.length} of them have a time from the last all-green run; the rest are guessed at 40 s)`);
+}
 const report = (job, mark, r) => {
   fs.writeFileSync(LOGS + job.label.replace(/\W+/g, '-') + '.log', r.out);
   rows.push({ mark, sec: r.sec, label: job.label, passes: r.passes });
+  try { fs.appendFileSync(LEDGER, JSON.stringify({ run: RUN, t: new Date().toISOString(), tier, label: job.label, mark, sec: Math.round(r.sec), changed, only: !!only, against: !!against }) + '\n'); } catch (e) { /* the ledger is a convenience */ }
+  const slug = job.label.replace(/\W+/g, '-');
+  const suite = job.label.split(' ')[0];
   console.log(`${mark.padEnd(5)} ${r.sec.toFixed(1).padStart(6)} s  ${job.label}`);
   if (verbose) console.log(r.out.split('\n').map(l => '        ' + l).join('\n'));
-  if (mark === 'FAIL') console.log(r.fails.slice(0, 8).map(l => '        ' + l.slice(0, 200)).join('\n') + `\n        (full output: qa/logs/${job.label.replace(/\W+/g, '-')}.log)`);
+  if (mark === 'FAIL') console.log(r.fails.slice(0, 8).map(l => '        ' + l.slice(0, 200)).join('\n') + `\n        (full output: qa/logs/${slug}.log)` + (against ? '' : `\n        next: read the failing lines above in qa/logs/${slug}.log; run only this suite with: node qa.js ${tier === 'sample' ? 'quick' : tier} --only ${suite}`));
+  if (mark === 'pass*') console.log(`        next: flaky (failed once, passed on the second try); the first try is in qa/logs/${slug}.first-try.log; node qa.js history shows how often`.replace('node qa.js history', 'node qa.js --history'));
 };
 const runOne = async job => {
   let r = await run(job);
   let mark = 'pass';
-  if (!r.ok) {
+  if (!r.ok && against) { mark = 'FAIL'; bad++; } /* against an old build a failure is the answer, not something to retry */
+  else if (!r.ok) {
     fs.writeFileSync(LOGS + job.label.replace(/\W+/g, '-') + '.first-try.log', r.out); /* kept, so a flaky pass* can be looked into */
     const r2 = await run(job);
     r2.sec += r.sec;
@@ -163,14 +240,20 @@ const worker = async () => { for (let job; (job = queue.shift()); ) await runOne
 (async () => {
 await waitForServer();
 await Promise.all(Array.from({ length: WORKERS }, worker));
-if (!bad) { rows.forEach(r => { TIMES[r.label] = Math.round(r.sec); }); fs.writeFileSync(timesFile, JSON.stringify(TIMES, null, 1)); }
+if (!bad && !against) { rows.forEach(r => { TIMES[r.label] = Math.round(r.sec); }); fs.writeFileSync(timesFile, JSON.stringify(TIMES, null, 1)); }
 const slow = rows.slice().sort((a, b) => b.sec - a.sec).slice(0, 3).map(r => `${r.label} ${r.sec.toFixed(0)} s`).join(', ');
 console.log(`\n${tier}: ${rows.length} suites, ${rows.filter(r => r.mark === 'pass').length} pass, ${rows.filter(r => r.mark === 'pass*').length} pass* (flaky), ${bad} FAIL, ${((Date.now() - T0) / 1000).toFixed(0)} s in all. Slowest: ${slow}`);
+if (bad && !against) console.log(`Next: fix the first failure above, then run only that suite (the "next:" line under it); finish with: node qa.js ${tier === 'sample' ? 'quick' : tier}`);
+if (against) {
+  const noticed = rows.filter(r => r.mark === 'FAIL').length;
+  console.log(`against ${against}: ${noticed} of ${rows.length} suites FAIL on the old build (they notice the bug); ${rows.length - noticed} pass there (they do not notice it)`);
+  process.exit(expectFail ? (noticed === rows.length && rows.length ? 0 : 1) : 0);
+}
 if (!bad && tier === 'full' && !only) { /* the check counts of this all-green full run are what later runs are held to */
   const counts = {};
   rows.forEach(r => { if (r.passes) counts[r.label] = r.passes; });
   fs.writeFileSync(countsFile, JSON.stringify(counts, null, 1));
 }
-if (!bad && tier !== 'quick' && !only) fs.writeFileSync(stampFile, new Date().toISOString());
+if (!bad && tier !== 'quick' && tier !== 'sample' && !only) fs.writeFileSync(stampFile, new Date().toISOString());
 process.exit(bad ? 1 : 0);
 })();

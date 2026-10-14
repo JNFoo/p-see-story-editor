@@ -253,6 +253,34 @@ function klPlayer(root, story, opts = {}) {
     if (title && g !== p.heading) last.appendChild(el('span', 'kl-took', title));
     ol.appendChild(last);
     det.appendChild(ol);
+
+    /* "Roads not taken": on the pages this run went through, the choices that were open to anyone and were not picked. A choice that needs or
+       forbids an item is left out (its label could give away what the player never found); so is anything on a page the run never reached. */
+    const pages = [];
+    Object.keys(state.seen || {}).forEach(k => {
+      const id = k.slice(0, k.lastIndexOf('.'));
+      if (byId[id] && pages.indexOf(id) < 0) pages.push(id);
+    });
+    const roads = [];
+    pages.forEach(id => {
+      const q = byId[id];
+      q.choices.forEach((c, i) => {
+        if (state.seen[`${id}.${i}`] || (c.needs && c.needs.length) || (c.forbid && c.forbid.length) || !byId[c.to]) return;
+        roads.push([q.heading || gist(q, state.flags), c.label]);
+      });
+    });
+    if (roads.length) {
+      det.appendChild(el('p', 'kl-roads-h', 'Roads not taken'));
+      const ul = el('ul', 'kl-roads');
+      roads.slice(0, 12).forEach(r => {
+        const li = el('li');
+        li.appendChild(el('span', 'kl-step', `${r[0]} `));
+        li.appendChild(el('span', 'kl-skip', `→ ${r[1]}`));
+        ul.appendChild(li);
+      });
+      if (roads.length > 12) ul.appendChild(el('li', 'kl-step', `…and ${roads.length - 12} more.`));
+      det.appendChild(ul);
+    }
     return det;
   }
 

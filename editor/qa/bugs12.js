@@ -4,7 +4,7 @@
    the reading-settings panel (Esc, outside click, never cut off); Start over on a stuck page; a doctored Place code. */
 const which = process.argv[2] || 'firefox'; const B = require('./engine').pick(which);
 const fs = require('fs'); const { genStory } = require('./genstory');
-const FILE = require('url').pathToFileURL(require('path').join(__dirname, '..', 'story-editor.html')).href;
+const FILE = require('url').pathToFileURL((process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html'))).href;
 let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };
 const nap = ms => new Promise(r => setTimeout(r, ms)); // real time (the browser shim's own waits can run short)
 const SETTINGS = JSON.stringify({ chosen: true, remember: true, advanced: { write: true, map: true, items: true, game: true } });

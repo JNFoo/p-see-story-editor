@@ -139,6 +139,12 @@ function speedReportText() {
     `Start-up: DOM ready ${nav ? Math.round(nav.domContentLoadedEventEnd) : '?'} ms, first paint ${paint['first-paint'] ?? '?'} ms, ` +
       `first content ${paint['first-contentful-paint'] ?? '?'} ms, loaded ${nav ? Math.round(nav.loadEventEnd) : '?'} ms`
   );
+  const got = nav ? Math.round(nav.responseEnd) : 0; // the file has arrived (from disk or the network)
+  L.push(
+    `Opened in ${READY_AT ? Math.round(READY_AT) + ' ms' : 'more than ' + Math.round(performance.now()) + ' ms (not drawn yet)'}: ` +
+      `the file arrived at ${got} ms, the editor's code started at ${Math.round(BOOT_AT)} ms (${Math.max(0, Math.round(BOOT_AT) - got)} ms unpacking and reading the page), ` +
+      `the first screen was drawn at ${READY_AT ? Math.round(READY_AT) : '?'} ms (${READY_AT ? Math.round(READY_AT - BOOT_AT) : '?'} ms setting up). All counted from the moment the page was asked for.`
+  );
   const f = speedFrame;
   if (f.n) {
     L.push(

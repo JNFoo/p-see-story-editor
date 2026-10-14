@@ -4,7 +4,7 @@
    Usage: node fuzz1.js [firefox|chromium] [steps=250] [seeds=3] */
 const which = process.argv[2] || 'firefox', STEPS = +process.argv[3] || 150, SEEDS = +process.argv[4] || 2;
 const B = require('./engine').pick(which);
-const FILE = require('url').pathToFileURL(require('path').join(__dirname, '..', 'story-editor.html')).href;
+const FILE = require('url').pathToFileURL((process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html'))).href;
 let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };
 const SKIP = /\b(open|import|download|export|save|copy game|manuscript|take the tour|speed report|print)\b/i;
 const WORDS = ['alpha', 'The door creaks open.', 'x', '', 'Two  spaces', 'a'.repeat(120), 'Quote "here" and it\'s', 'line\nbreak', '12', '-3'];

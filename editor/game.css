@@ -53,6 +53,9 @@
 .kl-recap ol{margin:.7em 0 0;padding-left:1.4em;font-size:.9em;line-height:1.55}
 .kl-recap li{margin:0 0 .55em}
 .kl-took{color:var(--lamp);font-weight:600}
+.kl-roads-h{margin:1.1em 0 0;font:var(--dw) .9em/1.4 var(--font);color:var(--muted)}
+.kl-roads{margin:.5em 0 0;padding-left:1.4em;font-size:.9em;line-height:1.55;list-style:circle}
+.kl-skip{color:var(--muted);font-style:italic}
 
 /*@part bars*/
 /* Numbers (stats): a labeled bar */

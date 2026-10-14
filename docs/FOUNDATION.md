@@ -266,7 +266,7 @@ One file and no network; edit parts, build the whole; write rules once and copy 
 8. A locked choice with two unmet conditions shows only the first as its reason unless the author types one.
 9. Real-device checks never done: Android dark drop-downs and folded warnings, the Aa panel / Back / dice banner / presets on phones, zoom and Place code on phones, splash speed in Firefox and on phones.
 10. Wide numbers across many pages can still hit the 200,001-situation limit.
-11. Features from the research list not built (images and the ranked ideas after the first ten): see `ADVANCED-FEATURES-RESEARCH.md` in the old working folder.
+11. Features from the research list not built (images and the ranked ideas after the first ten): see the research list in `docs/OPTIMIZATION-CHART.md` in the old working folder.
 
 ---
 

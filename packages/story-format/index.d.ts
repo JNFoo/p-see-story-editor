@@ -30,7 +30,7 @@ export interface Passage {
 }
 export interface GameOptions { back: 'off' | 'remember' | 'reroll' | 'block'; tracker: boolean; comfort: boolean; odds: boolean; place: boolean; pal: 'paper' | 'night' | 'sepia' | 'ocean' | 'forest' | 'contrast' }
 export interface Project {
-  format: 'story-editor'; version: number; id: string; title: string; author: string; start: string;
+  format: 'story-editor'; version: number; id: string; title: string; author: string; start: string; rev?: number; savedAt?: string;
   gameFont?: 'system'; game: GameOptions; items: Item[]; givens: Given[]; passages: Passage[];
 }
 

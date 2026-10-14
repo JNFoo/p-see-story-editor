@@ -3,7 +3,7 @@
 const which=process.argv[2]||'firefox';const B=require('./engine').pick(which);
 const fs=require('fs');
 const D=__dirname+'/work/';
-require('child_process').execSync('cp "'+require('path').join(__dirname, '..', 'story-editor.html')+'" '+D+'ed.html');const FILE='http://127.0.0.1:'+(process.env.QA_PORT||8765)+'/ed.html'; /* qa.js starts a server on a port of its own and says which in QA_PORT */
+require('child_process').execSync('cp "'+(process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html'))+'" '+D+'ed.html');const FILE='http://127.0.0.1:'+(process.env.QA_PORT||8765)+'/ed.html'; /* qa.js starts a server on a port of its own and says which in QA_PORT */
 let fails=0;const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)fails++};
 const S1='story-editor-v1',S1B='story-editor-v1-backup',S1D='story-editor-v1-damaged';
 (async()=>{

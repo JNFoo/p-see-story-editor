@@ -1,6 +1,6 @@
 const http=require('http'),fs=require('fs'),path=require('path');
 const which=process.argv[2]||'firefox';const B=require('./engine').pick(which);
-const ED=path.join(__dirname,'..','story-editor.html');
+const ED=(process.env.QA_EDITOR||path.join(__dirname,'..','story-editor.html'));
 const ok=(c,m)=>console.log((c?'PASS ':'FAIL ')+m);
 (async()=>{
  const srv=http.createServer((q,r)=>{const bad=q.url.startsWith('/cut');let d=fs.readFileSync(ED);if(bad){d=Buffer.from(d);const i=d.indexOf('var s="')+5000;d[i]=d[i]===65?66:65}r.writeHead(200,{'content-type':'text/html; charset=utf-8'});r.end(d)}).listen(0,'127.0.0.1');

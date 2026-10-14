@@ -111,7 +111,7 @@ function joinAnd(parts) {
  * without the checker being taught about it: list the field below, then make analyze() use it.
  */
 const FIELD_CONTRACT = {
-  project: { rules: ['start', 'items', 'givens', 'passages'], display: ['format', 'version', 'id', 'title', 'author', 'gameFont', 'game'] },
+  project: { rules: ['start', 'items', 'givens', 'passages'], display: ['format', 'version', 'id', 'title', 'author', 'gameFont', 'game', 'rev', 'savedAt'] },
   item: { rules: ['id', 'kind', 'show', 'lo', 'hi', 'start'], display: ['name', 'names'] },
   given: { rules: ['options'], display: ['id', 'question'] },
   passage: { rules: ['id', 'ending', 'blocks', 'gives', 'takes', 'adds', 'sends', 'choices'], display: ['name', 'heading', 'valence', 'todo'] },
@@ -361,7 +361,7 @@ function makePassage(name) {
 function makeProject(title) {
   const p = {
     format: 'story-editor',
-    version: 1,
+    version: STORY_VERSION,
     id: uid('s_'),
     title: title || 'Untitled story',
     author: '',
@@ -384,6 +384,16 @@ function makeProject(title) {
  * type, ids are validated, and references to things that do not exist are dropped.
  * Throws an Error with a friendly message if the data is not a story at all.
  */
+/** The story file format this editor writes. A file with an older number is brought up to date by MIGRATIONS; a newer one is opened with a warning. */
+const STORY_VERSION = 1;
+
+/**
+ * The upgrade chain: MIGRATIONS[n] takes the raw data of a version-n file and returns the raw data of a version n+1 file.
+ * Empty while there is only version 1. When the format changes, bump STORY_VERSION, add the step here, and keep an old-format file in
+ * qa/fixtures so the story-format test proves it still opens (that test already opens every fixture there).
+ */
+const MIGRATIONS = {};
+
 /** Set by normalizeProject when it had to change something the author should hear about (shown after opening a file). */
 let startFixNote = '';
 
@@ -391,6 +401,8 @@ function normalizeProject(raw) {
   if (!raw || typeof raw !== 'object' || !Array.isArray(raw.passages)) {
     throw new Error('This file is not a story backup.');
   }
+  const fileVersion = Math.round(Number(raw.version)) || 1;
+  for (let v = fileVersion; MIGRATIONS[v]; v++) raw = MIGRATIONS[v](raw); // oldest format first, one step at a time
   const A = x => (Array.isArray(x) ? x : []); // a field of the wrong type (a hand-edited file) counts as empty instead of crashing
   const taken = Object.create(null); // ids already handed out
   const itemMap = Object.create(null); // id as found in the file -> id we use
@@ -409,7 +421,7 @@ function normalizeProject(raw) {
 
   const p = {
     format: 'story-editor',
-    version: 1,
+    version: STORY_VERSION,
     id: String(raw.id || uid('s_')).slice(0, 64),
     title: String(raw.title || 'Untitled story'),
     author: String(raw.author || ''),
@@ -418,6 +430,12 @@ function normalizeProject(raw) {
     givens: [],
     passages: []
   };
+  /* the revision counter and the time of the last save to a file (written by Save; display only, the game never reads them) */
+  if (raw.rev !== undefined || raw.savedAt !== undefined) {
+    const r = Math.round(Number(raw.rev));
+    if (Number.isFinite(r) && r > 0) p.rev = Math.min(r, 1e9);
+    if (typeof raw.savedAt === 'string' && /^\d{4}-\d\d-\d\dT[\d:.]{5,16}Z$/.test(raw.savedAt)) p.savedAt = raw.savedAt;
+  }
 
   const intIn = (v, lo, hi, d) => {
     v = Math.round(Number(v));
@@ -571,6 +589,7 @@ function normalizeProject(raw) {
   if (raw.gameFont === 'system') p.gameFont = 'system';
   p.game = cleanGame(raw.game);
   pruneVirtual(p);
+  if (fileVersion > STORY_VERSION && !startFixNote) startFixNote = `This story was saved by a newer version of the editor (file format ${fileVersion}; this editor reads format ${STORY_VERSION}). It opened, but anything this editor does not know about was left out. Do not save over the original file.`;
   return p;
 }
 

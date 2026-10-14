@@ -1,7 +1,7 @@
 /* Oct 8 night round: no up/down arrows, start page is never an ending, map icon toolbar, key above Start, dice tab icon, first-time tour, new checker rules. */
 const which=process.argv[2]||'firefox';const B=require('./engine').pick(which);
 const fs=require('fs');
-const FILE=require('url').pathToFileURL(require('path').join(__dirname, '..', 'story-editor.html')).href;
+const FILE=require('url').pathToFileURL((process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html'))).href;
 const KEEP=fs.readFileSync(require('path').join(__dirname, '..', 'keepers-light.project.json'),'utf8');
 let fails=0;const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)fails++};
 (async()=>{

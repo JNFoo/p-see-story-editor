@@ -107,7 +107,7 @@ function joinAnd(parts) {
  * without the checker being taught about it: list the field below, then make analyze() use it.
  */
 const FIELD_CONTRACT = {
-  project: { rules: ['start', 'items', 'givens', 'passages'], display: ['format', 'version', 'id', 'title', 'author', 'gameFont', 'game'] },
+  project: { rules: ['start', 'items', 'givens', 'passages'], display: ['format', 'version', 'id', 'title', 'author', 'gameFont', 'game', 'rev', 'savedAt'] },
   item: { rules: ['id', 'kind', 'show', 'lo', 'hi', 'start'], display: ['name', 'names'] },
   given: { rules: ['options'], display: ['id', 'question'] },
   passage: { rules: ['id', 'ending', 'blocks', 'gives', 'takes', 'adds', 'sends', 'choices'], display: ['name', 'heading', 'valence', 'todo'] },
@@ -422,7 +422,7 @@ function makePassage(name) {
 function makeProject(title) {
   const p = {
     format: 'story-editor',
-    version: 1,
+    version: STORY_VERSION,
     id: uid('s_'),
     title: title || 'Untitled story',
     author: '',
@@ -444,12 +444,22 @@ function makeProject(title) {
  * type, ids are validated, and references to things that do not exist are dropped.
  * Throws an Error with a friendly message if the data is not a story at all.
  */
+/** The story file format this editor writes. A file with an older number is brought up to date by MIGRATIONS; a newer one is opened with a warning. */
+const STORY_VERSION = 1;
+/**
+ * The upgrade chain: MIGRATIONS[n] takes the raw data of a version-n file and returns the raw data of a version n+1 file.
+ * Empty while there is only version 1. When the format changes, bump STORY_VERSION, add the step here, and keep an old-format file in
+ * qa/fixtures so the story-format test proves it still opens (that test already opens every fixture there).
+ */
+const MIGRATIONS = {};
 /** Set by normalizeProject when it had to change something the author should hear about (shown after opening a file). */
 let startFixNote = '';
 function normalizeProject(raw) {
   if (!raw || typeof raw !== 'object' || !Array.isArray(raw.passages)) {
     throw new Error('This file is not a story backup.');
   }
+  const fileVersion = Math.round(Number(raw.version)) || 1;
+  for (let v = fileVersion; MIGRATIONS[v]; v++) raw = MIGRATIONS[v](raw); // oldest format first, one step at a time
   const A = x => (Array.isArray(x) ? x : []); // a field of the wrong type (a hand-edited file) counts as empty instead of crashing
   const taken = Object.create(null); // ids already handed out
   const itemMap = Object.create(null); // id as found in the file -> id we use
@@ -468,7 +478,7 @@ function normalizeProject(raw) {
 
   const p = {
     format: 'story-editor',
-    version: 1,
+    version: STORY_VERSION,
     id: String(raw.id || uid('s_')).slice(0, 64),
     title: String(raw.title || 'Untitled story'),
     author: String(raw.author || ''),
@@ -477,6 +487,12 @@ function normalizeProject(raw) {
     givens: [],
     passages: []
   };
+  /* the revision counter and the time of the last save to a file (written by Save; display only, the game never reads them) */
+  if (raw.rev !== undefined || raw.savedAt !== undefined) {
+    const r = Math.round(Number(raw.rev));
+    if (Number.isFinite(r) && r > 0) p.rev = Math.min(r, 1e9);
+    if (typeof raw.savedAt === 'string' && /^\d{4}-\d\d-\d\dT[\d:.]{5,16}Z$/.test(raw.savedAt)) p.savedAt = raw.savedAt;
+  }
 
   const intIn = (v, lo, hi, d) => {
     v = Math.round(Number(v));
@@ -630,6 +646,7 @@ function normalizeProject(raw) {
   if (raw.gameFont === 'system') p.gameFont = 'system';
   p.game = cleanGame(raw.game);
   pruneVirtual(p);
+  if (fileVersion > STORY_VERSION && !startFixNote) startFixNote = `This story was saved by a newer version of the editor (file format ${fileVersion}; this editor reads format ${STORY_VERSION}). It opened, but anything this editor does not know about was left out. Do not save over the original file.`;
   return p;
 }
 
@@ -2718,6 +2735,102 @@ function storyManuscript(project) {
           .join('\n')
       );
   });
+  return out.join('\n\n') + '\n';
+}
+
+/**
+ * Routes for a tester: a short list of walks through the story that together take every choice a player can ever be offered at least once
+ * (every outcome of a skill check too). `a` is the analyze() result. Each route is the quickest way (with the right things in hand) to a page, plus
+ * the one choice being tested; a greedy pick keeps the list short (the next route is the one with the most choices not yet covered).
+ * Returns null when the story is too large to have been checked completely. { routes: [{ steps }], total, unbuilt: [`pageId: label`], unreached: [pageId] }.
+ * A step is { given, question, label } (an answer to a Given), or { label, to, ci, fail } (a choice taken, the page it leads to).
+ */
+function storyTestRoutes(project, a) {
+  if (!a || a.truncated || !a.samples) return null;
+  const byId = {};
+  project.passages.forEach(p => (byId[p.id] = p));
+  const edgesOf = steps => {
+    let at = project.start;
+    const out = [];
+    steps.forEach(st => {
+      if (st.given) return;
+      out.push(`${at}.${st.ci}.${st.fail ? 1 : 0}`);
+      at = st.to;
+    });
+    return out;
+  };
+  const want = new Set();
+  const cands = [];
+  const unbuilt = [];
+  const unreached = [];
+  project.passages.forEach(p => {
+    const sms = a.samples(p.id, 8);
+    if (!sms.length) return void unreached.push(p.id);
+    if (p.ending) return;
+    p.choices.forEach((c, ci) => {
+      if (!c.to || !byId[c.to] || (c.check && !byId[c.check.fail])) return;
+      (c.check ? [false, true] : [false]).forEach(fail => {
+        const dest = fail ? c.check.fail : c.to;
+        const sm = sms.find(x => klCondOk(c, x.flags) && (!c.check || klTarget(x.flags, c, fail ? 2 : 12) === dest));
+        if (!sm) {
+          // never offered, or no sample holds what it takes: the checker's own warnings say which; the script just says it has no route
+          if (sms.some(x => klCondOk(c, x.flags))) unbuilt.push(`${p.id}: ${c.label}${fail ? ' (fails the roll)' : ''}`);
+          return;
+        }
+        const steps = sm.path.concat([{ label: fail ? `${c.label} (fails the roll)` : c.label, to: dest, ci, fail }]);
+        const edges = edgesOf(steps);
+        edges.forEach(e => want.add(e));
+        cands.push({ steps, edges });
+      });
+    });
+  });
+  const total = want.size;
+  const routes = [];
+  const left = new Set(want);
+  while (left.size) {
+    let best = null;
+    let bestN = 0;
+    for (const cd of cands) {
+      let n = 0;
+      for (const e of cd.edges) if (left.has(e)) n++;
+      if (n > bestN || (n === bestN && n && best && cd.steps.length < best.steps.length)) {
+        best = cd;
+        bestN = n;
+      }
+    }
+    if (!best) break;
+    best.edges.forEach(e => left.delete(e));
+    routes.push({ steps: best.steps });
+  }
+  return { routes, total, unbuilt, unreached };
+}
+
+/** The tester's checklist as Markdown: the routes of storyTestRoutes() as tick boxes, with page names and the words to choose. */
+function storyTestScript(project, a) {
+  const r = storyTestRoutes(project, a);
+  if (!r) return null;
+  const nameOf = id => (project.passages.find(x => x.id === id) || {}).name || 'Untitled page';
+  const out = [`# Test script: ${project.title || 'Untitled story'}`];
+  out.push(
+    `${r.routes.length} route${r.routes.length === 1 ? '' : 's'} that together take each of the ${r.total} choice${r.total === 1 ? '' : 's'} players can be offered at least once. ` +
+      'Play each route in the Play tab or in an exported game, ticking each box. On every page, also read it: spelling, a missing line, anything that feels wrong.'
+  );
+  if (project.passages.some(p => p.choices.some(c => c.check)))
+    out.push('A line ending “(fails the roll)” needs a failed dice roll: the Play tab can set the roll, or just play again until it happens.');
+  r.routes.forEach((rt, i) => {
+    const last = rt.steps[rt.steps.length - 1];
+    const lines = [`## Route ${i + 1}: ends at “${nameOf(last.to)}”${(project.passages.find(x => x.id === last.to) || {}).ending ? ' _(an ending)_' : ''}`];
+    rt.steps.filter(st => st.given).forEach(st => lines.push(`- [ ] Before the story: answer “${st.question}” with “${st.label}”`));
+    lines.push(`- [ ] Start on “${nameOf(project.start)}”`);
+    rt.steps.filter(st => !st.given).forEach(st => lines.push(`- [ ] Choose “${st.label}” → “${nameOf(st.to)}”`));
+    out.push(lines.join('\n'));
+  });
+  if (r.unbuilt.length)
+    out.push(
+      '## Not covered\nThe editor found no route to these choices (they may need a combination of items it did not try). Test them by hand:\n' +
+        r.unbuilt.map(u => `- [ ] ${nameOf(u.split(': ')[0])}: ${u.slice(u.indexOf(': ') + 2)}`).join('\n')
+    );
+  if (r.unreached.length) out.push('## Pages no route reaches\n' + r.unreached.map(id => `- ${nameOf(id)}`).join('\n') + '\nThe Check tab says why.');
   return out.join('\n\n') + '\n';
 }
 

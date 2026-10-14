@@ -9,6 +9,8 @@
     "format": { "const": "story-editor" },
     "version": { "type": "integer", "minimum": 1 },
     "id": { "type": "string", "maxLength": 64 },
+    "rev": { "type": "integer", "minimum": 1, "description": "revision counter, raised by one each time the editor saves the story to a file (display only; the game never reads it)" },
+    "savedAt": { "type": "string", "description": "UTC time of the last save to a file, as 2026-10-14T12:00:00.000Z (display only)" },
     "title": { "type": "string" },
     "author": { "type": "string" },
     "start": { "type": "string", "description": "id of the first page (defaults to the first page in the list)" },

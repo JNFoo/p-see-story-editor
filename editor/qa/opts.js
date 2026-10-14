@@ -5,7 +5,7 @@ const ok=(c,m)=>console.log((c?'PASS ':'FAIL ')+m);
   const b = await chromium.launch(); const ctx = await b.newContext({viewport:{width:1440,height:900}}); const pg = await ctx.newPage();
   const errs=[]; pg.on('pageerror',e=>errs.push(e.message+' '+(e.stack||'').split('\n')[1]));
   const txt=fs.readFileSync(__dirname+'/fixtures/sample-rich.story.json','utf8');
-  await pg.goto(require('url').pathToFileURL(require('path').join(__dirname, '..', 'story-editor.html')).href); await pg.evaluate(t=>{ localStorage.clear(); localStorage.setItem('story-editor-v1', t); localStorage.setItem('story-editor-v1-toured','1'); }, txt);
+  await pg.goto(require('url').pathToFileURL((process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html'))).href); await pg.evaluate(t=>{ localStorage.clear(); localStorage.setItem('story-editor-v1', t); localStorage.setItem('story-editor-v1-toured','1'); }, txt);
   await pg.reload(); await pg.waitForFunction(()=>window.__editor&&!document.getElementById('splash'),null,{timeout:20000});
   const adv = () => pg.evaluate(()=>JSON.parse(localStorage.getItem('story-editor-v1-settings')||'null'));
   console.log('  first settings:', JSON.stringify(await adv()));

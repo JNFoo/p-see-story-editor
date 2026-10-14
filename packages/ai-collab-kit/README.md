@@ -5,7 +5,7 @@ A written **process** for a person and an AI assistant building software togethe
 | File | For | What it is |
 |---|---|---|
 | [GUIDE.md](GUIDE.md) | both | The ten habits, the testing and speed recipes, the pitfalls we hit, and a checklist for a new project. Everything in it was done and measured here; where something was not re-checked it says so. |
-| [templates/AGENTS.template.md](templates/AGENTS.template.md) | AI | A starting `AGENTS.md` (or `CLAUDE.md`) for your own repository: how to work, what never to do, how to hand over. |
+| [templates/AGENTS.template.md](templates/AGENTS.template.md) | AI | A starting `AGENTS.md` (or `CLAUDE.md`) for your own repository: how to work, an always / ask first / never tier, cost habits, how to hand over. |
 | [templates/TASKS.template.md](templates/TASKS.template.md) | both | A task board that several sessions can share without stepping on each other. |
 | [templates/session-brief.template.md](templates/session-brief.template.md) | human | What to tell a fresh AI session in the first message, in two minutes. |
 

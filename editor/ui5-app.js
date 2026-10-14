@@ -57,6 +57,22 @@ async function exportManuscript() {
     info('The manuscript could not be saved', [e?.message || String(e), 'Try again, or choose another folder.']);
   }
 }
+/** File -> Save test script: tick-box routes that take every choice once (storyTestScript in core.js). */
+async function exportTestScript() {
+  const text = storyTestScript(project, freshAnalysis());
+  if (!text) {
+    toast('This story is too large to check completely, so the editor cannot work out a complete test script.');
+    return;
+  }
+  const name = `${slug(project.title)}-test-script.md`;
+  try {
+    const ok = await saveFile(name, text, 'text/markdown', 'Test script (Markdown)', 'manuscripts');
+    if (ok) toast(`Saved ${name}.`);
+  } catch (e) {
+    logError('save test script', e);
+    info('The test script could not be saved', [e?.message || String(e), 'Try again, or choose another folder.']);
+  }
+}
 /**
  * The switch for this story's games: embed Inter Tight (the same look everywhere) or use the device's own font
  * (about 17 KB smaller). Saved with the story. `after` runs once it has changed.
@@ -253,6 +269,107 @@ function rememberFile(handle, at) {
   keepFileRecord();
   renderTop();
 }
+let revSeen = 0; // the highest revision this session has written (Undo can bring an older story back, but the counter never goes down)
+/** The next revision number and time, and the story text with them in it (what Save writes to the file). */
+function stampNext() {
+  const s = { rev: Math.max(project.rev || 0, revSeen) + 1, savedAt: new Date().toISOString() };
+  const both = { ...project, ...s };
+  return { s, compact: JSON.stringify(both), text: JSON.stringify(both, null, 1) };
+}
+/** After the file was written: the revision becomes part of the story (no undo step). Returns the text that is now saved in the file. */
+function applyStamp(st, at) {
+  revSeen = st.s.rev;
+  const same = cur === at; // false when the person kept typing while the file was being written: those edits stay unsaved
+  Object.assign(project, st.s);
+  cur = JSON.stringify(project);
+  persistSoon();
+  return same ? cur : st.compact;
+}
+/* ----- Options → Safety: where the story is kept, and a gentle reminder to keep a copy in a file -----
+   The autosave lives in this browser, which can clear it (low space, "clear site data", a private window). A file is the real copy.
+   Reminder: once a story has some words in it and its last file save (or, if it never had one, the first day this browser saw it) is a week
+   old, one toast offers Save now; at most once a day. The record is kept even when "Remember preferences" is off. */
+const NUDGE_AFTER = 7 * 864e5;
+const NUDGE_EVERY = 864e5;
+const NUDGE_KEY = `${STORE}-nudge`;
+const storyWords = () => project.passages.reduce((n, p) => n + wordsOnPage(p), 0);
+function agoText(ms) {
+  const m = Math.floor(ms / 6e4);
+  if (m < 2) return 'just now';
+  if (m < 120) return `${m} minutes ago`;
+  const hrs = Math.floor(m / 60);
+  if (hrs < 48) return `${hrs} hours ago`;
+  return `${Math.floor(hrs / 24)} days ago`;
+}
+/** The saved-to-a-file line of the Safety box (also used by the reminder): when, which revision, and whether there are newer edits. */
+function fileSaveLine() {
+  const at = project.savedAt ? Date.parse(project.savedAt) : NaN;
+  if (!Number.isFinite(at)) return 'This story has not been saved to a file from this editor yet.';
+  const when = new Date(at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
+  return `Last saved to a file ${agoText(Date.now() - at)} (${when}), revision ${project.rev || 1}. ${savedText === cur ? 'Nothing has changed since.' : 'There are changes since that are only in this browser.'}`;
+}
+function showSafety() {
+  const lines = h('div', { class: 'safety' });
+  const row = (label, text) => {
+    const p = h('p', {}, [h('b', { text: label + ' ' }), document.createTextNode(text)]);
+    lines.appendChild(p);
+    return p;
+  };
+  row('This browser:', storageOk ? 'your story is autosaved here after every change.' : 'it refuses to keep anything (a private window or blocked site data), so nothing is autosaved. Save to a file.');
+  row('A file:', fileSaveLine());
+  const keep = row('Kept for good:', 'checking…');
+  const space = row('Space:', 'checking…');
+  const persistBtn = h('button', { class: 'btn', type: 'button', text: 'Ask the browser to keep it', hidden: true });
+  const st = navigator.storage;
+  if (st?.persisted) {
+    const show = p => {
+      keep.lastChild.textContent = p ? 'yes, the browser has promised not to clear the autosave when space runs low.' : 'not promised. The browser may clear the autosave when space runs low, or when you clear site data.';
+      persistBtn.hidden = !!p || !st.persist;
+    };
+    st.persisted().then(show, () => (keep.lastChild.textContent = 'this browser cannot say.'));
+    persistBtn.addEventListener('click', () => {
+      st.persist().then(
+        ok => {
+          show(ok);
+          toast(ok ? 'The browser will keep the autosave.' : 'The browser did not agree. Saving a file is the safe way.');
+        },
+        () => toast('The browser would not say yes. Saving a file is the safe way.')
+      );
+    });
+  } else keep.lastChild.textContent = 'this browser cannot say.';
+  if (st?.estimate)
+    st.estimate().then(
+      e => (space.lastChild.textContent = `about ${Math.max(1, Math.round((e.usage || 0) / 1024))} KB used here, of about ${Math.round((e.quota || 0) / 1048576)} MB the browser allows.`),
+      () => (space.lastChild.textContent = 'this browser cannot say.')
+    );
+  else space.lastChild.textContent = 'this browser cannot say.';
+  dialog((d, close) => {
+    d.appendChild(h('h3', { text: 'Safety' }));
+    d.appendChild(h('div', { class: 'hint', text: 'Your story is autosaved in this browser, but a file is the copy you can trust. File → Save puts one wherever you choose.' }));
+    d.appendChild(lines);
+    d.appendChild(
+      h('div', { class: 'row end' }, [
+        persistBtn,
+        h('button', { class: 'btn primary', type: 'button', text: 'Save now', onclick: () => { close(); saveStory(); } }),
+        h('button', { class: 'btn', type: 'button', text: 'Close', onclick: close })
+      ])
+    );
+  });
+}
+/** The once-a-day reminder (see above). Runs a moment after start-up, so it never competes with the start-up notes. */
+function maybeNudge() {
+  if (!storageOk || storyWords() < 50) return;
+  let rec = null;
+  try { rec = JSON.parse(localStorage.getItem(NUDGE_KEY) || 'null'); } catch { rec = null; }
+  const now = Date.now();
+  if (!rec || rec.id !== project.id) rec = { id: project.id, first: now, last: 0 };
+  const savedAt = project.savedAt ? Date.parse(project.savedAt) : NaN;
+  const since = Number.isFinite(savedAt) ? savedAt : rec.first;
+  const due = now - since >= NUDGE_AFTER && now - rec.last >= NUDGE_EVERY;
+  if (due) rec.last = now;
+  try { localStorage.setItem(NUDGE_KEY, JSON.stringify(rec)); } catch { /* storage refused: no reminder state, no reminder */ }
+  if (due) toast(`This story has not been saved to a file for ${Math.floor((now - since) / 864e5)} days. A file is your safe copy.`, 'Save now', saveStory);
+}
 let saving = false; // a Save or Save as is still under way (a second press of Ctrl+S must not start another)
 /** Save: straight to the remembered file; the first time (or if that fails), asks where. */
 function saveStory() {
@@ -264,7 +381,9 @@ function saveStory() {
   saving = true;
   const sf = storyFile;
   const at = cur; // what is being written: edits made while the write is under way stay unsaved
-  const text = JSON.stringify(project, null, 1);
+  const st = stampNext();
+  const text = st.text;
+  const ep = epoch;
   canWrite(sf)
     .then(ok => {
       if (!ok) throw new Error('no permission');
@@ -274,11 +393,11 @@ function saveStory() {
       () => {
         saving = false;
         if (storyFile === sf) {
-          savedText = at;
+          savedText = epoch === ep ? applyStamp(st, at) : at;
           keepFileRecord();
           renderTop();
         }
-        toast(`Saved to ${sf.name}.`);
+        toast(`Saved to ${sf.name} (revision ${st.s.rev}).`);
       },
       () => {
         saving = false;
@@ -291,7 +410,9 @@ async function saveStoryAs() {
   if (saving) return;
   saving = true;
   const at = cur;
-  const text = JSON.stringify(project, null, 1);
+  const st = stampNext();
+  const text = st.text;
+  const ep = epoch;
   const name = `${slug(project.title)}.story.json`;
   let r;
   try {
@@ -304,9 +425,10 @@ async function saveStoryAs() {
   }
   saving = false;
   if (!r) return;
-  if (r !== true) rememberFile(r, at);
+  const saved = epoch === ep ? applyStamp(st, at) : at;
+  if (r !== true) rememberFile(r, saved);
   else {
-    savedText = at;
+    savedText = saved;
     renderTop();
   }
   toast(
@@ -1485,6 +1607,7 @@ function init() {
   applyEditorFont();
   adviseAdvanced(project);
   if (startFixNote) setTimeout(() => toast(startFixNote), 700);
+  setTimeout(maybeNudge, 2600);
   if (restored) setTimeout(() => toast('Your last autosave could not be read, so the earlier copy was restored. The unreadable one is kept aside in this browser.'), 600);
 
   /* The File and Options menus */
@@ -1499,6 +1622,7 @@ function init() {
     ['Example story', loadExample, 'Load the example story to look around.'],
     null,
     ['Save manuscript (.md)…', exportManuscript, 'Save all the words of the story as one Markdown text file: every page with its choices and where they lead. For proofreading; it has no rules in it.'],
+    ['Save test script (.md)…', exportTestScript, 'Save a checklist of routes through the story that together take every choice at least once, with a box to tick for each step. For testers and proofreaders.'],
     ['Copy game code…', exportGame, 'Copy the finished game’s HTML, to paste somewhere else.']
   ]);
   optionsMenu = dropMenu($('#optbtn'), $('#optpop'), () =>
@@ -1530,6 +1654,7 @@ function init() {
         'Keep light or dark, the editor font and map settings in this browser between visits. The Advanced choices are always kept.'
       ],
       null,
+      ['Safety…', showSafety, 'Where your story is kept, when it was last saved to a file, and whether the browser promises to keep the autosave.'],
       ['Advanced…', showAdvanced, 'Choose which advanced features each tab shows.'],
       ['Speed report…', showSpeedReport, 'For troubleshooting: record how smoothly the editor runs on this device and copy a report to paste into the chat.']
     ].filter(x => x !== undefined)
@@ -1658,3 +1783,4 @@ function init() {
   };
 }
 init();
+requestAnimationFrame(() => setTimeout(() => (READY_AT = performance.now()), 0)); // the first screen has been drawn

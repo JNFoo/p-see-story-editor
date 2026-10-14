@@ -89,7 +89,7 @@ var StoryFormat = (() => {
     return `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`;
   }
   var FIELD_CONTRACT = {
-    project: { rules: ["start", "items", "givens", "passages"], display: ["format", "version", "id", "title", "author", "gameFont", "game"] },
+    project: { rules: ["start", "items", "givens", "passages"], display: ["format", "version", "id", "title", "author", "gameFont", "game", "rev", "savedAt"] },
     item: { rules: ["id", "kind", "show", "lo", "hi", "start"], display: ["name", "names"] },
     given: { rules: ["options"], display: ["id", "question"] },
     passage: { rules: ["id", "ending", "blocks", "gives", "takes", "adds", "sends", "choices"], display: ["name", "heading", "valence", "todo"] },
@@ -286,7 +286,7 @@ var StoryFormat = (() => {
   function makeProject(title) {
     const p = {
       format: "story-editor",
-      version: 1,
+      version: STORY_VERSION,
       id: uid("s_"),
       title: title || "Untitled story",
       author: "",
@@ -301,11 +301,15 @@ var StoryFormat = (() => {
     p.start = first.id;
     return p;
   }
+  var STORY_VERSION = 1;
+  var MIGRATIONS = {};
   var startFixNote = "";
   function normalizeProject(raw) {
     if (!raw || typeof raw !== "object" || !Array.isArray(raw.passages)) {
       throw new Error("This file is not a story backup.");
     }
+    const fileVersion = Math.round(Number(raw.version)) || 1;
+    for (let v = fileVersion; MIGRATIONS[v]; v++) raw = MIGRATIONS[v](raw);
     const A = (x) => Array.isArray(x) ? x : [];
     const taken = /* @__PURE__ */ Object.create(null);
     const itemMap = /* @__PURE__ */ Object.create(null);
@@ -320,7 +324,7 @@ var StoryFormat = (() => {
     }
     const p = {
       format: "story-editor",
-      version: 1,
+      version: STORY_VERSION,
       id: String(raw.id || uid("s_")).slice(0, 64),
       title: String(raw.title || "Untitled story"),
       author: String(raw.author || ""),
@@ -329,6 +333,11 @@ var StoryFormat = (() => {
       givens: [],
       passages: []
     };
+    if (raw.rev !== void 0 || raw.savedAt !== void 0) {
+      const r = Math.round(Number(raw.rev));
+      if (Number.isFinite(r) && r > 0) p.rev = Math.min(r, 1e9);
+      if (typeof raw.savedAt === "string" && /^\d{4}-\d\d-\d\dT[\d:.]{5,16}Z$/.test(raw.savedAt)) p.savedAt = raw.savedAt;
+    }
     const intIn = (v, lo, hi, d) => {
       v = Math.round(Number(v));
       return Number.isFinite(v) ? Math.max(lo, Math.min(hi, v)) : d;
@@ -466,6 +475,7 @@ var StoryFormat = (() => {
     if (raw.gameFont === "system") p.gameFont = "system";
     p.game = cleanGame(raw.game);
     pruneVirtual(p);
+    if (fileVersion > STORY_VERSION && !startFixNote) startFixNote = `This story was saved by a newer version of the editor (file format ${fileVersion}; this editor reads format ${STORY_VERSION}). It opened, but anything this editor does not know about was left out. Do not save over the original file.`;
     return p;
   }
   function cleanGame(g) {

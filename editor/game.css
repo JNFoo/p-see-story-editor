@@ -102,7 +102,7 @@
 .kl-aa summary{list-style:none;cursor:pointer;color:var(--muted);text-decoration:underline;padding:6px}
 .kl-aa summary::-webkit-details-marker{display:none}
 .kl-aa[open] summary{color:var(--fg)}
-.kl-aa-box{position:absolute;right:0;bottom:2.4em;z-index:5;min-width:17em;max-width:calc(100vw - 24px);background:var(--paper);border:1px solid var(--line);padding:10px 12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+.kl-aa-box{position:absolute;right:0;bottom:2.4em;z-index:5;min-width:min(17em,calc(100vw - 40px));max-width:calc(100vw - 40px);background:var(--paper);border:1px solid var(--line);padding:10px 12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
 .kl-aa-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .kl-aa-name{flex:1 0 100%;font-size:.78em;color:var(--muted)}
 .kl-aa-box button{font:600 .8em var(--font);color:var(--fg);background:transparent;border:1px solid var(--line);padding:6px 10px;cursor:pointer;text-decoration:none}
@@ -119,5 +119,8 @@
 .kl.cf-calm *{transition:none!important}
 .kl.cf-nums .kl-choices button[data-n]::before{content:attr(data-n) ". ";font-variant-numeric:tabular-nums}
 .kl.cf-hc .kl-choices button{border-width:2px}
+.kl-choices button.seen{font-weight:400}
+.kl-choices button.seen::after{content:" \2713"}
+@media (forced-colors:active){.kl-choices button.locked{border-style:dashed}.kl-aa-box{border-color:CanvasText}}
 /*@part base*/
 @media (prefers-reduced-motion:reduce){.kl *{transition:none!important}}

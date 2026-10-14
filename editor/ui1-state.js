@@ -42,6 +42,7 @@ let analysis = null; // latest result of analyze(project)
 let analysisFor = null; // the saved story text (cur) that `analysis` was made from
 let checkTimer = 0; // pending timers
 let saveTimer = 0;
+let writerLost = false; // true while another window has the story: this one writes nothing to storage (see guardStart in ui5-app.js)
 let filter = ''; // text typed in the page-list search box (no longer shown; kept for the list code)
 /** Pages visited in the Write tab, for the Back and Forward buttons: `list` of ids, `i` the one showing. */
 const hist = { list: [], i: -1, nav: false };
@@ -260,6 +261,7 @@ function savable(text) {
 }
 /** Writes the current story to this browser's storage right now, but only if it is a whole story; the old save becomes the spare. */
 function persistNow(forceSpare) {
+  if (writerLost) return;
   clearTimeout(saveTimer);
   saveTimer = 0;
   if (!savable(cur)) {

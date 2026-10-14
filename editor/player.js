@@ -267,7 +267,7 @@ function klPlayer(root, story, opts = {}) {
     let trail = (state.trail || []).concat([{ t: gist(from, state.flags), c: c.label }]);
     if (trail.length > 400) trail = trail.slice(trail.length - 400);
     const prev = state;
-    state = { pid: next.id, flags: klArrive(klChoose(state.flags, c, st), next, st), trail, answers: state.answers || [] };
+    state = { pid: next.id, flags: klArrive(klChoose(state.flags, c, st), next, st), trail, answers: state.answers || [], seen: { ...state.seen, [`${from.id}.${from.choices.indexOf(c)}`]: 1 } }; // seen: the choices taken in this run (Back does not forget them)
     each('step', prev, state, { from, c, r });
     each('arrive', next);
     if (quiet) return; // replaying a saved route (the place module): drawn once at the end
@@ -363,6 +363,7 @@ function klPlayer(root, story, opts = {}) {
         b.type = 'button';
         each('choice', c, b); // the odds, for a skill check
         if (ok) {
+          if (state.seen && state.seen[`${p.id}.${p.choices.indexOf(c)}`]) b.classList.add('seen'); // taken before in this run: a check mark and lighter type
           b.setAttribute('data-n', String(++n));
           b.onclick = () => {
             go(p, c);
@@ -539,6 +540,23 @@ function klFeatBack(P) {
     P.save();
     P.render(true);
   }
+  /* The phone's back swipe or button (and Esc) does Back while there is a page to go back to, then leaves normally. Only in a stand-alone game, and only where the browser has CloseWatcher. */
+  let cw = null;
+  P.on('rendered', () => {
+    const s = P.state;
+    const can = (s.hist || []).length > (s.floor || 0);
+    if (can && !cw && P.opts.persist && window.CloseWatcher) {
+      try {
+        cw = new CloseWatcher();
+        cw.onclose = () => {
+          cw = null;
+          back();
+        };
+      } catch (e) {
+        cw = null;
+      }
+    } else if (!can && cw) (cw.destroy(), (cw = null));
+  });
   P.on('barLeft', () => {
     const s = P.state;
     if (!(s.hist || []).length) return null;
@@ -799,6 +817,9 @@ function klFeatComfort(P) {
   const comfortKey = 'story-editor-comfort'; // shared by every story in this browser
   const comfort = P.readJson(comfortKey) || {};
   const el = P.el;
+  /* Contrast starts as the system asks (prefers-contrast: more) until the reader presses Normal or High once */
+  const sysHc = !!window.matchMedia?.('(prefers-contrast:more)').matches;
+  const val = k => (k === 'hc' && comfort.hc === undefined && sysHc ? '1' : comfort[k] || '');
   const ROWS = [
     [
       'size',
@@ -844,14 +865,14 @@ function klFeatComfort(P) {
   ];
   /** The classes on the story's wrapper for the reader's current choices. */
   const cls = () =>
-    [comfort.size && `cf-s${comfort.size}`, comfort.space && 'cf-roomy', comfort.hc && 'cf-hc', comfort.calm && 'cf-calm', comfort.nums && 'cf-nums']
+    [comfort.size && `cf-s${comfort.size}`, comfort.space && 'cf-roomy', val('hc') && 'cf-hc', comfort.calm && 'cf-calm', comfort.nums && 'cf-nums']
       .filter(Boolean)
       .join(' ');
   P.on('wrapClass', cls);
   /* the open panel closes with Esc or a click anywhere else (it sits over the choices) */
   document.addEventListener('keydown', e => {
     const o = e.key === 'Escape' && document.querySelector('.kl-aa[open]');
-    if (o) (o.open = false), o.firstChild.focus();
+    if (o) (o.open = false), o.firstChild.focus(), e.preventDefault(); // Esc closes only this panel (not also Back)
   });
   document.addEventListener('click', e => {
     const o = document.querySelector('.kl-aa[open]');
@@ -871,7 +892,7 @@ function klFeatComfort(P) {
       choices.forEach(([v, text]) => {
         const b = el('button', '', text);
         b.type = 'button';
-        b.setAttribute('aria-pressed', String((comfort[k] || '') === v));
+        b.setAttribute('aria-pressed', String(val(k) === v));
         b.onclick = () => {
           comfort[k] = v;
           P.writeJson(comfortKey, comfort);
@@ -888,8 +909,10 @@ function klFeatComfort(P) {
     d.appendChild(box);
     /* opens upward; on a short page there may be no room above, and the top rows could not be reached: open downward then */
     fit = () => {
-      box.style.top = box.style.bottom = '';
-      if (d.open && box.getBoundingClientRect().top < 0) (box.style.top = '2.4em'), (box.style.bottom = 'auto');
+      box.style.top = box.style.bottom = box.style.right = '';
+      const r = d.open && box.getBoundingClientRect();
+      if (r && r.top < 0) (box.style.top = '2.4em'), (box.style.bottom = 'auto');
+      if (r && r.left < 8) box.style.right = `${r.left - 8}px`; // the Aa button can sit well left of the right edge (a wrapped bar): slide the panel back on screen
     };
     d.addEventListener('toggle', fit);
     return d;

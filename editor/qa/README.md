@@ -44,6 +44,9 @@ Chromium does the native one). `PROFILE=1 node <suite> firefox` prints where a s
 | `top5-safe`, `top5-new` | Save safety (the spare copy, a place kept across reloads), short ids, fingerprinted saves, the Map |
 | `packed` | The packed editor file opens from a file and from a web server that sends a UTF-8 header, and a damaged copy shows the plain message instead of running |
 | `nosave` | A game says so when the browser will not keep its save (blocked from the start, or full later), and says nothing when saving works |
+| `twowin` | One window at a time: a second editor window (or a second copy on this computer) is paused with a box; "Use this window instead" takes over and the first window saves its last edit and pauses; without Web Locks a save by another window asks which version to keep |
+| `gamefeel` | The game's already-taken check mark, back swipe / back button / Esc doing Back (CloseWatcher) without also closing the Aa panel twice, and contrast that follows the system until the reader chooses |
+| `textstress` | Every page of two sample stories at 320 px with Larger text, Roomy spacing, choice numbers and the WCAG 1.4.12 spacing values: nothing cut off, nothing scrolling sideways, the Aa panel on screen (full tier only) |
 | `motion` | With real animation (every other suite asks for reduced motion), the opening splash plays its full time and leaves |
 | `ffsmoke` | The editor and an exported game load without errors in Firefox |
 | `top10-export`, `top10-player`, `top10-editor` | Export and Game options, the game's Back / dice / locks / bars, the editor's screens |
@@ -105,3 +108,7 @@ What changed, and why:
 Not changed (decisions for the owner): Chromium repeats every suite (about half of full-check time; `fuzz2` alone is a minute on Chromium); fixed waits
 still total about 45 s of suite time in the quick tier; `smart` re-runs nearly everything after any source change because most suites watch every file.
 
+
+## Does the contract test notice a deliberate bug? (`mutants.py`)
+
+`python3 qa/mutants.py` (about 20 seconds) puts 14 one-line bugs into the game rules, one at a time, in a copy of `core.js` and runs `contract.mjs` on each. All 14 are caught (checked 2026-10-14); two of them are changes that do not alter the game (an odds shortcut at 2, the default top limit of a number that the loader always fills in) and used to survive until the contract compared the paragraphs and choices shown with a plain-words reading. Add a line to `MUTANTS` whenever a rule changes; a "SURVIVED" line that is not marked equivalent means the contract has a gap. The contract itself now stops after `CONTRACT_TIMEOUT_S` seconds (90) instead of hanging when a rule loops.

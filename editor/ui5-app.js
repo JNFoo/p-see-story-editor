@@ -1349,6 +1349,94 @@ function dropMenu(btn, pop, entries) {
   return { set, isOpen: () => !pop.hidden };
 }
 
+/* ----- one window at a time -----
+   The autosave is one slot in this browser's storage, and every copy of the editor on this computer shares it (a page opened from a file
+   shares storage with other files, measured in Firefox and Chromium). Two windows saving would silently overwrite each other, so only one
+   holds the "writer" lock (Web Locks); another window shows a box with a Use-this-window button. Taking over steals the lock, the other
+   window flushes its last edit and pauses, and this one reloads so it starts from what was saved. Where Web Locks are missing, the
+   `storage` event stands in: a save by another window pauses this one and asks which version to keep. */
+const WRITER_LOCK = 'story-editor-writer';
+let guardState = ''; // '', 'other' (another window had it first), 'taken' (another window took over), 'changed' (no Web Locks: another window saved)
+function guardBox(state) {
+  guardState = state;
+  writerLost = true;
+  const text = {
+    other: 'Another window or tab (or another copy of the editor on this computer) already has this story open. If both saved, they would overwrite each other, so this window is paused: nothing here is saved.',
+    taken: 'Another window took over this story, so this one is paused. What you did here was saved first. Nothing new here is saved.',
+    changed: 'Another window saved this story just now. If you keep going here, your version replaces theirs (theirs is kept as the spare copy).'
+  }[state];
+  const again = () => setTimeout(() => guardState === state && guardBox(state), 0); // Esc or a click outside cannot dismiss it
+  dialog((d, close) => {
+    d.appendChild(h('h3', { text: state === 'changed' ? 'Changed in another window' : 'This story is open in another window' }));
+    d.appendChild(h('div', { text }));
+    d.appendChild(
+      h('div', { class: 'row end' }, [
+        state === 'changed' &&
+          h('button', { class: 'btn', type: 'button', text: 'Load their version', onclick: () => location.reload() }),
+        h('button', {
+          class: 'btn primary',
+          type: 'button',
+          text: state === 'changed' ? 'Keep mine' : 'Use this window instead',
+          onclick: () => {
+            if (state === 'changed') {
+              guardState = '';
+              writerLost = false;
+              close();
+              persistNow(true);
+            } else {
+              guardTakeOver();
+            }
+          }
+        })
+      ])
+    );
+  }, again);
+}
+/** Steals the writer lock, gives the other window a moment to save its last edit, then reloads to start from what was saved. */
+function guardTakeOver() {
+  try {
+    navigator.locks.request(WRITER_LOCK, { steal: true }, () => {
+      setTimeout(() => location.reload(), 500);
+      return new Promise(() => {});
+    });
+  } catch (e) {
+    logError('take over', e);
+    location.reload();
+  }
+}
+function guardStart() {
+  let locks = null;
+  try {
+    locks = navigator.locks;
+  } catch {
+    /* a sandboxed page has no locks */
+  }
+  if (locks?.request) {
+    try {
+      locks
+        .request(WRITER_LOCK, { ifAvailable: true }, lock => {
+          if (!lock) {
+            guardBox('other');
+            return undefined;
+          }
+          return new Promise(() => {}); // held for as long as this page lives
+        })
+        .catch(() => {
+          /* the lock was stolen by another window: save what is pending, then pause */
+          if (saveTimer) persistNow();
+          guardBox('taken');
+        });
+      return;
+    } catch (e) {
+      logError('writer lock', e);
+    }
+  }
+  window.addEventListener('storage', e => {
+    if (e.key !== STORE || e.storageArea !== localStorage || writerLost || e.newValue === cur) return;
+    guardBox('changed');
+  });
+}
+
 function init() {
   const gs = document.createElement('style');
   gs.textContent = gameCss(GAME_PARTS.css, KL_FEATURE_ORDER, null); // every feature, every palette: the Play tab can show anything
@@ -1553,7 +1641,12 @@ function init() {
   });
   showSplash();
   maybeTour();
+  guardStart();
   window.__editor = {
+    get guard() {
+      return guardState;
+    },
+    persistNow, // so a test can ask for the autosave a paused window would attempt
     get project() {
       return project;
     },

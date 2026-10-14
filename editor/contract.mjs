@@ -13,13 +13,33 @@
         stuck pages, usable choices, possible roll outcomes and the number of situations must match exactly.
      4. Every kl* function the game uses is in KL_RULES (so it is copied into exports), and nothing else is needed.
      5. Every color palette is readable (WCAG AA contrast, 4.5 to 1).
+     6. The paragraphs a player sees on each page (klVisibleBlocks) and the choices shown, usable or greyed out (klShown), match an
+        independent reading of the rules in plain words (added Oct 2026: a deliberate bug in either one passed the old contract).
+   A time limit protects the build: the test runs again as a child process and is stopped after CONTRACT_TIMEOUT_S seconds
+   (default 90; a normal run takes about 2). A rule bug that never lets the play-out finish (a number with no upper limit,
+   say) now fails with a message instead of hanging forever. The play-out also stops itself after 200,000 situations.
    Usage:  node contract.mjs [stories=300] [seed=1]     Exit code 1 and a plain message on any failure.
    ============================================================================ */
 import { readFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { deflateRawSync } from 'node:zlib';
 import { createContext, runInContext } from 'node:vm';
 import { transformSync } from 'esbuild';
 
+if (!process.env.CONTRACT_CHILD) {
+  const limit = Number(process.env.CONTRACT_TIMEOUT_S || 90);
+  const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), ...process.argv.slice(2)], {
+    env: { ...process.env, CONTRACT_CHILD: '1' },
+    stdio: 'inherit',
+    timeout: limit * 1000
+  });
+  if (r.error && r.error.code === 'ETIMEDOUT') {
+    console.error(`CONTRACT TEST FAILED (1):\n - The test did not finish within ${limit} seconds (a normal run takes about 2). A rule probably loops without end, for example a number with no upper limit.`);
+    process.exit(1);
+  }
+  process.exit(r.status === null ? 1 : r.status);
+}
 const here = new URL('.', import.meta.url);
 const read = f => readFileSync(new URL(f, here), 'utf8');
 /* an exception while playing stories means a rule used something an exported game does not have */
@@ -212,6 +232,44 @@ function collectKeys(p) {
   });
 }
 
+/* ---------- 6: the paragraphs and choices a player sees, read independently of the rule functions ----------
+   Written from the rules in plain words, in a different shape from klVisibleBlocks and klShown: a condition holds when everything it
+   needs is held and nothing it forbids is held ("t:<number>:<n>" means that number is n or more). A paragraph marked "otherwise" shows
+   when its own condition holds and no earlier paragraph in its group showed; the group starts at the last paragraph not marked
+   "otherwise". A choice is shown when its condition holds, or when it is a locked choice (shown greyed out until it can be used). */
+const seeIt = (flags, id) => (/^t:(.*):(-?\d+(?:\.\d+)?)$/.test(id) ? (flags['v:' + RegExp.$1] || 0) >= Number(RegExp.$2) : Boolean(flags[id]));
+const holds = (c, flags) => (c.needs || []).every(id => seeIt(flags, id)) && !(c.forbid || []).some(id => seeIt(flags, id));
+function blocksShownIndependently(blocks, flags) {
+  const out = [];
+  let groupShown = false;
+  (blocks || []).forEach((b, i) => {
+    if (!b.orPrev) groupShown = false;
+    const show = holds(b, flags) && !(b.orPrev && groupShown);
+    if (show) {
+      groupShown = true;
+      out.push(i);
+    }
+  });
+  return out;
+}
+let shownChecks = 0;
+let shownMismatchReported = 0;
+function checkSeen(p, f, P) {
+  shownChecks++;
+  const got = C.klVisibleBlocks(p, f);
+  const want = blocksShownIndependently(p.blocks, f).map(i => p.blocks[i]);
+  if ((got.length !== want.length || got.some((b, i) => b !== want[i])) && shownMismatchReported++ < 3)
+    fail(`The paragraphs shown on page ${p.id} differ from the plain-words reading (game ${got.length}, reading ${want.length}); something in klVisibleBlocks or klCondOk changed. story: ${JSON.stringify(P)}`);
+  const sh = C.klShown(p, f);
+  const ws = (p.choices || []).filter(c => c.lock || holds(c, f));
+  if ((sh.length !== ws.length || sh.some((c, i) => c !== ws[i])) && shownMismatchReported++ < 3)
+    fail(`The choices shown on page ${p.id} differ from the plain-words reading (game ${sh.length}, reading ${ws.length}); something in klShown changed. story: ${JSON.stringify(P)}`);
+  const us = C.klVisibleChoices(p, f);
+  const wu = (p.choices || []).filter(c => holds(c, f));
+  if ((us.length !== wu.length || us.some((c, i) => c !== wu[i])) && shownMismatchReported++ < 3)
+    fail(`The usable choices on page ${p.id} differ from the plain-words reading (game ${us.length}, reading ${wu.length}). story: ${JSON.stringify(P)}`);
+}
+
 /* ---------- 3: play the story out by brute force, with the game's own rules ---------- */
 function brute(P, E = C.exportStory(P)) {
   const byId = {};
@@ -250,9 +308,14 @@ function brute(P, E = C.exportStory(P)) {
   };
   combos.forEach(cb => push(E.start, C.klArrive(C.klInit({ ...cb }, st), byId[E.start], st)));
   while (q.length) {
+    if (seen.size > 200000) {
+      fail(`The play-out passed 200000 situations and was stopped: a number probably has no upper limit, or a rule never settles. story: ${JSON.stringify(P)}`);
+      break;
+    }
     const [pid, f] = q.shift();
     reached.add(pid);
     const p = byId[pid];
+    checkSeen(p, f, P);
     if (p.ending) {
       endings.add(pid);
       continue;
@@ -713,5 +776,5 @@ if (failures.length) {
   process.exit(1);
 }
 console.log(
-  `contract ok: ${compared} random stories played out in full and matched the checker (${truncatedSkips} too large to compare; numbers were grouped in ${groupedStories}; with dead numbers forgotten the verdicts were the same in all, and ${prunedStories} had fewer situations, ${prunedSaved} fewer in all), fields, rule list, feature modules and ${C.PALETTE_KEYS.length} palettes verified`
+  `contract ok: ${compared} random stories played out in full and matched the checker (${truncatedSkips} too large to compare; numbers were grouped in ${groupedStories}; with dead numbers forgotten the verdicts were the same in all, and ${prunedStories} had fewer situations, ${prunedSaved} fewer in all), the paragraphs and choices shown in ${shownChecks} situations matched a plain-words reading, fields, rule list, feature modules and ${C.PALETTE_KEYS.length} palettes verified`
 );

@@ -14,6 +14,21 @@
     "title": { "type": "string" },
     "author": { "type": "string" },
     "start": { "type": "string", "description": "id of the first page (defaults to the first page in the list)" },
+    "lang0": { "type": "string", "maxLength": 40, "description": "what the story's own language is called (defaults to English); the first choice in the game's language menu" },
+    "langs": {
+      "type": "array", "maxItems": 12,
+      "description": "Translations. Each language maps the exact (trimmed, LF-only) source text of a page, choice, item or label to its translation; anything not listed stays as written. Present languages add a language menu to the exported game.",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "t"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[A-Za-z0-9_-]{1,24}$" },
+          "name": { "type": "string", "maxLength": 40 },
+          "code": { "type": "string", "description": "optional language tag such as es or pt-BR" },
+          "t": { "type": "object", "additionalProperties": { "type": "string", "maxLength": 4000 }, "description": "source text -> translation" }
+        }
+      }
+    },
     "gameFont": { "const": "system", "description": "use the reader's own font in the exported game (smaller file)" },
     "game": {
       "type": "object",
@@ -75,6 +90,8 @@
           "ending": { "type": "boolean" },
           "valence": { "enum": ["", "good", "bad"], "description": "for endings: good, bad, or neutral (empty)" },
           "todo": { "type": "boolean", "description": "the author's 'unfinished' flag (never exported)" },
+          "color": { "enum": ["", "red", "orange", "yellow", "green", "blue", "purple", "gray"], "description": "the author's color mark (never exported)" },
+          "note": { "type": "string", "maxLength": 600, "description": "the author's private note on the page (never exported)" },
           "blocks": {
             "type": "array",
             "description": "paragraphs",

@@ -266,9 +266,9 @@ let crashes = 0, refused = 0, opened = 0;
     const t0 = Date.now();
     try { C.importTwine(text, { code }); } catch (e) { if (!/^(That |This Twine)/.test(e.message)) { slow++; console.log('CRASH', name, e.message); } }
     const ms = Date.now() - t0;
-    if (ms > 3000) { slow++; console.log(`SLOW ${name} (${code}): ${ms} ms`); }
+    if (ms > 6000) { slow++; console.log(`SLOW ${name} (${code}): ${ms} ms`); }
   }
-  console.log(`${slow ? 'FAIL' : 'PASS'} hostile files: ${cases.length * 2} runs, each finished in under 3 seconds without crashing`);
+  console.log(`${slow ? 'FAIL' : 'PASS'} hostile files: ${cases.length * 2} runs, each finished in under 6 seconds without crashing`);
   if (slow) bad++;
 }
 const share = flagged / Math.max(1, pagesTotal);

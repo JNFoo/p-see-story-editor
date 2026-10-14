@@ -99,6 +99,10 @@
 .kl-pl-msg{font-size:.78em;color:var(--signal)}
 .kl-pl summary:focus-visible,.kl-pl-box button:focus-visible,.kl-pl-box input:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
 
+/*@part lang*/
+.kl-lang{font:600 .8em var(--font);color:var(--fg);background:var(--paper);border:1px solid var(--line);padding:6px 8px;max-width:11em;cursor:pointer}
+.kl-lang:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
+
 /*@part comfort*/
 /* The Aa panel (reader comfort) */
 .kl-aa{position:relative}

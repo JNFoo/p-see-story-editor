@@ -1004,6 +1004,8 @@ function renderSide() {
           p.ending && p.valence === 'good' ? h('span', { class: 'pico', title: 'Good ending' }, [icon('smile', 14)]) : null,
           p.ending && p.valence === 'bad' ? h('span', { class: 'pico', title: 'Bad ending' }, [icon('frown', 14)]) : null,
           p.ending && !p.valence ? h('span', { class: 'tag end neutral', title: 'Neutral ending', text: 'end' }) : null,
+          p.color ? h('span', { class: 'pcdot', style: `--c:var(--pc-${p.color})`, title: `Marked ${p.color}` }) : null,
+          p.note ? h('span', { class: 'pico', title: p.note }, [icon('note', 14)]) : null,
           p.todo ? h('span', { class: 'pico todo', title: 'Marked unfinished' }, [icon('todo', 14)]) : null,
           pageEmpty(p) ? h('span', { class: 'pico empty', title: 'No text on this page yet' }) : null,
           bad[p.id] ? h('span', { class: 'dot', title: 'The checker found a problem here' }) : null
@@ -1426,6 +1428,54 @@ function toggleTodo(p) {
   toast(p.todo ? 'Marked unfinished. The Check tab lists it.' : 'Marked finished.');
 }
 
+/**
+ * "Color and note": the author's own marks on a page. A color (a stripe on the map, a dot in the page list) and a private note
+ * (shown on the map when you point at the page). Neither is ever exported or read by the checker or the game.
+ */
+function pageMarkDialog(p) {
+  dialog((d, close) => {
+    d.appendChild(h('h3', { text: `Color and note for “${pname(p)}”` }));
+    d.appendChild(h('div', { class: 'hint', text: 'For you only. Players never see these, and they do not change the game.' }));
+    const row = h('div', { class: 'pcrow', role: 'group', 'aria-label': 'Page color' });
+    const set = c => {
+      p.color = c;
+      row.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.c === c)));
+      refresh();
+    };
+    ['', ...PAGE_COLORS].forEach(c => {
+      row.appendChild(
+        h('button', {
+          type: 'button',
+          class: 'pcswatch',
+          'data-c': c,
+          style: c ? `--c:var(--pc-${c})` : null,
+          'aria-pressed': String(p.color === c),
+          'aria-label': c || 'No color',
+          title: c ? `Mark this page ${c}` : 'No color',
+          text: c ? '' : '×',
+          onclick: () => set(c)
+        })
+      );
+    });
+    d.appendChild(row);
+    const note = h('textarea', { class: 'in pcnote', maxlength: String(PAGE_NOTE_MAX), 'aria-label': 'Note about this page', placeholder: 'A note to yourself, such as “reads too fast” or “needs the key scene”.' });
+    note.value = p.note || '';
+    note.addEventListener('change', () => {
+      p.note = note.value.trim();
+      refresh();
+    });
+    d.appendChild(note);
+    d.appendChild(h('div', { class: 'row' }, [h('button', { class: 'btn primary', type: 'button', text: 'Done', onclick: () => {
+      if (note.value.trim() !== (p.note || '')) {
+        p.note = note.value.trim();
+        refresh();
+      }
+      close();
+    } })]));
+    setTimeout(() => d.querySelector('.pcswatch[aria-pressed="true"]')?.focus(), 0);
+  });
+}
+
 /** Menu entries that toggle every item of a list on or off for page `p` (list = 'gives' or 'takes'). */
 function itemEntries(p, list) {
   if (!project.items.length) return [{ label: 'No items yet. Add some on the Items tab.', disabled: true }];
@@ -1472,6 +1522,13 @@ function pageMenu(p, compact) {
       title: p.ending ? 'An ending cannot be the first page.' : null,
       fn: function () {
         makeStart(p);
+      }
+    },
+    {
+      label: 'Color and note…',
+      title: 'Your own color mark and private note. Shown on the map and in the page list; never in the game.',
+      fn: function () {
+        pageMarkDialog(p);
       }
     },
     {
@@ -1863,6 +1920,17 @@ function pageBar(p) {
     },
     [icon('todo', 17)]
   );
+  const mark = h(
+    'button',
+    {
+      class: `iconbtn${p.color || p.note ? ' on' : ''}`,
+      type: 'button',
+      title: 'Your own color mark and private note for this page. Shown on the map; never in the game.',
+      'aria-label': 'Color and note',
+      onclick: () => pageMarkDialog(p)
+    },
+    [p.color ? h('span', { class: 'pcdot', style: `--c:var(--pc-${p.color})` }) : icon(p.note ? 'note' : 'pcolor', 17)]
+  );
   const play = iconBtn('▶', 'Play from this page (starts with empty pockets)', () => {
     playFrom(p.id);
   });
@@ -1951,6 +2019,7 @@ function pageBar(p) {
       heading,
       star,
       todo,
+      mark,
       play,
       more,
       prefs.itemsOpen ? null : sideReveal('items')

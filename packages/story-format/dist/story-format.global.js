@@ -92,16 +92,18 @@ var StoryFormat = (() => {
     return `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`;
   }
   var FIELD_CONTRACT = {
-    project: { rules: ["start", "items", "givens", "passages"], display: ["format", "version", "id", "title", "author", "gameFont", "game", "rev", "savedAt"] },
+    project: { rules: ["start", "items", "givens", "passages"], display: ["format", "version", "id", "title", "author", "gameFont", "game", "rev", "savedAt", "lang0", "langs"] },
     item: { rules: ["id", "kind", "show", "lo", "hi", "start"], display: ["name", "names"] },
     given: { rules: ["options"], display: ["id", "question"] },
-    passage: { rules: ["id", "ending", "blocks", "gives", "takes", "adds", "sends", "choices"], display: ["name", "heading", "valence", "todo"] },
+    passage: { rules: ["id", "ending", "blocks", "gives", "takes", "adds", "sends", "choices"], display: ["name", "heading", "valence", "todo", "color", "note"] },
     block: { rules: ["needs", "forbid", "orPrev"], display: ["text"] },
     choice: { rules: ["to", "needs", "forbid", "gives", "takes", "adds", "check", "lock"], display: ["label", "why"] },
     check: { rules: ["stat", "target", "fail"], display: [] },
     game: { rules: [], display: [] }
     // filled from the GAME_OPTIONS table just below it
   };
+  var PAGE_COLORS = ["red", "orange", "yellow", "green", "blue", "purple", "gray"];
+  var PAGE_NOTE_MAX = 600;
   function makeBlock(text) {
     return { text: text || "", needs: [], forbid: [], orPrev: false };
   }
@@ -278,6 +280,8 @@ var StoryFormat = (() => {
       ending: false,
       valence: "",
       todo: false,
+      color: "",
+      note: "",
       blocks: [makeBlock("")],
       gives: [],
       takes: [],
@@ -442,6 +446,8 @@ var StoryFormat = (() => {
         ending: !!q.ending,
         valence: q.valence === "good" || q.valence === "bad" ? q.valence : "",
         todo: !!q.todo,
+        color: PAGE_COLORS.includes(q.color) ? q.color : "",
+        note: String(q.note || "").slice(0, PAGE_NOTE_MAX),
         blocks,
         gives: knownReal(q.gives).filter((id) => !answer[id]),
         // Givens never change during the story
@@ -477,9 +483,61 @@ var StoryFormat = (() => {
     }
     if (raw.gameFont === "system") p.gameFont = "system";
     p.game = cleanGame(raw.game);
+    const langs = cleanLangs(raw.langs);
+    if (langs.length) p.langs = langs;
+    if (typeof raw.lang0 === "string" && raw.lang0.trim() && raw.lang0.trim() !== "English") p.lang0 = raw.lang0.trim().slice(0, LANG_NAME_MAX);
     pruneVirtual(p);
     if (fileVersion > STORY_VERSION && !startFixNote) startFixNote = `This story was saved by a newer version of the editor (file format ${fileVersion}; this editor reads format ${STORY_VERSION}). It opened, but anything this editor does not know about was left out. Do not save over the original file.`;
     return p;
+  }
+  var LANG_MAX = 12;
+  var LANG_NAME_MAX = 40;
+  var LANG_TEXT_MAX = 4e3;
+  var LANG_ENTRIES_MAX = 8e3;
+  var LANG_UI = ["The end.", "Play again", "Start over", "Tap again to start over", "Back", "Roads not taken", "Carrying:", "Feeling / status:"];
+  var xlNorm = (s) => String(s === void 0 || s === null ? "" : s).replace(/\r\n?/g, "\n").trim();
+  function cleanLangs(raw) {
+    const out = [];
+    const used = {};
+    (Array.isArray(raw) ? raw : []).slice(0, LANG_MAX).forEach((L, n) => {
+      if (!L || typeof L !== "object") return;
+      let id = String(L.id || "");
+      if (!/^[A-Za-z0-9_\-]{1,24}$/.test(id) || used[id]) id = `lg${n + 1}`;
+      while (used[id]) id += "x";
+      used[id] = true;
+      const t = {};
+      let count = 0;
+      if (L.t && typeof L.t === "object" && !Array.isArray(L.t))
+        Object.keys(L.t).forEach((k) => {
+          const v = L.t[k];
+          if (typeof v !== "string" || !v.trim() || !k.trim() || k.length > LANG_TEXT_MAX || count >= LANG_ENTRIES_MAX) return;
+          t[xlNorm(k)] = xlNorm(v).slice(0, LANG_TEXT_MAX);
+          count++;
+        });
+      const code = String(L.code || "").trim();
+      out.push({ id, name: String(L.name || "Language").trim().slice(0, LANG_NAME_MAX) || "Language", code: /^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})?$/.test(code) ? code : "", t });
+    });
+    return out;
+  }
+  function xlCompile(project, lang, out) {
+    const g = (s) => lang.t[xlNorm(s)] || "";
+    const L = { n: lang.name };
+    if (lang.code) L.c = lang.code;
+    const title = g(project.title);
+    if (title) L.title = title;
+    const ui = {};
+    LANG_UI.forEach((w) => g(w) && (ui[w] = g(w)));
+    if (Object.keys(ui).length) L.ui = ui;
+    L.i = out.items.map((x) => g(x.name));
+    const alt = {};
+    out.items.forEach((x, k) => (x.names || []).some((n) => g(n.name)) && (alt[k] = x.names.map((n) => g(n.name))));
+    if (Object.keys(alt).length) L.a = alt;
+    if (out.givens && out.givens.some((q) => g(q.question))) L.g = out.givens.map((q) => g(q.question));
+    L.p = out.passages.map((p) => {
+      const e = [g(p.heading), p.blocks.map((b) => g(b.text)), (p.choices || []).map((c) => g(c.label)), (p.choices || []).map((c) => c.lock ? g(c.why) : "")];
+      return e[0] || e[1].some(Boolean) || e[2].some(Boolean) || e[3].some(Boolean) ? e : 0;
+    });
+    return L;
   }
   function cleanGame(g) {
     g = g && typeof g === "object" ? g : {};
@@ -1252,6 +1310,10 @@ var StoryFormat = (() => {
       if (g[k] !== GAME_DEFAULTS[k]) go[k] = g[k];
     });
     put(out, "game", go);
+    if ((project.langs || []).length) {
+      out.l0 = project.lang0 || "English";
+      out.langs = project.langs.map((L) => xlCompile(project, L, out));
+    }
     return out;
   }
   function klFingerprint(project) {

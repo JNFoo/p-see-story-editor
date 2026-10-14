@@ -1027,6 +1027,7 @@ function renderMap(main) {
     if (n.choke && (mapOpts.traffic || vname === 'spine')) t += '\nA choke point: every route to the goal passes here.';
     if (mapOpts.traffic) t += `\nAbout ${Math.round(n.traffic * 100)}% of all routes pass here.`;
     if (isSide) t += '\nA side page: on no shortest route to a good or bad ending.';
+    if (!n.run && p.note) t += `\nYour note: ${p.note}`;
     if (color === 'odds' || color === 'heat') {
       const o = oddsOf(n.pages);
       t += o.n
@@ -1343,6 +1344,7 @@ function renderMap(main) {
     if (ov?.style) rect.setAttribute('style', ov.style);
     if (n.run) g.appendChild(s('rect', { class: 'stack', x: 5, y: -5, width: MAP_W, height: MAP_H, rx: 4 }));
     g.appendChild(rect);
+    if (p.color && !n.run) g.appendChild(s('rect', { class: `pcol pc-${p.color}`, x: 1, y: 1, width: 7, height: MAP_H - 2, rx: 3 }));
     const badge = p.id === project.start ? 'flag' : !n.run && p.ending ? (p.valence === 'good' ? 'smile' : p.valence === 'bad' ? 'frown' : '') : '';
     const lim = badge ? 19 : 24;
     const t1 = s('text', { x: 10, y: 24 });
@@ -1353,6 +1355,14 @@ function renderMap(main) {
       bi.setAttribute('x', MAP_W - 24);
       bi.setAttribute('y', 8);
       g.appendChild(bi);
+    }
+    if (p.note && !n.run) {
+      const ni = icon('note', 14);
+      ni.setAttribute('x', MAP_W - (badge ? 42 : 24));
+      ni.setAttribute('y', 9);
+      const ng = s('g', { class: 'nnote' });
+      ng.appendChild(ni);
+      g.appendChild(ng);
     }
     let gives = [],
       takes = [];

@@ -1677,6 +1677,7 @@ function init() {
     ['Open…', () => openFile('json'), 'Open a story file (.story.json).'],
     ['Import old format…', () => openFile('old'), 'Bring in a story saved in the old text format.'],
     ['Import Twine…', importTwineFile, 'Bring in a story from Twine (a Twine 2 HTML file, a Twee text file, or a Twine 1 file) to edit here. Its links become choices; its code is kept as text or turned into rules.'],
+    ['Translations…', translationsDialog, 'Save the story’s words as a sheet for translators, bring the translated sheet back, and give the game a language menu.'],
     null,
     ['New story', newStory, 'Start an empty story.'],
     ['Example story', loadExample, 'Load the example story to look around.'],
@@ -1839,6 +1840,9 @@ function init() {
       return analysis;
     },
     setView,
+    openPage: id => openPage(typeof id === 'string' ? byId(id) : id), // for the test suites
+    xl: { sheet: () => translationSheet(project), csvParse, csvWrite }, // for the test suites
+    refresh, // the test suites change the story directly, then ask for the same redraw an edit would
     startTour
   };
 }

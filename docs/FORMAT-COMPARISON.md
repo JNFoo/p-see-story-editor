@@ -42,7 +42,7 @@ The comparison covers five formats, each with the editor people most often write
 
 - No scripting at all, by design. A story that needs arrays, random values in text or computed values cannot be written in this format; importing such a Twine story flags those parts.
 - Much smaller community, no add-ons, and it is a beta.
-- No team editing, no translation workflow, no game-engine integration.
+- No team editing and no game-engine integration. Translation is a spreadsheet round trip (File → Translations…), not a built-in translating tool, and Yarn Spinner's localization is deeper (its own string tables and per-line identifiers).
 - Twine has years of tutorials and many story formats; Yarn Spinner has engine integration and localization; Ink has a mature runtime ecosystem.
 
 ## 4. Where this one is ahead
@@ -51,6 +51,9 @@ The comparison covers five formats, each with the editor people most often write
 - The checker explains in plain words why a page or ending cannot be reached, and it is exact for the story's own rules.
 - One offline file for the editor and one small file per finished game.
 - It can read Twine stories and convert their code to rules where the rules can say it.
+- Pinned routes: keep a route you played, replay it after edits, and the first step that no longer works is named in a plain sentence; the Check tab counts how many pinned routes still work.
+- Page colors and private notes show on the map (a stripe and a note icon), as Twine's tags and sticky notes do, and never reach the exported game.
+- Translations: the story's words go out as a CSV sheet and come back filled; the finished game then offers a language menu (the reader's choice is remembered), including the game's own button words.
 
 ## Sources (read 2026-10-14)
 

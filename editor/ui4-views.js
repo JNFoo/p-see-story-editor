@@ -972,6 +972,29 @@ function renderCheck(main) {
       );
     });
   }
+  const pins = routesFor(project.id).pinned;
+  if (pins.length) {
+    const results = pins.map(pn => ({ pn, res: routeReplay(project, pn.route) }));
+    const works = results.filter(x => !x.res.problem).length;
+    wrap.appendChild(h('h2', { class: 'sec', text: `Pinned routes (${works} of ${pins.length} still work)` }));
+    results.forEach(({ pn, res }) => {
+      wrap.appendChild(
+        h('div', { class: `issue ${res.problem ? 'warn' : 'ok'}` }, [
+          h('span', { class: 'iico' }, [icon(res.problem ? 'frown' : 'smile', 16)]),
+          h('div', { class: 't', text: res.problem ? `${pn.name}: ${res.problem.text}` : `${pn.name}: all ${res.total} pages can still be played in this order.` }),
+          h('button', {
+            class: 'btn small',
+            type: 'button',
+            text: res.problem ? 'Play to where it stops' : 'Play it',
+            onclick: function () {
+              playRoutePending = pn.route;
+              setView('play');
+            }
+          })
+        ])
+      );
+    });
+  }
   if (a.notes?.length) {
     // folded: worth knowing, not mistakes
     const d = h('details', { class: 'notes' }, [
@@ -1354,6 +1377,81 @@ function renderGame(main) {
   start();
 }
 
+/* ----- pinned routes (see routes.js) ----- */
+let liveRoute = null; // the route of the run in the Play tab
+let playRoutePending = null; // a route the Check tab asked the Play tab to walk
+let routeUi = null; // redraws the route row of the Play tab, if it is on screen
+
+/** Records each page of the run in the Play tab as it is drawn. */
+function routeNote(pid, flags, moved, story) {
+  const r = liveRoute;
+  if (!r || !byId(pid)) return;
+  const name = pname(byId(pid));
+  if (!r.steps.length) {
+    r.start = pid;
+    r.answers = {};
+    (story.givens || []).forEach(g => {
+      const a = (g.options || []).find(o => flags[o]);
+      if (a) r.answers[g.id] = a;
+    });
+    r.steps.push({ id: pid, name });
+  } else if (!moved) return;
+  else if (routeIsBack(r.steps, pid, project)) r.steps.pop();
+  else if (r.steps.length < ROUTE_MAX_STEPS) r.steps.push({ id: pid, name });
+  const s = routesFor(project.id);
+  routesSave(project.id, { last: r.steps.length > 1 ? { start: r.start, flags0: r.flags0, answers: r.answers, steps: r.steps } : s.last, pinned: s.pinned });
+  routeUi && routeUi();
+}
+
+/** The sentence for a replay result, shown above the story. */
+function routeResultText(res) {
+  return res.problem
+    ? `Back at “${pname(byId(res.at)) || '?'}” after ${res.done} of ${res.total} pages. ${res.problem.text}`
+    : `Back where you were: all ${res.total} pages replayed with the current story.`;
+}
+
+/** The "Pinned routes" window: replay, remove, and say which ones still work. */
+function pinnedDialog(replay) {
+  dialog((d, close) => {
+    d.appendChild(h('h3', { text: 'Pinned routes' }));
+    d.appendChild(h('div', { class: 'hint', text: 'A pinned route is a path you played and want to keep trying. After you edit the story, each one is walked again with the game’s own rules; it works if every step is still possible. They are kept in this browser, not in the story file.' }));
+    const list = h('div', { class: 'pinlist' });
+    const draw = () => {
+      list.textContent = '';
+      const s = routesFor(project.id);
+      if (!s.pinned.length) list.appendChild(h('div', { class: 'hint', text: 'Nothing pinned yet. Play a route, then choose “Pin this route”.' }));
+      s.pinned.forEach((pn, i) => {
+        const res = routeReplay(project, pn.route);
+        list.appendChild(
+          h('div', { class: `issue ${res.problem ? 'warn' : 'ok'}` }, [
+            h('div', { class: 't' }, [
+              h('strong', { text: pn.name }),
+              h('div', { class: 'hint', text: routeLine(pn.route) }),
+              h('div', { text: res.problem ? res.problem.text : `Works: all ${res.total} pages can still be played in this order.` })
+            ]),
+            h('button', { class: 'btn small', type: 'button', text: res.problem ? 'Play to where it stops' : 'Play it', onclick: () => { close(); replay(pn.route); } }),
+            h('button', {
+              class: 'btn small',
+              type: 'button',
+              text: 'Remove',
+              onclick: () => {
+                const t = routesFor(project.id);
+                t.pinned.splice(i, 1);
+                routesSave(project.id, t);
+                draw();
+                routeUi && routeUi();
+              }
+            })
+          ])
+        );
+      });
+    };
+    draw();
+    d.appendChild(list);
+    d.appendChild(h('div', { class: 'row end' }, [h('button', { class: 'btn primary', type: 'button', text: 'Done', onclick: close })]));
+  });
+}
+
 function renderPlay(main) {
   const p = byId(selId);
   const box = h('div', { class: 'playbox' });
@@ -1403,6 +1501,61 @@ function renderPlay(main) {
     );
     testRow = h('div', { class: 'row gpicks' }, [icon('play', 15), sel]);
   }
+  /* the route so far: pin it, or go back to where you were after editing */
+  const routeNoteEl = h('div', { class: 'hint routenote', role: 'status', 'aria-live': 'polite', hidden: true });
+  const routeLineEl = h('span', { class: 'routeline' });
+  const pinBtn = h('button', { class: 'btn small', type: 'button', text: 'Pin this route', title: 'Keep the pages you have played so far, to walk again after you edit the story' });
+  const backBtn = h('button', { class: 'btn small', type: 'button', text: 'Continue where I was', title: 'Replay your last route with the story as it is now and carry on from the last page that still works' });
+  const pinsBtn = h('button', { class: 'btn small', type: 'button' });
+  const routeRow = h('div', { class: 'row gpicks routerow' }, [icon('mv-flow', 15), routeLineEl, pinBtn, backBtn, pinsBtn]);
+  const redrawRoute = () => {
+    if (!routeRow.isConnected) return;
+    const s = routesFor(project.id);
+    const r = liveRoute && liveRoute.steps.length > 1 ? liveRoute : null;
+    routeLineEl.textContent = r ? `Route: ${routeLine(r)}` : 'Route: nothing played yet';
+    pinBtn.disabled = !r || s.pinned.length >= ROUTE_MAX_PINNED;
+    backBtn.hidden = !s.last;
+    pinsBtn.textContent = `Pinned routes (${s.pinned.length})…`;
+  };
+  routeUi = redrawRoute;
+  /** Walks `route` on the story as it is now, then plays on from where it stops. */
+  const replay = route => {
+    const res = routeReplay(project, route);
+    if (!res.at) {
+      routeNoteEl.textContent = res.problem.text;
+      routeNoteEl.hidden = false;
+      return;
+    }
+    start(res.at, res.flags, { start: route.start, flags0: route.flags0, answers: route.answers, steps: route.steps.slice(0, res.done) });
+    routeNoteEl.textContent = routeResultText(res);
+    routeNoteEl.hidden = false;
+  };
+  pinBtn.onclick = () => {
+    const r = liveRoute;
+    dialog((d, close) => {
+      d.appendChild(h('h3', { text: 'Pin this route' }));
+      d.appendChild(h('div', { class: 'hint', text: routeLine(r) }));
+      const nm = h('input', { class: 'in', type: 'text', maxlength: '60', 'aria-label': 'Name for this route' });
+      nm.value = `${r.steps[0].name} to ${r.steps[r.steps.length - 1].name}`.slice(0, 60);
+      d.appendChild(nm);
+      const ok = () => {
+        const s = routesFor(project.id);
+        s.pinned.push({ name: nm.value.trim() || 'Route', route: { start: r.start, flags0: r.flags0, answers: r.answers, steps: r.steps.slice() } });
+        routesSave(project.id, s);
+        close();
+        redrawRoute();
+        toast('Route pinned.');
+      };
+      nm.addEventListener('keydown', e => e.key === 'Enter' && ok());
+      d.appendChild(h('div', { class: 'row end' }, [h('button', { class: 'btn', type: 'button', text: 'Cancel', onclick: close }), h('button', { class: 'btn primary', type: 'button', text: 'Pin it', onclick: ok })]));
+      setTimeout(() => nm.select(), 0);
+    });
+  };
+  backBtn.onclick = () => {
+    const s = routesFor(project.id);
+    if (s.last) replay(s.last);
+  };
+  pinsBtn.onclick = () => pinnedDialog(replay);
   const wrap = h('div', { class: 'wrap' }, [
     h('h2', { class: 'sec', text: 'Play it' }),
     h('div', { class: 'row' }, [
@@ -1428,15 +1581,26 @@ function renderPlay(main) {
     ]),
     testRow,
     gRow.length ? h('div', { class: 'row gpicks' }, gRow) : null,
+    routeRow,
+    routeNoteEl,
     h('div', { class: 'hint', text: 'This is exactly how your exported game behaves. Nothing you do here is saved.' }),
     box
   ]);
   main.appendChild(wrap);
-  function start(id, flags) {
+  function start(id, flags, seed) {
     playFrom0 = id;
     box.textContent = '';
-    klPlayer(box, exportStory(project), { persist: false, startId: id || project.start, givens: sessionGivens, flags, exact: !!flags });
+    if (!seed) routeNoteEl.hidden = true;
+    liveRoute = seed ? { start: seed.start, flags0: seed.flags0, answers: seed.answers, steps: seed.steps.slice() } : { start: id || project.start, flags0: flags ? Object.assign({}, flags) : null, answers: {}, steps: [] };
+    const story = exportStory(project);
+    redrawRoute();
+    klPlayer(box, story, { persist: false, startId: id || project.start, givens: sessionGivens, flags, exact: !!flags, onPage: (pid, f, moved) => routeNote(pid, f, moved, story) });
   }
   start(playStart);
   playStart = null;
+  if (playRoutePending) {
+    const r = playRoutePending;
+    playRoutePending = null;
+    replay(r);
+  }
 }

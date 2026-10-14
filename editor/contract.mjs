@@ -54,7 +54,7 @@ const ctx = createContext({ console, TextDecoder });
 runInContext(
   `${read('core.js')}\n${read('player.js')}\nthis.C = { storyTestRoutes, storyTestScript, zipInflate, zippedPage, analyze, analyzeStructure, STARTERS, normalizeProject, exportStory, makeProject, makeItem, makePassage, makeChoice, makeBlock, cleanGame,
   FIELD_CONTRACT, KL_RULES, PALETTES, PALETTE_KEYS, GAME_DEFAULTS, GAME_OPTIONS, paletteCss, klHas, klCondOk, klVisibleBlocks, klStatMap, klInit, klAdd, klChoose, klVisibleChoices,
-  klShown, klArrive, klTarget, klOdds, klPlayer, klShortIds, klFingerprint, KL_FEATURE_ORDER, KL_FEATS, klFeatures, gameCss,
+  klShown, klArrive, klTarget, klOdds, klPlayer, klShortIds, klFingerprint, KL_FEATURE_ORDER, KL_FEATS, klFeatures, gameCss, xlStrings, xlNorm, LANG_UI, cleanLangs,
   modules: KL_FEATURE_ORDER.map(n => [n, eval('klFeat' + n[0].toUpperCase() + n.slice(1))]) };`,
   ctx
 );
@@ -786,6 +786,7 @@ C.STARTERS.forEach(sp => {
     if (n === 'tracker') return g.tracker === true;
     if (n === 'place') return g.place === true;
     if (n === 'comfort') return g.comfort !== false;
+    if (n === 'lang') return Array.isArray(story.langs) && story.langs.length > 0;
     return false;
   };
   const probe = P => {
@@ -821,6 +822,43 @@ C.STARTERS.forEach(sp => {
   if (C.klFingerprint(P) !== a) fail('Fixing the words of a page changed the story fingerprint, so everyone would lose their saved place.');
   P.passages.push(C.makePassage('Another'));
   if (C.klFingerprint(P) === a) fail('Adding a page did not change the story fingerprint, so an old save could land on the wrong page.');
+}
+
+/* 8: translations. Every text a player can read is found by xlStrings; a language made by wrapping each text in « » comes out of exportStory as lists
+   lined up with the exported story (items, Given questions, pages, paragraphs, the choices that were exported); the short-id version keeps them lined up;
+   a story with no language exports no trace of one; and a saved language survives normalizeProject. */
+{
+  const wrap = s => `«${s}»`;
+  for (let i = 0; i < 60; i++) {
+    const P = C.normalizeProject(gen());
+    if (C.exportStory(P).langs || C.exportStory(P).l0) fail('A story with no translation exported language data.');
+    const t = {};
+    C.xlStrings(P).forEach(s => (t[s.text] = wrap(s.text)));
+    P.langs = [{ id: 'lg1', name: 'Test', code: 'tt', t }];
+    const E = C.exportStory(P);
+    const L = E.langs && E.langs[0];
+    if (!L) {
+      fail('A story with a translation exported no language.');
+      break;
+    }
+    if (L.i.length !== E.items.length || L.p.length !== E.passages.length) fail('A language is not lined up with the exported items and pages.');
+    E.passages.forEach((p, k) => {
+      const e = L.p[k];
+      const blocks = p.blocks.map(b => C.xlNorm(b.text));
+      if (!e) {
+        if (blocks.some(Boolean) || p.heading || (p.choices || []).length) fail(`A page with words had no translation entry (page ${k}).`);
+        return;
+      }
+      if (e[1].length !== p.blocks.length || e[2].length !== (p.choices || []).length) fail(`Translation lists are not the length of the page's paragraphs or exported choices (page ${k}).`);
+      p.blocks.forEach((b, j) => C.xlNorm(b.text) && e[1][j] !== wrap(C.xlNorm(b.text)) && fail(`Paragraph ${j} of page ${k} did not get its translation.`));
+      (p.choices || []).forEach((c, j) => C.xlNorm(c.label) && e[2][j] !== wrap(C.xlNorm(c.label)) && fail(`Choice ${j} of page ${k} did not get its translation.`));
+    });
+    const S = C.klShortIds(E);
+    if (S.langs !== E.langs || S.passages.length !== E.passages.length) fail('Shortening the ids disturbed the language lists.');
+    const back = C.normalizeProject(JSON.parse(JSON.stringify(P)));
+    if (!back.langs || Object.keys(back.langs[0].t).length !== Object.keys(t).length) fail('A saved language lost translations in normalizeProject.');
+    if (C.cleanLangs([{ id: 'a b', name: 'x'.repeat(99), code: 'not a code', t: { a: 'b', c: 5, d: '  ' } }])[0].code !== '') fail('A bad language code was kept.');
+  }
 }
 
 if (failures.length) {

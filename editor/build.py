@@ -16,7 +16,7 @@ Sources, in the order they appear in the finished file:
                                 -> <script type="application/json" id="game-parts"> (code and styles in one piece per optional feature)
   keepers-light.project.json    the built-in example story                -> <script type="application/json" id="starter-story">
   ui.css                        styles for the editor                     -> <style>
-  core.js, maplayout.js, twine.js
+  core.js, maplayout.js, twine.js, routes.js
                                 PART 1: story model, game rules, checker, export; map layout; Twine import (global functions)
   player.js                     PART 2: plays a story (global function)
   ui1-state.js ... ui5-app.js   PART 3, wrapped in one function so it leaks nothing
@@ -81,7 +81,7 @@ GAME = json.loads(subprocess.run(["node", HERE + "build-game.mjs"], capture_outp
 # "<" is escaped so no text can end the tag early. buildGameHtml (core.js) writes into each game only the pieces its story uses.
 GAME_PARTS = json.dumps(GAME, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
 
-UI_PARTS = ["ui1-state.js", "ui2-widgets.js", "ui3-write.js", "ui4-map.js", "ui4-views.js", "ui4-speed.js", "ui5-app.js"]
+UI_PARTS = ["ui1-state.js", "ui2-widgets.js", "ui3-write.js", "ui4-map.js", "ui4-views.js", "ui4-speed.js", "translate.js", "ui5-app.js"]
 
 # ---- the example story, as compact JSON (it is data; the readable copy is keepers-light.project.json).
 #      "<" is escaped so no text can end the tag early.
@@ -90,7 +90,7 @@ starter = starter.replace("<", "\\u003c")
 
 # ---- the editor's script
 ui = "(function () {\n'use strict';\n\n" + "\n".join(read(f) for f in UI_PARTS) + "\n})();\n"
-script = "'use strict';\n\n" + read("core.js") + "\n" + read("maplayout.js") + "\n" + read("twine.js") + "\n" + read("player.js") + "\n" + ui
+script = "'use strict';\n\n" + read("core.js") + "\n" + read("maplayout.js") + "\n" + read("twine.js") + "\n" + read("routes.js") + "\n" + read("player.js") + "\n" + ui
 script = re.sub(r"</(script)", r"<\\/\1", script, flags=re.I)  # any capitalization ends a script tag in HTML
 # ---- the version stamp shown on the splash: when this file was built, as YYYY.MM.DD.HHMM in US Eastern time, 24-hour clock, e.g. "2026.10.08.2320" (the owner's format from Oct 8 2026 on)
 now = datetime.datetime.now(ZoneInfo("America/New_York"))
@@ -224,11 +224,11 @@ print("built story-editor.html (%d KB plain), stamped %s" % (len(standalone.enco
 #      budget.mjs makes the numbers from the finished file, using the same function the Export button uses.
 #      "Change" is against the previous build (kept in sizes-last.json).
 BUDGETS = {  # name: ceiling in bytes (the file itself, not gzip)
-    "Editor (story-editor.html)": 565000,   # raised to 565,000 on Oct 14 for Import Twine (twine.js: file readers, SugarCube and Harlowe macro readers, variables and if / else turned into rules; +50 KB plain, +20 KB packed). Before that: 520,000,   # the plain page (lowered to 520,000 on Oct 14: shortening local names took 42 KB off, which more than paid for the Options → Safety box, its reminder, the revision stamp and the test script; was 545,000, raised to 545,000 on Oct 8 night for the map icon toolbar, start-page rule, drag handles, first-time tour and many more checker rules; raised to 540,000 on Oct 8 evening for the Write-tab batches: page picker, history, side toggles, split, paste, templates, phone bar, wide layout; tightened to 520,000 when they were done; was 500,000 on Oct 8 for the Game tab with its live preview; was 490,000; raised from 470,000 for find and replace, unfinished flags, reach reports, the manuscript, Oct 8 2026; now about 2% headroom, so it stays)
-    "Editor as delivered (packed)": 246000, # raised to 246,000 on Oct 14 for Import Twine (+20 KB); what the file on disk weighs
-    "The Keeper\u2019s Light (the built-in example)": 58600,   # raised to 58,600 on Oct 14 with the other two for the recap's "Roads not taken" (about 600 bytes); raised from 57,500 on Oct 14 with the next two (about 400 bytes: back swipe, contrast follows the system, already-taken check mark)
-    "Standard 25-page game": 50200,                           # was 49,500, 49,000
-    "Standard 25-page game, Place code on": 53500,            # was 53,000, 52,500
+    "Editor (story-editor.html)": 620000,   # raised to 620,000 on Oct 14 (owner: "raise ceiling to implement ideas and then we can discuss what to compress or reduce after") for page colors and notes, pinned routes and translations; the owner expects more growth from further UI research, so trimming is a later discussion. Before that 565,000 on Oct 14 for Import Twine (twine.js: file readers, SugarCube and Harlowe macro readers, variables and if / else turned into rules; +50 KB plain, +20 KB packed). Before that: 520,000,   # the plain page (lowered to 520,000 on Oct 14: shortening local names took 42 KB off, which more than paid for the Options → Safety box, its reminder, the revision stamp and the test script; was 545,000, raised to 545,000 on Oct 8 night for the map icon toolbar, start-page rule, drag handles, first-time tour and many more checker rules; raised to 540,000 on Oct 8 evening for the Write-tab batches: page picker, history, side toggles, split, paste, templates, phone bar, wide layout; tightened to 520,000 when they were done; was 500,000 on Oct 8 for the Game tab with its live preview; was 490,000; raised from 470,000 for find and replace, unfinished flags, reach reports, the manuscript, Oct 8 2026; now about 2% headroom, so it stays)
+    "Editor as delivered (packed)": 275000, # raised to 275,000 on Oct 14 with the plain page for colors/notes, pinned routes and translations (owner asked to raise first and trim later); was 246,000 for Import Twine (+20 KB); what the file on disk weighs
+    "The Keeper\u2019s Light (the built-in example)": 59900,   # raised to 59,900 on Oct 14 with the other games (translation hooks); was 58,600 on Oct 14 with the other two for the recap's "Roads not taken" (about 600 bytes); raised from 57,500 on Oct 14 with the next two (about 400 bytes: back swipe, contrast follows the system, already-taken check mark)
+    "Standard 25-page game": 51500,                           # raised to 51,500 on Oct 14 (headroom for the translation hooks in the player); was 50,200, 49,500, 49,000
+    "Standard 25-page game, Place code on": 54800,            # raised to 54,800 on Oct 14 with the other games; was 53,500, 53,000, 52,500
 }
 sizes = json.loads(subprocess.run(["node", HERE + "budget.mjs", HERE + "story-editor.plain.html"], capture_output=True, text=True, check=True).stdout)
 rows = [("Editor (story-editor.html)", sizes["editor"])] + [(g["name"], g) for g in sizes["games"]]

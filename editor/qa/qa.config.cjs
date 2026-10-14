@@ -2,7 +2,7 @@
    Suites run on Firefox first; the full tier runs them again on Chromium. */
 const path = require('path');
 
-const SOURCES = ['core.js', 'player.js', 'maplayout.js', 'game.css', 'ui.css', 'ui1-state.js', 'ui2-widgets.js', 'ui3-write.js', 'ui4-map.js', 'ui4-views.js', 'ui4-speed.js', 'ui5-app.js', 'twine.js', 'build.py', 'build-game.mjs', 'minify.mjs', 'contract.mjs'];
+const SOURCES = ['core.js', 'player.js', 'maplayout.js', 'game.css', 'ui.css', 'ui1-state.js', 'ui2-widgets.js', 'ui3-write.js', 'ui4-map.js', 'ui4-views.js', 'ui4-speed.js', 'ui5-app.js', 'twine.js', 'routes.js', 'translate.js', 'build.py', 'build-game.mjs', 'minify.mjs', 'contract.mjs'];
 const EDITOR = SOURCES.filter(f => f !== 'contract.mjs');
 const GAME = ['core.js', 'player.js', 'game.css', 'build-game.mjs'];
 
@@ -25,6 +25,9 @@ module.exports = {
     S('twowin', 'twowin.js', ['ui1-state.js', 'ui5-app.js', 'ui2-widgets.js'], true),
     S('safety', 'safety.js', ['ui5-app.js', 'ui1-state.js', 'ui2-widgets.js', 'core.js'], true),
     S('twine', 'twine.js', ['twine.js', 'ui5-app.js', 'ui2-widgets.js', 'core.js'], true),
+    S('marks', 'marks.js', ['ui3-write.js', 'ui4-map.js', 'ui2-widgets.js', 'ui.css', 'core.js'], true),
+    S('routes', 'routes.js', ['routes.js', 'ui4-views.js', 'player.js', 'core.js'], true),
+    S('translate', 'translate.js', ['translate.js', 'player.js', 'game.css', 'ui5-app.js', 'core.js'], true),
     S('gamefeel', 'gamefeel.js', ['player.js', 'game.css', 'core.js'], true),
     S('textstress', 'textstress.js', ['player.js', 'game.css', 'core.js'], false),
     S('motion', 'motion.js', ['ui5-app.js', 'ui2-widgets.js', 'ui.css'], true),

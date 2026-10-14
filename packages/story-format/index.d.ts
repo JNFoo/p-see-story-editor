@@ -25,13 +25,14 @@ export interface Choice {
   why: string;
 }
 export interface Passage {
-  id: string; name: string; heading: string; ending: boolean; valence: Valence; todo: boolean;
+  id: string; name: string; heading: string; ending: boolean; valence: Valence; todo: boolean; color: '' | 'red' | 'orange' | 'yellow' | 'green' | 'blue' | 'purple' | 'gray'; note: string;
   blocks: Block[]; gives: string[]; takes: string[]; adds: Record<string, number>; sends: Record<string, string>; choices: Choice[];
 }
 export interface GameOptions { back: 'off' | 'remember' | 'reroll' | 'block'; tracker: boolean; comfort: boolean; odds: boolean; place: boolean; pal: 'paper' | 'night' | 'sepia' | 'ocean' | 'forest' | 'contrast' }
+export interface Lang { id: string; name: string; code: string; t: Record<string, string> }
 export interface Project {
   format: 'story-editor'; version: number; id: string; title: string; author: string; start: string; rev?: number; savedAt?: string;
-  gameFont?: 'system'; game: GameOptions; items: Item[]; givens: Given[]; passages: Passage[];
+  gameFont?: 'system'; lang0?: string; langs?: Lang[]; game: GameOptions; items: Item[]; givens: Given[]; passages: Passage[];
 }
 
 export function makeProject(title?: string): Project;

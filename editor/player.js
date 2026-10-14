@@ -10,7 +10,7 @@
             flags     extra things the player starts with, { itemId: true, 'v:<statId>': number } ("Test from here")
             exact     true: `flags` is everything the player holds on arrival (the start page's own gains are not applied again)
             showTitle false hides the small story title above each page
-            onPage    callback(pageId, flags) after each page is drawn
+            onPage    callback(pageId, flags, moved) after each page is drawn; moved is true when the reader just moved to it (a choice or Back)
    Returns { restart() }.
    Reader options come from story.game: back (off | remember | reroll | block), tracker (count endings found), comfort
    (the Aa panel), odds (show a skill check's chance), pal (color palette, applied by game.css).
@@ -149,6 +149,9 @@ function klPlayer(root, story, opts = {}) {
   /* Givens: questions asked before page one ("Who are you?"). Each answer is a state the player then has. */
   const givens = (story.givens || []).filter(g => g.options && g.options.length);
 
+  /** A fixed word of the game in the reader's language (the lang module fills story.ui), or the English original. */
+  const T = w => (story.ui && story.ui[w]) || w;
+
   const itemsById = Object.create(null);
   (story.items || []).forEach(i => {
     itemsById[i.id] = i;
@@ -270,7 +273,7 @@ function klPlayer(root, story, opts = {}) {
       });
     });
     if (roads.length) {
-      det.appendChild(el('p', 'kl-roads-h', 'Roads not taken'));
+      det.appendChild(el('p', 'kl-roads-h', T('Roads not taken')));
       const ul = el('ul', 'kl-roads');
       roads.slice(0, 12).forEach(r => {
         const li = el('li');
@@ -362,16 +365,16 @@ function klPlayer(root, story, opts = {}) {
     }
     const haveO = shown('object');
     const haveS = shown('state');
-    if (haveO.length) page.appendChild(el('div', 'kl-have', `Carrying: ${haveO.join(', ')}.`));
-    if (haveS.length) page.appendChild(el('div', 'kl-have', `Feeling / status: ${haveS.join(', ')}.`));
+    if (haveO.length) page.appendChild(el('div', 'kl-have', `${T('Carrying:')} ${haveO.join(', ')}.`));
+    if (haveS.length) page.appendChild(el('div', 'kl-have', `${T('Feeling / status:')} ${haveS.join(', ')}.`));
     each('afterText', p, page);
     let list = el('ul', 'kl-choices');
     let pickable = () => 0;
     if (p.ending) {
-      page.appendChild(el('div', 'kl-end', 'The end.'));
+      page.appendChild(el('div', 'kl-end', T('The end.')));
       each('endLine', p, page);
       const li = el('li');
-      const b = el('button', '', 'Play again');
+      const b = el('button', '', T('Play again'));
       b.type = 'button';
       b.onclick = restart;
       li.appendChild(b);
@@ -412,7 +415,7 @@ function klPlayer(root, story, opts = {}) {
     collect('barRight', p, wrap).forEach(x => right.appendChild(x));
     /* also when nothing on the page can be picked (a first page whose only choices need something this player lacks): otherwise a saved game could never be left */
     if (!p.ending && ((state.trail && state.trail.length) || pickable() === 0)) {
-      const r = el('button', '', 'Start over');
+      const r = el('button', '', T('Start over'));
       let armed = null;
       r.type = 'button';
       r.onclick = () => {
@@ -421,11 +424,11 @@ function klPlayer(root, story, opts = {}) {
           restart();
           return;
         }
-        r.textContent = 'Tap again to start over';
+        r.textContent = T('Tap again to start over');
         r.className = 'armed';
         armed = setTimeout(() => {
           armed = null;
-          r.textContent = 'Start over';
+          r.textContent = T('Start over');
           r.className = '';
         }, 3000);
       };
@@ -446,7 +449,7 @@ function klPlayer(root, story, opts = {}) {
       }
       if (root.getBoundingClientRect().top < 0 && root.scrollIntoView) root.scrollIntoView(true); // only when the page's start is out of view
     }
-    if (opts.onPage) opts.onPage(p.id, state.flags);
+    if (opts.onPage) opts.onPage(p.id, state.flags, moved);
   }
 
   /* What the feature modules are given (see the notes at the top of this file), and the modules themselves, in order. */
@@ -462,6 +465,7 @@ function klPlayer(root, story, opts = {}) {
     el,
     nm,
     nameOf,
+    T,
     readJson,
     writeJson,
     readList,
@@ -588,7 +592,7 @@ function klFeatBack(P) {
   P.on('barLeft', () => {
     const s = P.state;
     if (!(s.hist || []).length) return null;
-    const bk = P.el('button', '', 'Back');
+    const bk = P.el('button', '', P.T('Back'));
     bk.type = 'button';
     if ((s.hist || []).length > (s.floor || 0)) bk.onclick = back;
     else {
@@ -947,6 +951,73 @@ function klFeatComfort(P) {
   });
 }
 
+/**
+ * lang: translations. The story carries each language as lists lined up with its pages (see xlCompile in core.js); this module keeps the
+ * original words, swaps in the reader's language (chosen from a small menu, remembered in this browser, first guessed from the browser's
+ * language) and redraws. A text with no translation stays as the author wrote it. The page's own words are changed in place, so nothing
+ * else in the player needs to know a second language exists.
+ */
+function klFeatLang(P) {
+  const S = P.story;
+  const Ls = S.langs;
+  if (!Ls || !Ls.length) return;
+  const key = `story-editor-lang:${S.id}`;
+  const pages = S.passages;
+  const orig = {
+    t: S.title,
+    i: S.items.map(x => [x.name, (x.names || []).map(n => n.name)]),
+    g: (S.givens || []).map(x => x.question),
+    p: pages.map(q => [q.heading, q.blocks.map(b => b.text), (q.choices || []).map(c => [c.label, c.why])])
+  };
+  const pick = (t, o) => t || o;
+  const set = n => {
+    const L = n < 0 ? {} : Ls[n];
+    S.title = pick(L.title, orig.t);
+    S.ui = L.ui || {};
+    S.items.forEach((x, k) => {
+      x.name = pick(L.i && L.i[k], orig.i[k][0]);
+      (x.names || []).forEach((m, j) => (m.name = pick(L.a && L.a[k] && L.a[k][j], orig.i[k][1][j])));
+    });
+    (S.givens || []).forEach((x, k) => (x.question = pick(L.g && L.g[k], orig.g[k])));
+    pages.forEach((q, k) => {
+      const e = (L.p && L.p[k]) || [];
+      const o = orig.p[k];
+      q.heading = pick(e[0], o[0]);
+      q.blocks.forEach((b, j) => (b.text = pick(e[1] && e[1][j], o[1][j])));
+      (q.choices || []).forEach((c, j) => {
+        c.label = pick(e[2] && e[2][j], o[2][j][0]);
+        if (c.lock) c.why = pick(e[3] && e[3][j], o[2][j][1]);
+      });
+    });
+  };
+  let cur = -1;
+  const saved = P.readJson(key);
+  if (typeof saved === 'number' && saved >= -1 && saved < Ls.length) cur = saved;
+  else if (P.opts.persist) {
+    const mine = String(navigator.language || '').toLowerCase().split('-')[0];
+    const j = Ls.findIndex(L => L.c && L.c.toLowerCase().split('-')[0] === mine);
+    if (mine && j >= 0) cur = j;
+  }
+  set(cur);
+  P.on('barRight', () => {
+    const sel = P.el('select', 'kl-lang');
+    sel.setAttribute('aria-label', 'Language');
+    [S.l0 || 'English'].concat(Ls.map(L => L.n)).forEach((name, n) => {
+      const o = P.el('option', '', name);
+      o.value = String(n - 1);
+      sel.appendChild(o);
+    });
+    sel.value = String(cur);
+    sel.onchange = () => {
+      cur = Number(sel.value);
+      set(cur);
+      P.writeJson(key, cur);
+      P.render(false);
+    };
+    return sel;
+  });
+}
+
 /* Registration: this order is the order the modules start (KL_FEATURE_ORDER in core.js lists the same names). */
 KL_FEATS.ask = klFeatAsk;
 KL_FEATS.back = klFeatBack;
@@ -955,4 +1026,5 @@ KL_FEATS.locks = klFeatLocks;
 KL_FEATS.bars = klFeatBars;
 KL_FEATS.tracker = klFeatTracker;
 KL_FEATS.place = klFeatPlace;
+KL_FEATS.lang = klFeatLang;
 KL_FEATS.comfort = klFeatComfort;

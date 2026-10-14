@@ -78,12 +78,15 @@ function joinAnd(parts) {
      format: 'story-editor', version: 1, id, title, author, start,
      gameFont: 'system',     // optional: exported games use the device's own font instead of the embedded one (smaller file)
      game:     { back, tracker, comfort, odds, place, pal }, // optional reader options (see GAME_OPTIONS); only non-default values are kept
+     lang0:    'English',    // optional: what the story's own language is called in the game's language picker
+     langs:    [{ id, name, code, t: { 'source text': 'translation' } }],   // optional translations (see section "Translations"); the key is the exact source text
      items:    [{ id, name, kind: 'object' | 'state' | 'stat', show,
                   lo, hi, start,                           // stats only: a number from lo to hi, begun at `start`
                   names: [{ when: itemId, name }] }],   // optional: shown under another name while the player has/is `when`
      givens:   [{ id, question, options: [stateId] }],  // asked before page one; the player becomes exactly one option
      passages: [{ id, name, heading, ending, valence: '' | 'good' | 'bad',
                   todo: false,                // the author's "unfinished" flag; never exported, never read by the checker or the game
+                  color: '', note: '',        // the author's own color mark (one of PAGE_COLORS, or '') and a private note; shown on the map and in the page list, never exported
                   blocks:  [{ text, needs[], forbid[], orPrev }],   // paragraphs
                   gives[], takes[],           // item ids gained / lost on arrival
                   adds: { statId: number },   // stats raised (or lowered, if negative) on arrival
@@ -111,15 +114,21 @@ function joinAnd(parts) {
  * without the checker being taught about it: list the field below, then make analyze() use it.
  */
 const FIELD_CONTRACT = {
-  project: { rules: ['start', 'items', 'givens', 'passages'], display: ['format', 'version', 'id', 'title', 'author', 'gameFont', 'game', 'rev', 'savedAt'] },
+  project: { rules: ['start', 'items', 'givens', 'passages'], display: ['format', 'version', 'id', 'title', 'author', 'gameFont', 'game', 'rev', 'savedAt', 'lang0', 'langs'] },
   item: { rules: ['id', 'kind', 'show', 'lo', 'hi', 'start'], display: ['name', 'names'] },
   given: { rules: ['options'], display: ['id', 'question'] },
-  passage: { rules: ['id', 'ending', 'blocks', 'gives', 'takes', 'adds', 'sends', 'choices'], display: ['name', 'heading', 'valence', 'todo'] },
+  passage: { rules: ['id', 'ending', 'blocks', 'gives', 'takes', 'adds', 'sends', 'choices'], display: ['name', 'heading', 'valence', 'todo', 'color', 'note'] },
   block: { rules: ['needs', 'forbid', 'orPrev'], display: ['text'] },
   choice: { rules: ['to', 'needs', 'forbid', 'gives', 'takes', 'adds', 'check', 'lock'], display: ['label', 'why'] },
   check: { rules: ['stat', 'target', 'fail'], display: [] },
   game: { rules: [], display: [] } // filled from the GAME_OPTIONS table just below it
 };
+
+
+/** The colors an author can mark a page with (shown as a stripe on the map and a dot in the page list; the game never sees them). */
+const PAGE_COLORS = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'gray'];
+
+const PAGE_NOTE_MAX = 600;
 
 
 /** A paragraph. `orPrev` means "use this only if the paragraph above was hidden". */
@@ -347,6 +356,8 @@ function makePassage(name) {
     ending: false,
     valence: '',
     todo: false,
+    color: '',
+    note: '',
     blocks: [makeBlock('')],
     gives: [],
     takes: [],
@@ -553,6 +564,8 @@ function normalizeProject(raw) {
       ending: !!q.ending,
       valence: q.valence === 'good' || q.valence === 'bad' ? q.valence : '',
       todo: !!q.todo,
+      color: PAGE_COLORS.includes(q.color) ? q.color : '',
+      note: String(q.note || '').slice(0, PAGE_NOTE_MAX),
       blocks,
       gives: knownReal(q.gives).filter(id => !answer[id]), // Givens never change during the story
       takes: knownReal(q.takes).filter(id => !answer[id]),
@@ -588,9 +601,90 @@ function normalizeProject(raw) {
   }
   if (raw.gameFont === 'system') p.gameFont = 'system';
   p.game = cleanGame(raw.game);
+  const langs = cleanLangs(raw.langs);
+  if (langs.length) p.langs = langs;
+  if (typeof raw.lang0 === 'string' && raw.lang0.trim() && raw.lang0.trim() !== 'English') p.lang0 = raw.lang0.trim().slice(0, LANG_NAME_MAX);
   pruneVirtual(p);
   if (fileVersion > STORY_VERSION && !startFixNote) startFixNote = `This story was saved by a newer version of the editor (file format ${fileVersion}; this editor reads format ${STORY_VERSION}). It opened, but anything this editor does not know about was left out. Do not save over the original file.`;
   return p;
+}
+
+
+/* ---------------------------------------------------------------------------
+   Translations
+   ---------------------------------------------------------------------------
+   A translation is a table from the exact source text to its translation: project.langs[n].t = { 'Push the door open': 'Empuja la puerta' }.
+   Keying by the words (not by a page and position) means moving, reordering or duplicating pages and paragraphs never mixes translations up,
+   the same sentence on two pages is translated once, and a sentence that was edited simply shows up as "not translated yet".
+   xlStrings lists everything a player can read, each different text once. An exported game carries each language as lists lined up with the
+   exported story (xlCompile), and the game's `lang` module swaps the words in when the reader picks a language.
+   --------------------------------------------------------------------------- */
+
+const LANG_MAX = 12;
+
+const LANG_NAME_MAX = 40;
+
+const LANG_TEXT_MAX = 4000;
+
+const LANG_ENTRIES_MAX = 8000;
+
+/** The fixed words of the game itself that a translation can cover (the player calls T() on each). */
+const LANG_UI = ['The end.', 'Play again', 'Start over', 'Tap again to start over', 'Back', 'Roads not taken', 'Carrying:', 'Feeling / status:'];
+
+
+/** A text as a translation table key: line ends made alike, outer blanks removed. */
+const xlNorm = s => String(s === undefined || s === null ? '' : s).replace(/\r\n?/g, '\n').trim();
+
+
+/** The translation table of a language, checked: text keys and values only, each cut to size. */
+function cleanLangs(raw) {
+  const out = [];
+  const used = {};
+  (Array.isArray(raw) ? raw : []).slice(0, LANG_MAX).forEach((L, n) => {
+    if (!L || typeof L !== 'object') return;
+    let id = String(L.id || '');
+    if (!/^[A-Za-z0-9_\-]{1,24}$/.test(id) || used[id]) id = `lg${n + 1}`;
+    while (used[id]) id += 'x';
+    used[id] = true;
+    const t = {};
+    let count = 0;
+    if (L.t && typeof L.t === 'object' && !Array.isArray(L.t))
+      Object.keys(L.t).forEach(k => {
+        const v = L.t[k];
+        if (typeof v !== 'string' || !v.trim() || !k.trim() || k.length > LANG_TEXT_MAX || count >= LANG_ENTRIES_MAX) return;
+        t[xlNorm(k)] = xlNorm(v).slice(0, LANG_TEXT_MAX);
+        count++;
+      });
+    const code = String(L.code || '').trim();
+    out.push({ id, name: String(L.name || 'Language').trim().slice(0, LANG_NAME_MAX) || 'Language', code: /^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})?$/.test(code) ? code : '', t });
+  });
+  return out;
+}
+
+
+/**
+ * One language ready for the game: the lists line up with the exported story `out` (items, Given questions, pages; blocks; the choices that
+ * were exported). An empty text means "no translation, keep the original".
+ */
+function xlCompile(project, lang, out) {
+  const g = s => lang.t[xlNorm(s)] || '';
+  const L = { n: lang.name };
+  if (lang.code) L.c = lang.code;
+  const title = g(project.title);
+  if (title) L.title = title;
+  const ui = {};
+  LANG_UI.forEach(w => g(w) && (ui[w] = g(w)));
+  if (Object.keys(ui).length) L.ui = ui;
+  L.i = out.items.map(x => g(x.name));
+  const alt = {};
+  out.items.forEach((x, k) => (x.names || []).some(n => g(n.name)) && (alt[k] = x.names.map(n => g(n.name))));
+  if (Object.keys(alt).length) L.a = alt;
+  if (out.givens && out.givens.some(q => g(q.question))) L.g = out.givens.map(q => g(q.question));
+  L.p = out.passages.map(p => {
+    const e = [g(p.heading), p.blocks.map(b => g(b.text)), (p.choices || []).map(c => g(c.label)), (p.choices || []).map(c => (c.lock ? g(c.why) : ''))];
+    return e[0] || e[1].some(Boolean) || e[2].some(Boolean) || e[3].some(Boolean) ? e : 0;
+  });
+  return L;
 }
 
 
@@ -1478,6 +1572,10 @@ function exportStory(project) {
     if (g[k] !== GAME_DEFAULTS[k]) go[k] = g[k];
   });
   put(out, 'game', go);
+  if ((project.langs || []).length) {
+    out.l0 = project.lang0 || 'English';
+    out.langs = project.langs.map(L => xlCompile(project, L, out));
+  }
   return out;
 }
 

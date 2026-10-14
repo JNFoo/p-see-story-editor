@@ -952,6 +952,7 @@ function pagePicker(o) {
       p.ending && p.valence === 'good' ? h('span', { class: 'pico' }, [icon('smile', 13)]) : null,
       p.ending && p.valence === 'bad' ? h('span', { class: 'pico' }, [icon('frown', 13)]) : null,
       p.ending && !p.valence ? h('span', { class: 'tag end neutral', text: 'end' }) : null,
+      p.color ? h('span', { class: 'pcdot', style: `--c:var(--pc-${p.color})`, title: `Marked ${p.color}` }) : null,
       p.todo ? h('span', { class: 'pico todo' }, [icon('todo', 13)]) : null,
       pageEmpty(p) ? h('span', { class: 'tag', text: 'no text yet' }) : null
     ];
@@ -1205,6 +1206,10 @@ const ICON_PARTS = {
   ],
   /* a bookmark: the author's "unfinished" flag on a page (filled when on, by the .on rule in ui.css) */
   todo: [['path', { d: 'M4 2.2H12V14L8 10.9L4 14Z' }]],
+  /* a small folded note: the author's private note on a page */
+  note: [['path', { d: 'M3 2H13V10.5L9.5 14H3Z' }], ['path', { d: 'M9.5 14V10.5H13M5.5 5H10.5M5.5 7.5H10.5' }]],
+  /* two overlapping dabs of paint: the author's color mark on a page */
+  pcolor: [['circle', { cx: 6, cy: 6.5, r: 4 }], ['circle', { cx: 10.2, cy: 9.5, r: 4 }]],
   /* the Map's controls */
   'mv-flow': [
     ['rect', { x: 1, y: 6.2, width: 3.2, height: 3.6, rx: 0.6 }],

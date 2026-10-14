@@ -90,6 +90,8 @@ var StoryMap = (() => {
     });
     return out;
   }
+  var PAGE_COLORS = ["red", "orange", "yellow", "green", "blue", "purple", "gray"];
+  var PAGE_NOTE_MAX = 600;
   function makeBlock(text) {
     return { text: text || "", needs: [], forbid: [], orPrev: false };
   }
@@ -264,6 +266,8 @@ var StoryMap = (() => {
       ending: false,
       valence: "",
       todo: false,
+      color: "",
+      note: "",
       blocks: [makeBlock("")],
       gives: [],
       takes: [],
@@ -428,6 +432,8 @@ var StoryMap = (() => {
         ending: !!q.ending,
         valence: q.valence === "good" || q.valence === "bad" ? q.valence : "",
         todo: !!q.todo,
+        color: PAGE_COLORS.includes(q.color) ? q.color : "",
+        note: String(q.note || "").slice(0, PAGE_NOTE_MAX),
         blocks,
         gives: knownReal(q.gives).filter((id) => !answer[id]),
         // Givens never change during the story
@@ -463,9 +469,40 @@ var StoryMap = (() => {
     }
     if (raw.gameFont === "system") p.gameFont = "system";
     p.game = cleanGame(raw.game);
+    const langs = cleanLangs(raw.langs);
+    if (langs.length) p.langs = langs;
+    if (typeof raw.lang0 === "string" && raw.lang0.trim() && raw.lang0.trim() !== "English") p.lang0 = raw.lang0.trim().slice(0, LANG_NAME_MAX);
     pruneVirtual(p);
     if (fileVersion > STORY_VERSION && !startFixNote) startFixNote = `This story was saved by a newer version of the editor (file format ${fileVersion}; this editor reads format ${STORY_VERSION}). It opened, but anything this editor does not know about was left out. Do not save over the original file.`;
     return p;
+  }
+  var LANG_MAX = 12;
+  var LANG_NAME_MAX = 40;
+  var LANG_TEXT_MAX = 4e3;
+  var LANG_ENTRIES_MAX = 8e3;
+  var xlNorm = (s) => String(s === void 0 || s === null ? "" : s).replace(/\r\n?/g, "\n").trim();
+  function cleanLangs(raw) {
+    const out = [];
+    const used = {};
+    (Array.isArray(raw) ? raw : []).slice(0, LANG_MAX).forEach((L, n) => {
+      if (!L || typeof L !== "object") return;
+      let id = String(L.id || "");
+      if (!/^[A-Za-z0-9_\-]{1,24}$/.test(id) || used[id]) id = `lg${n + 1}`;
+      while (used[id]) id += "x";
+      used[id] = true;
+      const t = {};
+      let count = 0;
+      if (L.t && typeof L.t === "object" && !Array.isArray(L.t))
+        Object.keys(L.t).forEach((k) => {
+          const v = L.t[k];
+          if (typeof v !== "string" || !v.trim() || !k.trim() || k.length > LANG_TEXT_MAX || count >= LANG_ENTRIES_MAX) return;
+          t[xlNorm(k)] = xlNorm(v).slice(0, LANG_TEXT_MAX);
+          count++;
+        });
+      const code = String(L.code || "").trim();
+      out.push({ id, name: String(L.name || "Language").trim().slice(0, LANG_NAME_MAX) || "Language", code: /^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})?$/.test(code) ? code : "", t });
+    });
+    return out;
   }
   function cleanGame(g) {
     g = g && typeof g === "object" ? g : {};

@@ -123,7 +123,7 @@ build; raise the ceiling in `BUDGETS` (build.py) on purpose, with a reason, or t
   path (about 150 ms): its length is now worked out from the numbers that draw it (`brushStroke` in ui2-widgets.js, within 0.3
   px of the browser's own measure). Parsing the script is a small part of start-up, so moving fixed text out of code would not pay.
 
-**Starting a similar project?** `../STARTER-GUIDE.md` collects the habits, the checking kit, the speed method and the pitfalls from this build.
+**Starting a similar project?** `../packages/ai-collab-kit/GUIDE.md` collects the habits, the checking kit, the speed method and the pitfalls from this build.
 
 ## Writing aids and checker reports (Oct 8 2026, second batch)
 

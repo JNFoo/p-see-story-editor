@@ -1,0 +1,36 @@
+:: StoryTitle
+Market Day
+
+:: StoryData
+{"ifid":"D674C58C-DEFA-4F70-B7A2-27742230C0FC","format":"SugarCube","format-version":"2.36.1","start":"Home"}
+
+:: StoryInit
+<<set $coins to 3>>
+<<set $mood to "calm">>
+<<set $sword to false>>
+
+:: Home [start]
+You stand at home. //Cold// morning.
+<<if $coins gte 5>>Plenty of coins.<<elseif $coins gt 0>>A few coins.<<else>>No coins!<</if>>
+<<if $mood is "angry" or $sword>>You look dangerous.<</if>>
+[[Go to market|Market]]
+[[Sleep|Sleep][$mood to "rested"]]
+
+:: Market
+<<set $coins -= 1>>
+<<if visited("Smith")>>The smith waves.<</if>>
+<<link "Buy bread" "Bread">><<set $coins -= 2>><</link>>
+[[Visit the smith->Smith]]
+<<if $coins <= 0>>[[Beg->Home]]<</if>>
+[[Home]]
+
+:: Smith
+<<set $sword to true>><<set $mood to "angry">>You buy a sword.
+<<goto "Home">>
+
+:: Sleep
+Zzz. <<print $coins>> coins.
+[[Wake->Home]]
+
+:: Bread
+Tasty. The end.

@@ -73,3 +73,25 @@ export const BACK_MODES: string[];
 export const PALETTES: Record<string, unknown>;
 export const STAT_MIN: number;
 export const STAT_MAX: number;
+
+/** One story read from a Twine file, before any conversion. */
+export interface TwineStory {
+  name: string; ifid: string; format: string; formatVersion: string; startName: string;
+  passages: { name: string; tags: string[]; text: string }[];
+  stylesheet: string; script: string;
+}
+export interface TwineImport {
+  /** A valid story, already passed through normalizeProject. `project.author` is exactly what the Twine file names ('' if it names none). */
+  project: Project;
+  /** Plain-words notes: what became rules, what was kept as flagged text, what was left out, whose work it is. */
+  report: string[];
+  summary: { pages: number; choices: number; items: number; unfinished: number; mode: 'text' | 'rules' };
+  kind: 'Twine 2 HTML' | 'Twine 1 HTML' | 'Twee';
+  /** Names of every story found in the file (archives hold several). */
+  stories: string[];
+}
+/** Reads Twine 2 HTML (published story or library archive), Twee 3 text or Twine 1 HTML. Throws an Error in plain words if the text is not a Twine story. */
+export function twineRead(text: string): { kind: TwineImport['kind']; stories: TwineStory[] };
+export function twineConvert(story: TwineStory, opts?: { code?: 'text' | 'rules' }): Omit<TwineImport, 'kind' | 'stories'>;
+/** `code: 'rules'` (default here) turns SugarCube/Twine 1/Harlowe code into items and conditions; `'text'` keeps it as flagged words. `story` is a 0-based index into an archive. The author is never changed or supplied. */
+export function importTwine(text: string, opts?: { code?: 'text' | 'rules'; story?: number }): TwineImport;

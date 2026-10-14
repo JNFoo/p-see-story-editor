@@ -81,7 +81,7 @@ If a story has more situations than `limit`, `result.truncated` is `true` and ve
 
 ## How it differs from what exists
 
-Link checkers (Twine's broken-link markers and similar tools) see arrows. Story engines (Ink, ChoiceScript, Yarn Spinner and others) run a story but do not, as far as I know, ship an exhaustive "can this ending ever happen?" analysis over items, numbers and dice. This is an exhaustive search over the story's own rules, in plain JavaScript, with explanations written for authors. It does not read the story formats of those other tools; convert to the JSON shape in `story-format` first. This is a comparison of approach, not a benchmark against those tools.
+Link checkers (Twine's broken-link markers and similar tools) see arrows. Story engines (Ink, ChoiceScript, Yarn Spinner and others) run a story but do not, as far as I know, ship an exhaustive "can this ending ever happen?" analysis over items, numbers and dice. This is an exhaustive search over the story's own rules, in plain JavaScript, with explanations written for authors. It does not read the story formats of those other tools; convert to the JSON shape in `story-format` first (`story-format` can read Twine files). This is a comparison of approach, not a benchmark against those tools.
 
 ## Limits
 

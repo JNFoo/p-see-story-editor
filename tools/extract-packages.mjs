@@ -34,6 +34,7 @@ function put(path, text) {
 const CORE = 'editor/core.js';
 const PLAYER = 'editor/player.js';
 const MAP = 'editor/maplayout.js';
+const TWINE = 'editor/twine.js';
 
 /* The rules every package that "plays" a story needs. */
 const RULES = ['klStatMap', 'klInit', 'klAdd', 'klChoose', 'klArrive', 'klVisibleBlocks', 'klVisibleChoices', 'klShown', 'klCondOk', 'klHas', 'klTarget', 'klOdds'];
@@ -42,13 +43,13 @@ const MODEL = ['makeProject', 'makePassage', 'makeChoice', 'makeBlock', 'makeIte
 export const PACKAGES = {
   'story-format': {
     global: 'StoryFormat',
-    files: [CORE],
-    what: 'The story data model: create, normalize, import, export, search and measure interactive stories.',
+    files: [CORE, TWINE],
+    what: 'The story data model: create, normalize, import (old text format and Twine), export, search and measure interactive stories.',
     roots: [
       ...MODEL,
       'FIELD_CONTRACT', 'GAME_DEFAULTS', 'GAME_OPTIONS', 'BACK_MODES', 'PALETTES', 'STARTERS', 'STAT_MIN', 'STAT_MAX',
       'statTest', 'parseStatTest', 'givenOf', 'condSummary',
-      'parseLegacy', 'exportStory', 'klFingerprint', 'klShortIds',
+      'parseLegacy', 'twineRead', 'twineConvert', 'importTwine', 'exportStory', 'klFingerprint', 'klShortIds',
       'storyFind', 'storyReplace', 'storyOrder', 'storyManuscript', 'storyStats'
     ]
   },

@@ -1,0 +1,6 @@
+<tw-storydata name="Cave" startnode="1" creator="Twine" creator-version="2.6.2" ifid="6D9C2F8A-3A52-4C1B-9E0A-1D1F7C0B5A11" format="Harlowe" format-version="3.3.8" options="" hidden><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style><script role="script" id="twine-user-script" type="text/twine-javascript"></script><tw-passagedata pid="1" name="Start" tags="" position="0,0" size="100,100">(set: $gold to 0)(set: $hasKey to false)You wake in a cave.
+[[Take the torch-&gt;Torch]]
+[[Walk on-&gt;Door]]</tw-passagedata><tw-passagedata pid="2" name="Torch" tags="" position="150,0" size="100,100">(set: $gold to it + 5)(set: $hasKey to true)You find a key and 5 coins.
+[[Back-&gt;Door]]</tw-passagedata><tw-passagedata pid="3" name="Door" tags="" position="300,0" size="100,100">A heavy door.
+(if: $hasKey is true)[You unlock it. [[Open-&gt;Treasure]]](else:)[It is locked. [[Go back-&gt;Start]]]
+(if: $gold &gt;= 5)[You could bribe the guard. [[Bribe-&gt;Treasure]]]</tw-passagedata><tw-passagedata pid="4" name="Treasure" tags="" position="450,0" size="100,100">Treasure! The end.</tw-passagedata></tw-storydata>

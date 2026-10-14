@@ -36,7 +36,7 @@ const LOGS = HERE + 'logs/';
 fs.mkdirSync(LOGS, { recursive: true });
 fs.mkdirSync(HERE + 'work/shots', { recursive: true });
 
-const SOURCES = ['core.js', 'player.js', 'maplayout.js', 'game.css', 'ui.css', 'ui1-state.js', 'ui2-widgets.js', 'ui3-write.js', 'ui4-map.js', 'ui4-views.js', 'ui4-speed.js', 'ui5-app.js', 'build.py', 'build-game.mjs', 'minify.mjs', 'contract.mjs'];
+const SOURCES = ['core.js', 'player.js', 'maplayout.js', 'game.css', 'ui.css', 'ui1-state.js', 'ui2-widgets.js', 'ui3-write.js', 'ui4-map.js', 'ui4-views.js', 'ui4-speed.js', 'ui5-app.js', 'twine.js', 'build.py', 'build-game.mjs', 'minify.mjs', 'contract.mjs'];
 const EDITOR = SOURCES.filter(f => f !== 'contract.mjs');
 const GAME = ['core.js', 'player.js', 'game.css', 'build-game.mjs'];
 
@@ -51,6 +51,7 @@ const SUITES = [
   S('nosave', 'nosave.js', ['player.js', 'game.css', 'core.js'], true),
   S('twowin', 'twowin.js', ['ui1-state.js', 'ui5-app.js', 'ui2-widgets.js'], true),
   S('safety', 'safety.js', ['ui5-app.js', 'ui1-state.js', 'ui2-widgets.js', 'core.js'], true),
+  S('twine', 'twine.js', ['twine.js', 'ui5-app.js', 'ui2-widgets.js', 'core.js'], true),
   S('gamefeel', 'gamefeel.js', ['player.js', 'game.css', 'core.js'], true),
   S('textstress', 'textstress.js', ['player.js', 'game.css', 'core.js'], false),
   S('motion', 'motion.js', ['ui5-app.js', 'ui2-widgets.js', 'ui.css'], true),
@@ -73,6 +74,7 @@ const SUITES = [
   S('inter', 'inter.js', EDITOR, false)
 ];
 const FUZZ3 = { name: 'fuzz3', cmd: ['node', HERE + 'fuzz3.mjs', '1500', '1'], watch: ['core.js', 'player.js', 'maplayout.js'], quick: false, engine: '' };
+const TWINE_DIFF = { name: 'twine-diff', cmd: ['node', HERE + 'twine-diff.mjs', '120', '1'], watch: ['core.js', 'player.js', 'twine.js'], quick: true, engine: '' };
 const CONTRACT = { name: 'contract', cmd: ['node', ED + 'contract.mjs', '400', '1'], watch: ['core.js', 'player.js', 'contract.mjs'], quick: true, engine: '' };
 
 const args = process.argv.slice(2);
@@ -162,6 +164,7 @@ const watched = s => {
 };
 const want = s => against ? true : tier === 'full' ? true : tier === 'sample' ? (s.quick ? quickNames.indexOf(s.name) % 4 === sampleTurn || watched(s) : watched(s)) : s.quick || (tier === 'smart' && watched(s));
 if (!against && (!only || 'contract'.includes(only))) if (want(CONTRACT) || tier === 'sample') jobs.push({ label: 'contract', cmd: CONTRACT.cmd, lane: 'firefox' });
+if (!against && (!only || 'twine-diff'.includes(only))) if (want(TWINE_DIFF) || tier === 'sample') jobs.push({ label: 'twine-diff', cmd: TWINE_DIFF.cmd, lane: 'firefox' });
 if (!against && tier === 'full' && (!only || 'fuzz3'.includes(only))) jobs.push({ label: 'fuzz3', cmd: FUZZ3.cmd, lane: 'firefox' });
 if (!only && !against) jobs.push({ label: 'lines-selftest', cmd: ['node', 'lines.js'], lane: 'firefox' });
 const lane = engine => SUITES.forEach(s => {

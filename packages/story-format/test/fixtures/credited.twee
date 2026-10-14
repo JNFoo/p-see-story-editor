@@ -1,0 +1,14 @@
+:: StoryTitle
+Lantern Walk
+
+:: StoryAuthor
+Zoë Ó Briain-Nakamura
+
+:: StoryData
+{"ifid":"5B2A3C4D-1111-4222-8333-444455556666","format":"Harlowe","format-version":"3.3.9","start":"One"}
+
+:: One
+A lantern glows. [[Walk on->Two]]
+
+:: Two
+You arrive.

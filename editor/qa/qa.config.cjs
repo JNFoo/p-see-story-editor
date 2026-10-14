@@ -2,7 +2,7 @@
    Suites run on Firefox first; the full tier runs them again on Chromium. */
 const path = require('path');
 
-const SOURCES = ['core.js', 'player.js', 'maplayout.js', 'game.css', 'ui.css', 'ui1-state.js', 'ui2-widgets.js', 'ui3-write.js', 'ui4-map.js', 'ui4-views.js', 'ui4-speed.js', 'ui5-app.js', 'build.py', 'build-game.mjs', 'minify.mjs', 'contract.mjs'];
+const SOURCES = ['core.js', 'player.js', 'maplayout.js', 'game.css', 'ui.css', 'ui1-state.js', 'ui2-widgets.js', 'ui3-write.js', 'ui4-map.js', 'ui4-views.js', 'ui4-speed.js', 'ui5-app.js', 'twine.js', 'build.py', 'build-game.mjs', 'minify.mjs', 'contract.mjs'];
 const EDITOR = SOURCES.filter(f => f !== 'contract.mjs');
 const GAME = ['core.js', 'player.js', 'game.css', 'build-game.mjs'];
 
@@ -24,6 +24,7 @@ module.exports = {
     S('nosave', 'nosave.js', ['player.js', 'game.css', 'core.js'], true),
     S('twowin', 'twowin.js', ['ui1-state.js', 'ui5-app.js', 'ui2-widgets.js'], true),
     S('safety', 'safety.js', ['ui5-app.js', 'ui1-state.js', 'ui2-widgets.js', 'core.js'], true),
+    S('twine', 'twine.js', ['twine.js', 'ui5-app.js', 'ui2-widgets.js', 'core.js'], true),
     S('gamefeel', 'gamefeel.js', ['player.js', 'game.css', 'core.js'], true),
     S('textstress', 'textstress.js', ['player.js', 'game.css', 'core.js'], false),
     S('motion', 'motion.js', ['ui5-app.js', 'ui2-widgets.js', 'ui.css'], true),
@@ -48,6 +49,7 @@ module.exports = {
   /* commands that are not browser suites (run once, on the first engine's lane) */
   extra: [
     { name: 'fuzz3', cmd: ['node', 'fuzz3.mjs', '1500', '1'], watch: ['core.js', 'player.js', 'maplayout.js'], quick: false },
+    { name: 'twine-diff', cmd: ['node', 'twine-diff.mjs', '120', '1'], watch: ['core.js', 'player.js', 'twine.js'], quick: true },
     { name: 'contract', cmd: ['node', path.join(__dirname, '../contract.mjs'), '400', '1'], watch: ['core.js', 'player.js', 'contract.mjs'], quick: true }
   ]
 };

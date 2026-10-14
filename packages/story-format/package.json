@@ -1,7 +1,7 @@
 {
   "name": "story-format",
   "version": "1.0.0",
-  "description": "Data model and file format for branching interactive stories: create, clean, import, export, search and measure. Zero dependencies.",
+  "description": "Data model and file format for branching interactive stories: create, clean, import (including Twine), export, search and measure. Zero dependencies.",
   "license": "MIT",
   "author": "JNFoo",
   "type": "module",
@@ -43,9 +43,14 @@
     "interactive-fiction",
     "choose-your-own-adventure",
     "json-schema",
-    "story"
+    "story",
+    "twine",
+    "twee"
   ],
   "scripts": {
     "test": "node --test test/*.test.mjs"
+  },
+  "bin": {
+    "twine-to-story": "bin/twine-to-story.mjs"
   }
 }

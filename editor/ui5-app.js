@@ -462,7 +462,11 @@ function openFile(kind) {
     );
     return;
   }
-  const inp = h('input', { type: 'file', accept: kind === 'old' ? '.html,.htm,.txt,.md' : '.json,.html,.htm,.txt', class: 'hidden' });
+  readPicked(kind === 'old' ? '.html,.htm,.txt,.md' : '.json,.html,.htm,.txt', (text, name) => loadText(text, name));
+}
+/** Lets the person pick one file (up to 20 MB) and hands its text to `then(text, fileName)`. */
+function readPicked(accept, then) {
+  const inp = h('input', { type: 'file', accept, class: 'hidden' });
   inp.addEventListener('change', () => {
     const f = inp.files[0];
     inp.remove();
@@ -473,7 +477,7 @@ function openFile(kind) {
     }
     const r = new FileReader();
     r.onload = () => {
-      loadText(String(r.result), f.name);
+      then(String(r.result), f.name);
     };
     r.readAsText(f);
   });
@@ -502,6 +506,61 @@ function loadText(text, name, handle) {
       logError('open file', e);
       info('That file could not be opened', [e.message || String(e)]);
     }
+  });
+}
+/** File → Import Twine…: pick a Twine story file (Twine 2 HTML, Twee, Twine 1), choose how to treat its code, and replace the current story with it. */
+function importTwineFile() {
+  readPicked('.html,.htm,.twee,.tw,.txt', (text, name) => {
+    let found;
+    try {
+      found = twineRead(text);
+    } catch (e) {
+      info('That is not a Twine story', [e.message || String(e)]);
+      return;
+    }
+    twineChoose(text, name, found);
+  });
+}
+function twineChoose(text, name, found) {
+  dialog((d, close) => {
+    d.appendChild(h('h3', { text: 'Import a Twine story' }));
+    const box = h('div');
+    d.appendChild(box);
+    const row = (title, blurb, fn) => h('button', { class: 'startrow', type: 'button', onclick: fn }, [h('strong', { text: title }), h('span', { class: 'hint', text: blurb })]);
+    const cancel = () => h('div', { class: 'row end' }, [h('button', { class: 'btn', type: 'button', text: 'Cancel', onclick: close })]);
+    const chooseCode = i => {
+      const st = found.stories[i];
+      box.replaceChildren(
+        h('div', { class: 'hint', text: `“${st.name || 'Untitled story'}” from ${name}: ${st.passages.length} passages (${found.kind}). Your current story is replaced; you can undo this. Every [[link]] becomes a choice. What should happen to the story’s own code, such as <<set $gold to 5>> or (if: $key)[...]?` }),
+        row('Keep the code as text', 'Edit it here as words. Pages that hold code are marked unfinished so you can find them.', () => run(i, 'text')),
+        row('Convert the code to rules', 'Turn variables, if / else and links that set things into flags, numbers, conditions and choices. Anything that cannot be turned into rules stays as flagged text.', () => run(i, 'rules')),
+        cancel()
+      );
+    };
+    const run = (i, code) => {
+      close();
+      let res;
+      try {
+        res = importTwine(text, { story: i, code });
+      } catch (e) {
+        logError('import twine', e);
+        info('That story could not be imported', [e.message || String(e)]);
+        return;
+      }
+      replaceProject(res.project, `Imported “${res.project.title}” from Twine`);
+      noteAdvanced(adviseAdvanced(project));
+      rememberFile(null); // a new document: Save must ask where
+      savedText = null;
+      renderTop();
+      info(`Imported ${res.project.passages.length} pages from Twine`, res.report, dlg => {
+        dlg.appendChild(h('div', { class: 'row' }, [h('button', { class: 'btn', type: 'button', text: 'Copy this report', onclick: () => copyText(res.report.join('\n')) })]));
+      });
+    };
+    if (found.stories.length > 1) {
+      box.appendChild(h('div', { class: 'hint', text: `${name} holds ${found.stories.length} stories. Which one?` }));
+      found.stories.forEach((st, i) => box.appendChild(row(st.name || 'Untitled story', `${st.passages.length} passages`, () => chooseCode(i))));
+      box.appendChild(cancel());
+    } else chooseCode(0);
   });
 }
 /** File → New story: a blank page, or one of the starting points (small working stories to reshape). */
@@ -1617,6 +1676,7 @@ function init() {
     ['Save as…', saveStoryAs, 'Save this story to a new file.'],
     ['Open…', () => openFile('json'), 'Open a story file (.story.json).'],
     ['Import old format…', () => openFile('old'), 'Bring in a story saved in the old text format.'],
+    ['Import Twine…', importTwineFile, 'Bring in a story from Twine (a Twine 2 HTML file, a Twee text file, or a Twine 1 file) to edit here. Its links become choices; its code is kept as text or turned into rules.'],
     null,
     ['New story', newStory, 'Start an empty story.'],
     ['Example story', loadExample, 'Load the example story to look around.'],

@@ -86,4 +86,5 @@ The Inter Tight typeface is used under the SIL Open Font License (it is not cove
 
 - [Apple Press](https://github.com/JNFoo/apple-press): a clicker game for kids ([play](https://jnfoo.github.io/apple-press/))
 - [Fancy, the Banana](https://github.com/JNFoo/fancy-banana): a one-tap flying-banana arcade game ([play](https://jnfoo.github.io/fancy-banana/))
+- [Pineapple Defense](https://github.com/JNFoo/pineapple-defense): a flick-to-throw pineapples-at-penguins game ([play](https://jnfoo.github.io/pineapple-defense/))
 - [JS-modules](https://github.com/JNFoo/JS-modules): small dependency-free pieces for single-file browser games ([demos](https://jnfoo.github.io/JS-modules/))

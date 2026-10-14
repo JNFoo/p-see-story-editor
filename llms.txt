@@ -23,4 +23,4 @@ The editor: https://jnfoo.github.io/p-see-story-editor/ (also `index.html` in th
 
 ## Related
 - [JS-modules](https://github.com/JNFoo/JS-modules): small pieces for single-file browser games (https://jnfoo.github.io/JS-modules/)
-- [Apple Press](https://github.com/JNFoo/apple-press), [Fancy, the Banana](https://github.com/JNFoo/fancy-banana): the games.
+- [Apple Press](https://github.com/JNFoo/apple-press), [Fancy, the Banana](https://github.com/JNFoo/fancy-banana), [Pineapple Defense](https://github.com/JNFoo/pineapple-defense): the games.

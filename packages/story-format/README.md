@@ -115,6 +115,8 @@ Twine's Twee and Twison, Ink's JSON, Yarn and ChoiceScript are formats for their
 
 ### At a glance
 
+A longer comparison, including the editors people use for each format, is in [docs/FORMAT-COMPARISON.md](../../docs/FORMAT-COMPARISON.md).
+
 A summary of each format's public design, written from its documentation as I understand it; not a benchmark, and the other tools do many things this one does not.
 
 | | This format | Twine 2 (HTML / Twee) | Ink | Yarn Spinner | ChoiceScript |

@@ -904,3 +904,12 @@ body.typing #main.v-write{padding-bottom:20px}
   .pg,.pb,.scorechip,.fktoggle,.seg>button,.seg>label{min-height:36px}
   input[type=checkbox],input[type=radio]{width:20px;height:20px}
 }
+/* a narrow window on a computer (not a phone): logo and name beside the tabs at the bottom, the counters on a slim line under the top bar */
+@media (max-width:820px){
+  body.brandlow #tabrow .brandwrap{display:inline-flex;flex:0 0 auto;align-self:center;padding:0 6px 0 12px}
+  body.brandlow #tabrow .brand{display:flex}
+  body.brandlow #top{flex-wrap:wrap;row-gap:0}
+  body.brandlow #stats{display:flex;order:20;flex:1 0 100%;justify-content:flex-start;font-size:.76rem;padding:0 4px 1px;gap:2px 12px}
+}
+/* the counters belong to the writing and planning tabs, not to Play */
+body[data-view=play] #stats{display:none}

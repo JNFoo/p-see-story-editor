@@ -1941,7 +1941,10 @@ function init() {
       return guardState;
     },
     typing: setTyping, // for the test suites: typing mode on or off without a real keyboard
-    touch: v => (touchForce = v), // force touch wording (true or false), or null for the device's own answer
+    touch: v => {
+      touchForce = v;
+      placeChrome();
+    }, // force touch wording (true or false), or null for the device's own answer
     persistNow, // so a test can ask for the autosave a paused window would attempt
     get project() {
       return project;

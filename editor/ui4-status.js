@@ -135,7 +135,8 @@ function statusParts() {
 /** The status in plain lines for the phone's ⋯ menu: { text, tip, fn }. */
 function statusLines() {
   const st = storyStats(project);
-  return [{ text: `${st.pages} page${st.pages === 1 ? '' : 's'} · ${st.choices} choice${st.choices === 1 ? '' : 's'} · ${st.words.toLocaleString('en')} words`, tip: '' }].concat(
+  /* the counters are in the menu only on a phone or tablet; on a computer they stay on screen, under the top bar */
+  return (touchOnly() ? [{ text: `${st.pages} page${st.pages === 1 ? '' : 's'} · ${st.choices} choice${st.choices === 1 ? '' : 's'} · ${st.words.toLocaleString('en')} words`, tip: '' }] : []).concat(
     statusParts().map(c => ({ text: `${c.ico ? `${c.ico} ` : ''}${c.longText || ''}${c.text}`.trim(), tip: c.tip, fn: c.fn }))
   );
 }

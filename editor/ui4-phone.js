@@ -86,7 +86,25 @@ function keepFieldVisible(el) {
   setTimeout(show, 280);
 }
 
+/**
+ * Two small layout switches the stylesheet cannot make alone:
+ *   body.touch      a phone or tablet (touch screen), so the story's counters live in the ⋯ menu there;
+ *   body.brandlow   a narrow window on a computer: the logo and name move from the top bar to the bottom bar, beside the tabs.
+ */
+function placeChrome() {
+  const touch = touchOnly();
+  const low = phoneLayout() && !touch;
+  document.body.classList.toggle('touch', touch);
+  document.body.classList.toggle('brandlow', low);
+  const brand = $('.brandwrap');
+  const dest = low ? $('#tabrow') : $('#top');
+  if (!brand || !dest || brand.parentNode === dest) return;
+  dest.insertBefore(brand, low ? $('#tabs') : dest.firstChild);
+}
+
 function wirePhone() {
+  placeChrome();
+  ['(max-width: 820px)', '(hover: none) and (pointer: coarse)'].forEach(q => matchMedia(q).addEventListener('change', placeChrome));
   document.addEventListener('focusin', e => {
     const el = e.target;
     if (!typingPossible() || !el?.matches?.(TYPING_FIELD) || !el.closest('#main')) return;

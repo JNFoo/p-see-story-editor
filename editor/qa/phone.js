@@ -130,6 +130,29 @@ const SETTINGS = JSON.stringify({ chosen: true, remember: true, tourDone: true, 
     } else ok(false, 'no item button found');
   }
 
+  /* a narrow window on a computer (no touch): logo and name beside the tabs, counters on a line under the top bar, not in the menu */
+  await pg.evaluate(() => document.body.classList.remove('show-items', 'show-side')); await pg.setViewportSize({ width: 700, height: 800 }); await pg.evaluate(() => window.__editor.touch(false)); await pg.waitForTimeout(400);
+  const inRow = await pg.evaluate(() => !!document.querySelector('#tabrow > .brandwrap'));
+  const bb = await box('#tabrow > .brandwrap'); const tb = await box('#tabrow');
+  ok(inRow && bb && bb.shown && bb.x < 40 && bb.y > tb.y - 1 && bb.y + bb.h <= tb.y + tb.h + 1, 'on a computer, the logo and name sit at the bottom left, beside the tabs: ' + JSON.stringify(bb));
+  const nm = await pg.evaluate(() => { const e = document.querySelector('#tabrow .brand'); return e ? [e.textContent, getComputedStyle(e).display] : null; });
+  ok(nm && /Story/.test(nm[0]) && nm[1] !== 'none', 'the app name shows next to the logo: ' + JSON.stringify(nm));
+  const stt = await box('#stats'); const topb = await box('#top');
+  ok(stt && stt.shown && /pages/.test(await pg.evaluate(() => document.getElementById('stats').innerText)), 'the counters show under the top bar: ' + JSON.stringify(stt));
+  const sw2 = await pg.evaluate(() => { const t = document.getElementById('tabs'); return [t.scrollWidth, t.clientWidth]; });
+  ok(sw2[0] <= sw2[1] + 1, 'the tabs still need no sideways scroll beside the logo: ' + sw2.join(' / '));
+  await pg.locator('#morebtn').click(); await pg.waitForTimeout(200);
+  ok(!/\d+ pages ·/.test(await pg.evaluate(() => document.getElementById('morepop').innerText)), 'the ⋯ menu no longer repeats the counters on a computer');
+  await esc();
+  const here = [];
+  for (const v of ['map', 'items', 'check', 'game']) { await pg.evaluate(v => window.__editor.setView(v), v); await pg.waitForTimeout(250); const r = await box('#stats'); here.push(r && r.shown ? Math.round(r.y) : 'hidden'); }
+  ok(here.every(y => y === here[0] && y !== 'hidden'), 'the counters are in the same place on Map, Items, Check and Game: ' + here.join(','));
+  await pg.evaluate(() => window.__editor.setView('play')); await pg.waitForTimeout(250);
+  ok(!(await box('#stats')).shown, 'and they are left off the Play tab');
+  await pg.evaluate(() => { window.__editor.setView('write'); window.__editor.touch(true); }); await pg.waitForTimeout(300);
+  ok(await pg.evaluate(() => !!document.querySelector('#top > .brandwrap')) && !(await box('#top > .brandwrap')).shown && !(await box('#stats')).shown, 'on a phone the logo goes back to the (hidden) top bar and the counters stay in the ⋯ menu');
+  await pg.setViewportSize({ width: 390, height: 844 });
+
   /* desktop widths are unchanged */
   await pg.setViewportSize({ width: 1200, height: 850 }); await pg.evaluate(() => window.__editor.touch(null)); await pg.waitForTimeout(500);
   const dt = await box('#tabrow');

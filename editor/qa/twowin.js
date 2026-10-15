@@ -1,7 +1,7 @@
 /* One window at a time: a second window (or a second copy of the editor on this computer) must not silently overwrite the first one's autosave.
    Part 1 uses Web Locks: the second window is paused with a box; Use-this-window steals the lock, the first window saves its last edit and pauses.
    Part 2 hides Web Locks: a save by another window pauses this one and asks which version to keep.
-   Usage: node twowin.js [chromium|firefox]   Copyright (c) 2026 JNFoo. MIT License. */
+   Usage: node twowin.js [chromium|firefox]   Copyright (c) 2026 LFC Foundry. MIT License. */
 const which = process.argv[2] || 'firefox'; const B = require('./engine').pick(which);
 const D = __dirname + '/work/';
 require('child_process').execSync('cp "' + (process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html')) + '" ' + D + 'ed.html');

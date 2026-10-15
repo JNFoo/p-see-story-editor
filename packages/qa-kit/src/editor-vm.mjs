@@ -5,7 +5,7 @@
      const ed = loadEditor(['normalizeProject', 'analyze']);   // names to pull out of the sandbox
      ed.analyze(project)
 
-   Copyright (c) 2026 JNFoo. MIT License. */
+   Copyright (c) 2026 LFC Foundry. MIT License. */
 import { readFileSync } from 'node:fs';
 import { createContext, runInContext } from 'node:vm';
 

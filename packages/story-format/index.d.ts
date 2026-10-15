@@ -1,4 +1,4 @@
-// Types for story-format. Copyright (c) 2026 JNFoo. MIT License.
+// Types for story-format. Copyright (c) 2026 LFC Foundry. MIT License.
 export type ItemKind = 'object' | 'state' | 'stat';
 export type Valence = '' | 'good' | 'bad';
 

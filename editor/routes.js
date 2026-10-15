@@ -9,7 +9,7 @@
    routeReplay() walks a route again with the game's own rules (klChoose, klArrive) on the story as it is now, and stops at the first
    step that no longer works, saying why in plain words. The Play tab uses it to put you back where you were after you edited the story;
    the Check tab uses it to say how many pinned routes still work. Routes are kept in this browser, not in the story file.
-   Copyright (c) 2026 JNFoo. MIT License.
+   Copyright (c) 2026 LFC Foundry. MIT License.
    ============================================================================ */
 
 const ROUTE_KEY = 'story-editor-v1-routes';

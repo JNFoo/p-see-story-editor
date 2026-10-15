@@ -13,7 +13,7 @@ This repository holds a single-file offline story editor (`editor/`) and small p
 - README code samples are copied from `examples/*.mjs` by `npm run build` (`tools/docs.mjs`); edit the example, not the README block.
 - Every behavior you change gets a check. Package tests compare against the editor's own sources (`packages/qa-kit/src/editor-vm.mjs`), so equivalence is tested, not assumed.
 - Plain words in docs. Say what a thing does, then its limits. Name the closest existing projects and say honestly how this differs; do not claim a benchmark you did not run.
-- Keep the header `Copyright (c) 2026 JNFoo. MIT License` in new source files. Do not add code you cannot license under MIT, personal data, or other people's stories or text. Tests use the bundled sample story and generated stories only.
+- Keep the header `Copyright (c) 2026 LFC Foundry. MIT License` in new source files. Every HTML file the software makes (the editor, exported games, any new single-file app) starts with the LFC Foundry header comment in `editor/foundry-header.txt` (application or game name filled in); the only visible credit is the footer "Forged by LFC Foundry • MIT Licensed" inside the app itself. Commits are still authored by JNFoo. Do not add code you cannot license under MIT, personal data, or other people's stories or text. Tests use the bundled sample story and generated stories only.
 - Never change a story's author. Imports (Twine and others) keep the author the file names, word for word; if none is named the field stays empty. Never put JNFoo, Claude or any other name there on someone's behalf. Do not add other people's stories as test files; write original fixtures.
 - American English in anything a user sees.
 

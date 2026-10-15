@@ -1,4 +1,4 @@
-// Types for story-player. Copyright (c) 2026 JNFoo. MIT License.
+// Types for story-player. Copyright (c) 2026 LFC Foundry. MIT License.
 import type { Project, Passage } from '../story-format/index.js';
 export * from '../story-check/index.js';
 

@@ -1,5 +1,5 @@
 /* Translations: add a language, save the sheet, fill and import it, play in that language in the Play tab, and play an exported game that
-   carries it (the menu, the reader's choice kept, the game's own button words). Usage: node translate.js [chromium|firefox]   Copyright (c) 2026 JNFoo. MIT License. */
+   carries it (the menu, the reader's choice kept, the game's own button words). Usage: node translate.js [chromium|firefox]   Copyright (c) 2026 LFC Foundry. MIT License. */
 const which = process.argv[2] || 'firefox'; const B = require('./engine').pick(which);
 const fs = require('fs');
 const EDITOR = require('url').pathToFileURL(process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html')).href;

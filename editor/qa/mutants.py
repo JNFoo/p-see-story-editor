@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Does the contract test notice a deliberate bug in the game rules?  (Copyright (c) 2026 JNFoo. MIT License)
+"""Does the contract test notice a deliberate bug in the game rules?  (Copyright (c) 2026 LFC Foundry. MIT License)
 
 Puts one small bug at a time into a COPY of core.js, runs contract.mjs on the copy, and reports whether it failed (caught) or passed (survived).
 Nothing in the real editor folder is changed. A "survived" line is either an equivalent change (the game behaves the same) or a gap in

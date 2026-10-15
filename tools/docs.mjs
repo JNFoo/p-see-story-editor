@@ -10,7 +10,7 @@
    node tools/docs.mjs          rewrite every README under packages/
    node tools/docs.mjs --check  change nothing; exit 1 if a README is out of date
 
-   Copyright (c) 2026 JNFoo. MIT License. */
+   Copyright (c) 2026 LFC Foundry. MIT License. */
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 

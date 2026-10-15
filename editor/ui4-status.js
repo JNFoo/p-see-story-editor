@@ -1,6 +1,6 @@
 /* ============================================================================
    STATUS: named Undo and the History list, and the status line (saved here, file copy, problems).
-   Copyright (c) 2026 JNFoo. MIT License.
+   Copyright (c) 2026 LFC Foundry. MIT License.
    ============================================================================ */
 
 /* ----- named undo ----- */

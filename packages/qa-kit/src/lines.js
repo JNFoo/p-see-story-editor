@@ -1,4 +1,4 @@
-/* Copyright (c) 2026 JNFoo. MIT License. */
+/* Copyright (c) 2026 LFC Foundry. MIT License. */
 /* The rules the runner (runner.js) uses to read a suite's printed output. Kept in one small file so they can be tested on made-up lines
    (node lines.js runs that test). Every pattern is anchored to the START of the line, so a passing check whose NAME contains a word
    like "error" or "FAIL" is never mistaken for a failure.

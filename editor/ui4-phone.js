@@ -2,7 +2,7 @@
    PHONE: what makes the editor usable with thumbs: typing mode (while a text box has the on-screen keyboard, everything folds away
    except one slim row of keys above it) and swiping the page-name bar to the next or previous page.
    The layout itself (one-row top bar, tabs at the bottom, pinned page-name bar) is CSS under "Phones" in ui.css.
-   Copyright (c) 2026 JNFoo. MIT License.
+   Copyright (c) 2026 LFC Foundry. MIT License.
    ============================================================================ */
 
 let typing = false;

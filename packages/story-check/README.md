@@ -98,4 +98,4 @@ Link checkers (Twine's broken-link markers and similar tools) see arrows. Story 
 See [AGENTS.md](AGENTS.md).
 
 ---
-Part of [p-see-story-editor](../../README.md) · MIT License · Copyright (c) 2026 JNFoo
+Part of [p-see-story-editor](../../README.md) · MIT License · Copyright (c) 2026 LFC Foundry

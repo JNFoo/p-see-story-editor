@@ -1,5 +1,5 @@
 /* Named Undo, the History list, the status line, and the reader's language, direction and text size.
-   Usage: node undohist.js [chromium|firefox]   Copyright (c) 2026 JNFoo. MIT License. */
+   Usage: node undohist.js [chromium|firefox]   Copyright (c) 2026 LFC Foundry. MIT License. */
 const which = process.argv[2] || 'firefox'; const B = require('./engine').pick(which);
 const fs = require('fs');
 const EDITOR = require('url').pathToFileURL(process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html')).href;

@@ -1,7 +1,7 @@
 /* ============================================================================
    HELPERS (screen part): File → Paste an outline…, and the Writing notes in the Check tab.
    The reading and checking itself is in helpers.js. Nothing here sends anything anywhere.
-   Copyright (c) 2026 JNFoo. MIT License.
+   Copyright (c) 2026 LFC Foundry. MIT License.
    ============================================================================ */
 
 /* ----- paste an outline ----- */

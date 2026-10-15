@@ -5,7 +5,7 @@
 
    Needs only Node 18 or newer. For the very smallest output, the editor's own build uses Zopfli (see editor/build.py); this tool uses zlib level 9.
 
-   Copyright (c) 2026 JNFoo. MIT License. */
+   Copyright (c) 2026 LFC Foundry. MIT License. */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { deflateRawSync } from 'node:zlib';
 import { zippedPage } from '../src/index.js';

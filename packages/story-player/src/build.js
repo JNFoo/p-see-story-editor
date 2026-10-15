@@ -6,7 +6,7 @@
    `project` can be anything normalizeProject accepts (it is cleaned first). Options: { fonts, fontsLite } are CSS strings of @font-face rules
    (data: URLs) if you want the game to carry a font; without them the game uses the device's own font.
 
-   Copyright (c) 2026 JNFoo. MIT License. */
+   Copyright (c) 2026 LFC Foundry. MIT License. */
 import { normalizeProject, buildGameHtml, zipPage, GAME_PARTS } from './generated.js';
 
 export function buildGame(project, opts = {}) {

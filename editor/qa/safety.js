@@ -1,6 +1,6 @@
 /* Options → Safety (where the story is kept, when it was last saved to a file, ask the browser to keep it), the revision stamp a file save
    writes (both for a picked file and for a plain download), the once-a-week reminder to save a file, and File → Save test script (.md).
-   Usage: node safety.js [chromium|firefox]   Copyright (c) 2026 JNFoo. MIT License. */
+   Usage: node safety.js [chromium|firefox]   Copyright (c) 2026 LFC Foundry. MIT License. */
 const which = process.argv[2] || 'firefox'; const B = require('./engine').pick(which);
 const fs = require('fs');
 const EDITOR = require('url').pathToFileURL(process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html')).href;

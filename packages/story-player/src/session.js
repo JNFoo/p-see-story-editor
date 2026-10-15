@@ -7,7 +7,7 @@
      s.choose(0)   move on; returns { roll, passed } for a dice check, otherwise {}
      s.ended       true on an ending page
 
-   Copyright (c) 2026 JNFoo. MIT License. */
+   Copyright (c) 2026 LFC Foundry. MIT License. */
 import { klStatMap, klInit, klArrive, klChoose, klShown, klCondOk, klVisibleBlocks, klTarget, klOdds } from './generated.js';
 
 export function createSession(project, opts = {}) {

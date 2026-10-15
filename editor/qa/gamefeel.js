@@ -2,7 +2,7 @@
    - a choice already taken in this run gets a check mark and lighter type (and it differs from a greyed-out locked choice);
    - the phone's back swipe or button (and Esc) does the game's Back while there is a page to go back to, then leaves normally (CloseWatcher);
    - contrast starts as the system asks (prefers-contrast: more) until the reader chooses, and a forced-colors rule exists.
-   Usage: node gamefeel.js [firefox|chromium]   (needs "npm run build" at the repo root for packages/story-player)   Copyright (c) 2026 JNFoo. MIT License. */
+   Usage: node gamefeel.js [firefox|chromium]   (needs "npm run build" at the repo root for packages/story-player)   Copyright (c) 2026 LFC Foundry. MIT License. */
 const which = process.argv[2] || 'firefox';
 const B = require('./engine').pick(which), fs = require('fs'), path = require('path');
 let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };

@@ -6,7 +6,7 @@
      sample-other.story.json    the same pages under another id and title, for opening a different story over the example
      sample-older.story.json    an older copy of the same story (same id, three pages fewer, no Given), to test opening another
                                 version of the story that is already open
-   Copyright (c) 2026 JNFoo. MIT License. */
+   Copyright (c) 2026 LFC Foundry. MIT License. */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { loadEditor } from '../../../packages/qa-kit/src/editor-vm.mjs';
 

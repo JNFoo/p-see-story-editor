@@ -6,7 +6,7 @@
 
    story.json is a story file saved by the Story Editor, or any JSON that follows packages/story-format/story.schema.json.
 
-   Copyright (c) 2026 JNFoo. MIT License. */
+   Copyright (c) 2026 LFC Foundry. MIT License. */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createInterface } from 'node:readline/promises';
 import { buildGame, buildZippedGame, createSession, normalizeProject } from '../src/index.js';

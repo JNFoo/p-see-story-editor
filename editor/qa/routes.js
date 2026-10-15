@@ -1,6 +1,6 @@
 /* Pinned routes: the Play tab records the pages you played; "Continue where I was" and the pinned routes walk them again after the story
    was edited and stop, in plain words, at the first step that no longer works; the Check tab counts how many pinned routes still work.
-   Usage: node routes.js [chromium|firefox]   Copyright (c) 2026 JNFoo. MIT License. */
+   Usage: node routes.js [chromium|firefox]   Copyright (c) 2026 LFC Foundry. MIT License. */
 const which = process.argv[2] || 'firefox'; const B = require('./engine').pick(which);
 const fs = require('fs');
 const EDITOR = require('url').pathToFileURL(process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html')).href;

@@ -1,7 +1,7 @@
 /* ============================================================================
    CHANGES: a plain-words name for what one edit did, for "Undo: delete page “The Cellar”" and the History list.
    Pure functions over two saved copies of the story (JSON text): nothing here touches the screen or the story.
-   Copyright (c) 2026 JNFoo. MIT License.
+   Copyright (c) 2026 LFC Foundry. MIT License.
    ============================================================================ */
 
 const CHG_NAME_MAX = 30;

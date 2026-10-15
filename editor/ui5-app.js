@@ -1823,7 +1823,9 @@ function init() {
     ['History…', historyDialog, 'The latest changes, and a way back to any of them.'],
     ['Export game', quickExport, 'Turn your story into one HTML file anyone can play.'],
     null,
-    ...optionEntries()
+    ...optionEntries(),
+    null,
+    ['Forged by LFC Foundry • MIT Licensed', () => window.open('https://github.com/JNFoo', '_blank', 'noopener,noreferrer'), 'Opens LFC Foundry on GitHub in a new tab (needs the internet).']
   ]);
 
   /* Top bar buttons */

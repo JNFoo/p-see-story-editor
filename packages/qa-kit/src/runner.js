@@ -5,7 +5,7 @@
 
      node runner.js [config.cjs] quick|smart|full [--only text] [--verbose] [--reset-counts] [--help]
 
-   Copyright (c) 2026 JNFoo. MIT License.
+   Copyright (c) 2026 LFC Foundry. MIT License.
    --------------------------------------------------------------------------- */
 const { spawnSync, spawn } = require('child_process');
 const fs = require('fs');

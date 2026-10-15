@@ -4,7 +4,7 @@
    Not checked: URLs, names with * or <> or $ in them, files the build makes (BUILT below), and the two documents that record history
    on purpose (docs/CHANGELOG.md, docs/OPTIMIZATION-CHART.md): they name files that have since gone.
    Usage: node tools/docs-drift.mjs [--list]    Exit code 1 and the list of broken names when any are missing.
-   Copyright (c) 2026 JNFoo. MIT License. */
+   Copyright (c) 2026 LFC Foundry. MIT License. */
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';

@@ -1,7 +1,7 @@
 /* The file format over time: every story file kept in editor/qa/fixtures (some written by older releases) opens, comes out at the current
    format version, and normalizes to itself (opening and re-opening changes nothing). The revision stamp survives, a bad stamp is dropped,
    and a file from a newer format opens with a warning. When the format changes (STORY_VERSION in core.js), keep an old-format file in the
-   fixtures folder so this test proves the upgrade chain still opens it. Copyright (c) 2026 JNFoo. MIT License. */
+   fixtures folder so this test proves the upgrade chain still opens it. Copyright (c) 2026 LFC Foundry. MIT License. */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';

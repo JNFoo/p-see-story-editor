@@ -1,6 +1,6 @@
 /* File → Import Twine…: a Twine 2 HTML file, a Twee file, a Twine 1 file and an archive of two stories, with the code kept as text or turned into rules,
    the plain-words report, undo, and the friendly refusal of a file that is not a Twine story.
-   Usage: node twine.js [chromium|firefox]   Copyright (c) 2026 JNFoo. MIT License. */
+   Usage: node twine.js [chromium|firefox]   Copyright (c) 2026 LFC Foundry. MIT License. */
 const which = process.argv[2] || 'firefox'; const B = require('./engine').pick(which);
 const fs = require('fs');
 const EDITOR = require('url').pathToFileURL(process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html')).href;

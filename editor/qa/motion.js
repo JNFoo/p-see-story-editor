@@ -1,6 +1,6 @@
 /* The editor as a person sees it (the other suites remove the splash instead of waiting it out; this one uses a different test so it plays): with real animation (every other suite asks the browser for reduced motion, which is far cheaper), the opening
    splash plays for its full time, then leaves and the editor works. Usage: node motion.js [firefox|chromium]
-   Copyright (c) 2026 JNFoo. MIT License. */
+   Copyright (c) 2026 LFC Foundry. MIT License. */
 process.env.QA_MOTION = '1'; /* before engine.js is read */
 const which = process.argv[2] || 'firefox';
 const B = require('./engine').pick(which);

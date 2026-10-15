@@ -5,7 +5,7 @@
    a translator to fill in a spreadsheet program, and reads the filled sheet back. A row is matched by its original text, so a sheet stays
    usable while the story is edited: a row whose original no longer exists is reported and skipped. The translation tables themselves live
    in project.langs (core.js, "Translations"); an exported game carries them and lets the reader pick a language.
-   Copyright (c) 2026 JNFoo. MIT License.
+   Copyright (c) 2026 LFC Foundry. MIT License.
    ============================================================================ */
 
 function csvCell(s) {

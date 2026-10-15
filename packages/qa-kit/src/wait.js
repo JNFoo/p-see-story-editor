@@ -6,7 +6,7 @@
 
    Prefer waitFor (or the page's own waitForFunction / waitForSelector) to nap: wait for the thing you expect, never for a fixed time.
 
-   Copyright (c) 2026 JNFoo. MIT License. */
+   Copyright (c) 2026 LFC Foundry. MIT License. */
 const nap = ms => new Promise(r => setTimeout(r, ms));
 
 /** Polls `condition` (sync or async) every `every` ms until it returns something truthy, and returns that value.

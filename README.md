@@ -6,7 +6,7 @@ works, see your story as a map, and turn each story into one small game file tha
 **Open the editor:** https://jnfoo.github.io/p-see-story-editor/
 (or download `index.html` from this page and double-click it; nothing needs installing).
 
-MIT License · Copyright (c) 2026 JNFoo (see [LICENSE](LICENSE) and [NOTICE.md](NOTICE.md)). This is a beta.
+MIT License · Copyright (c) 2026 LFC Foundry (see [LICENSE](LICENSE) and [NOTICE.md](NOTICE.md)). This is a beta.
 
 ## Code you can reuse
 

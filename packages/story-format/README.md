@@ -145,4 +145,4 @@ A summary of each format's public design, written from its documentation as I un
 See [AGENTS.md](AGENTS.md).
 
 ---
-Part of [p-see-story-editor](../../README.md) · MIT License · Copyright (c) 2026 JNFoo
+Part of [p-see-story-editor](../../README.md) · MIT License · Copyright (c) 2026 LFC Foundry

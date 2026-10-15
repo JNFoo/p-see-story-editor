@@ -1,5 +1,5 @@
 /* Page colors and notes: set from the Write tab, shown as a dot in the page list and a stripe and note icon on the map, listed in the
-   map tip, kept in the saved story, and absent from the exported game. Usage: node marks.js [chromium|firefox]   Copyright (c) 2026 JNFoo. MIT License. */
+   map tip, kept in the saved story, and absent from the exported game. Usage: node marks.js [chromium|firefox]   Copyright (c) 2026 LFC Foundry. MIT License. */
 const which = process.argv[2] || 'firefox'; const B = require('./engine').pick(which);
 const fs = require('fs');
 const EDITOR = require('url').pathToFileURL(process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html')).href;

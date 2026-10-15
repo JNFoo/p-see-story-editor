@@ -1,6 +1,6 @@
 /* The phone layout: bottom icon tab bar, one-row top bar with a ⋯ menu, the pinned page-name bar (‹ › history, swipe, ↑ settings),
    typing mode (a slim key row), the folded page type, and tour / guide wording with no keyboard or mouse in it.
-   Usage: node phone.js [chromium|firefox]   Copyright (c) 2026 JNFoo. MIT License. */
+   Usage: node phone.js [chromium|firefox]   Copyright (c) 2026 LFC Foundry. MIT License. */
 const which = process.argv[2] || 'firefox'; const B = require('./engine').pick(which);
 const fs = require('fs');
 const EDITOR = require('url').pathToFileURL(process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html')).href;

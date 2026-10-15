@@ -1,6 +1,6 @@
 # How the Story Editor's screen changes with window size and device
 
-Written October 14, 2026 (build stamp 2026.10.14.2259 and later) for anyone building another **single-file, offline web app** who wants the same behavior. Everything here was learned by building and testing this editor; it says what the editor does, why, what went wrong on the way, and where the code is. Copyright (c) 2026 JNFoo. MIT License.
+Written October 14, 2026 (build stamp 2026.10.14.2259 and later) for anyone building another **single-file, offline web app** who wants the same behavior. Everything here was learned by building and testing this editor; it says what the editor does, why, what went wrong on the way, and where the code is. Copyright (c) 2026 LFC Foundry. MIT License.
 
 The editor is one HTML file with no network access (its security policy forbids it), so none of this depends on a server, a framework or an image file. All of it is plain CSS media queries, a few small JavaScript checks and two class names on `<body>`.
 

@@ -1,6 +1,10 @@
 # Notices
 
-**Story Editor and the packages in this repository**: Copyright (c) 2026 JNFoo, MIT License (see [LICENSE](LICENSE)).
+**Story Editor and the packages in this repository**: Copyright (c) 2026 LFC Foundry, MIT License (see [LICENSE](LICENSE)). The software is forged by LFC Foundry (https://github.com/JNFoo).
+
+**Branding notice.** While the code is open under the MIT License, the name "LFC Foundry" and associated project identities are reserved. If you fork, significantly modify, or commercially redistribute this software, you must change the external public product name and branding.
+
+**Exported games.** Every game exported from the editor starts with the same header comment. It covers the game program (the player code); the story's words and art belong to the story's author.
 
 **Provenance.** The code was written for the Story Editor by JNFoo with AI assistance (Claude, by Anthropic). The packages under `packages/` are cut from the editor's own sources by `tools/extract-packages.mjs`; they contain no third-party source code.
 

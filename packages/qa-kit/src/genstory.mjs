@@ -7,7 +7,7 @@
      const big = genStory(7, { huge: true });           // many objects/states: stresses the checker
      const wide = genStory(8, { wide: true });          // wide number ranges
 
-   Copyright (c) 2026 JNFoo. MIT License. */
+   Copyright (c) 2026 LFC Foundry. MIT License. */
 export function makeGenStory(normalizeProject) {
   let seed = 1;
   const rnd = () => { seed = (Math.imul(seed, 1103515245) + 12345) & 0x7fffffff; return seed / 0x7fffffff; };

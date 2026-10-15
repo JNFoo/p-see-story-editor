@@ -1,6 +1,6 @@
 # p-see-story-editor
 
-> A single-file, offline editor for branching interactive stories ("choose your own path"), and small zero-dependency JavaScript packages cut from its sources: a story data model with JSON Schema, an exact story checker, a game builder and headless player, story-graph layout with simulated players, a self-unzipping page packer, and a Playwright-style shim for stock Firefox. MIT License, Copyright (c) 2026 JNFoo.
+> A single-file, offline editor for branching interactive stories ("choose your own path"), and small zero-dependency JavaScript packages cut from its sources: a story data model with JSON Schema, an exact story checker, a game builder and headless player, story-graph layout with simulated players, a self-unzipping page packer, and a Playwright-style shim for stock Firefox. MIT License, Copyright (c) 2026 LFC Foundry.
 
 The editor: https://jnfoo.github.io/p-see-story-editor/ (also `index.html` in this repository; double-click it to run, nothing to install).
 

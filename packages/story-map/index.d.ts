@@ -1,4 +1,4 @@
-// Types for story-map. Copyright (c) 2026 JNFoo. MIT License.
+// Types for story-map. Copyright (c) 2026 LFC Foundry. MIT License.
 import type { Project } from '../story-format/index.js';
 export * from '../story-format/index.js';
 

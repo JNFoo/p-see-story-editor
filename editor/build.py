@@ -97,7 +97,11 @@ now = datetime.datetime.now(ZoneInfo("America/New_York"))
 STAMP = now.strftime("%Y.%m.%d.%H%M")
 script = script.replace("__BUILD_STAMP__", STAMP)
 
-BANNER = """<!--
+# LFC Foundry header (foundry-header.txt; core.js foundryHeader() writes the same text into every exported game)
+FOUNDRY = open(HERE + "foundry-header.txt", encoding="utf8").read().rstrip("\n").replace("{NAME}", "Story Editor")
+
+BANNER = FOUNDRY + """
+<!--
   STORY EDITOR  -  a single-file editor for interactive (choose-your-own-adventure) stories.
 
   HOW TO USE
@@ -154,6 +158,7 @@ BODY = """<!-- Page frame. The editor fills #side, #main and #itemside with Java
     <main id="main"></main>
     <aside id="itemside" aria-label="Items"></aside>
   </div>
+  <footer id="foundry">Forged by <a href="https://github.com/JNFoo" target="_blank" rel="noopener noreferrer" title="LFC Foundry on GitHub">LFC Foundry</a> • MIT Licensed</footer>
   <div id="scrim"></div>
   <div id="keyrow" hidden></div>
 </div>
@@ -205,7 +210,7 @@ standalone = """<!doctype html>
 </html>
 """ % (BANNER.replace("__STAMP__", STAMP), CSP, STYLE, BODY, DATA, SCRIPT)
 
-artifact = "<title>Story Editor</title>\n" + STYLE + BODY + "\n" + DATA + SCRIPT
+artifact = FOUNDRY + "\n<title>Story Editor</title>\n" + STYLE + BODY + "\n" + DATA + SCRIPT
 
 # ---- the editor as delivered is a PACKED page: the plain page above, compressed with LZMA (much tighter than zip; it costs build time, a few
 #      seconds) inside a tiny page that unpacks itself when opened and checks a hash of the result first. The compressed bytes are stored as
@@ -219,8 +224,8 @@ sys.path.insert(0, HERE + "lzma")
 import lzma_pack
 os.environ.setdefault("ESBUILD", HERE + "node_modules/.bin/esbuild")   # shrinks the unpacking script; build.py must give the same bytes every run
 _page, _info = lzma_pack.pack(_raw, title="Story Editor", encoding="base64", minifier="esbuild", tune=[(1, 0, 0), (2, 0, 0), (3, 0, 0)])   # three settings, 0.5 s; the full 15-setting search (2.7 s) saved at most 100 bytes more
-_zipped = _page.decode("latin-1")
-open(HERE + "story-editor.html", "w", encoding="utf8").write(_zipped)
+_page = _page.replace(b"<!doctype html>", b"<!doctype html>\n" + FOUNDRY.encode("utf8"), 1)   # the header stays readable at the top of the delivered file
+open(HERE + "story-editor.html", "wb").write(_page)   # bytes: the header holds emoji, which must stay UTF-8
 print("packed story-editor.html with LZMA (lc=%d pb=%d): %d KB plain -> %d KB" % (_info["lc"], _info["pb"], len(_raw) // 1024, len(_page) // 1024))
 open(HERE + "story-editor.artifact.html", "w", encoding="utf8").write(artifact)
 print("built story-editor.html (%d KB plain), stamped %s" % (len(standalone.encode("utf8")) // 1024, STAMP))
@@ -232,14 +237,14 @@ print("built story-editor.html (%d KB plain), stamped %s" % (len(standalone.enco
 BUDGETS = {  # name: ceiling in bytes (the file itself, not gzip)
     "Editor (story-editor.html)": 660000,   # raised to 660,000 on Oct 14 (later: the four UI picks plus the outline paste and writing checks used 13 KB of the 620,000 and the UI-research phases still to come need room; owner said to raise first and trim later); before that raised to 620,000 on Oct 14 (owner: "raise ceiling to implement ideas and then we can discuss what to compress or reduce after") for page colors and notes, pinned routes and translations; the owner expects more growth from further UI research, so trimming is a later discussion. Before that 565,000 on Oct 14 for Import Twine (twine.js: file readers, SugarCube and Harlowe macro readers, variables and if / else turned into rules; +50 KB plain, +20 KB packed). Before that: 520,000,   # the plain page (lowered to 520,000 on Oct 14: shortening local names took 42 KB off, which more than paid for the Options → Safety box, its reminder, the revision stamp and the test script; was 545,000, raised to 545,000 on Oct 8 night for the map icon toolbar, start-page rule, drag handles, first-time tour and many more checker rules; raised to 540,000 on Oct 8 evening for the Write-tab batches: page picker, history, side toggles, split, paste, templates, phone bar, wide layout; tightened to 520,000 when they were done; was 500,000 on Oct 8 for the Game tab with its live preview; was 490,000; raised from 470,000 for find and replace, unfinished flags, reach reports, the manuscript, Oct 8 2026; now about 2% headroom, so it stays)
     "Editor as delivered (packed)": 295000, # raised to 295,000 on Oct 14 with the plain page (same reason); before that raised to 275,000 on Oct 14 with the plain page for colors/notes, pinned routes and translations (owner asked to raise first and trim later); was 246,000 for Import Twine (+20 KB); what the file on disk weighs
-    "The Keeper\u2019s Light (the built-in example)": 59900,   # raised to 59,900 on Oct 14 with the other games (translation hooks); was 58,600 on Oct 14 with the other two for the recap's "Roads not taken" (about 600 bytes); raised from 57,500 on Oct 14 with the next two (about 400 bytes: back swipe, contrast follows the system, already-taken check mark)
-    "Standard 25-page game": 51500,                           # raised to 51,500 on Oct 14 (headroom for the translation hooks in the player); was 50,200, 49,500, 49,000
-    "Standard 25-page game, Place code on": 54800,            # raised to 54,800 on Oct 14 with the other games; was 53,500, 53,000, 52,500
+    "The Keeper\u2019s Light (the built-in example)": 60600,   # raised to 60,600 on Oct 15 for the LFC Foundry header comment every exported game now starts with (about 1,430 bytes, 700 gzipped; owner's standing rule for all software); raised to 59,900 on Oct 14 with the other games (translation hooks); was 58,600 on Oct 14 with the other two for the recap's "Roads not taken" (about 600 bytes); raised from 57,500 on Oct 14 with the next two (about 400 bytes: back swipe, contrast follows the system, already-taken check mark)
+    "Standard 25-page game": 52200,                           # raised to 52,200 on Oct 15 for the LFC Foundry header comment every exported game now starts with (about 1,430 bytes, 700 gzipped; owner's standing rule for all software); raised to 51,500 on Oct 14 (headroom for the translation hooks in the player); was 50,200, 49,500, 49,000
+    "Standard 25-page game, Place code on": 55500,            # raised to 55,500 on Oct 15 for the LFC Foundry header comment every exported game now starts with (about 1,430 bytes, 700 gzipped; owner's standing rule for all software); raised to 54,800 on Oct 14 with the other games; was 53,500, 53,000, 52,500
 }
 sizes = json.loads(subprocess.run(["node", HERE + "budget.mjs", HERE + "story-editor.plain.html"], capture_output=True, text=True, check=True).stdout)
 rows = [("Editor (story-editor.html)", sizes["editor"])] + [(g["name"], g) for g in sizes["games"]]
 import gzip as _gz
-_zb = _zipped.encode("utf8")
+_zb = _page
 rows.insert(1, ("Editor as delivered (packed)", {"bytes": len(_zb), "gzip": len(_gz.compress(_zb, 9))}))
 try:
     last = json.load(open(HERE + "sizes-last.json"))

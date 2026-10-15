@@ -3,7 +3,7 @@
      parseOutline   an indented outline becomes pages and choices (File → Paste an outline…)
      writingChecks  repeated words, names spelled two ways, very long paragraphs and pages, choices that read alike
    Pure functions over plain data: nothing here touches the screen, the story or the network.
-   Copyright (c) 2026 JNFoo. MIT License.
+   Copyright (c) 2026 LFC Foundry. MIT License.
    ============================================================================ */
 
 /* ----- paste an outline ----- */

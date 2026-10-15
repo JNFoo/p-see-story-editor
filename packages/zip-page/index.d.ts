@@ -1,4 +1,4 @@
-// Types for zip-page. Copyright (c) 2026 JNFoo. MIT License.
+// Types for zip-page. Copyright (c) 2026 LFC Foundry. MIT License.
 /** Raw-deflate bytes -> text (RFC 1951: stored, fixed and dynamic blocks). Pure JavaScript, no dependencies. */
 export function zipInflate(bytes: Uint8Array): string;
 /** The small page that holds `base64OfRawDeflate` and unzips itself when opened. `title` is placed in <title> as given (escape it yourself). */

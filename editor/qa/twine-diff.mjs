@@ -3,7 +3,7 @@
    abstract description directly and plays it the way Twine would; the story is also written out as Twine text, converted with code: 'rules', and played
    with the editor's own game rules. At every page and state reached, the words shown and the choices offered must be the same.
    Pages the converter flags as unfinished (a test too tangled to turn into rules) are not compared; they must stay a small share.
-   Usage: node twine-diff.mjs [stories=200] [seed=1]   Exit code 1 and a message on any difference.   Copyright (c) 2026 JNFoo. MIT License. */
+   Usage: node twine-diff.mjs [stories=200] [seed=1]   Exit code 1 and a message on any difference.   Copyright (c) 2026 LFC Foundry. MIT License. */
 import { readFileSync } from 'node:fs';
 import { createContext, runInContext } from 'node:vm';
 const ed = new URL('../', import.meta.url);

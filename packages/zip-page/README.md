@@ -51,4 +51,4 @@ This repository's sibling [JS-modules](https://github.com/JNFoo/JS-modules) alre
 See [AGENTS.md](AGENTS.md).
 
 ---
-Part of [p-see-story-editor](../../README.md) · MIT License · Copyright (c) 2026 JNFoo
+Part of [p-see-story-editor](../../README.md) · MIT License · Copyright (c) 2026 LFC Foundry

@@ -89,7 +89,8 @@ const outp=__dirname+'/work/exported.html';
 fs.writeFileSync(outp, await pg.evaluate(()=>window.__saves[0].text));await pg.keyboard.press('Escape');
 const saved=fs.readFileSync(outp,'utf8');const exp=require('./unzip').plain(saved);
 ok(require('./unzip').isZipped(saved)&&saved.length<exp.length*0.8,'exported game is saved zipped ('+Math.round(saved.length/1024)+' KB against '+Math.round(exp.length/1024)+' KB plain)');
-ok(!/https?:\/\//.test(exp.replace(/<script type="application\/json"[\s\S]*?<\/script>/,'')),'exported game contains no http(s) URLs outside the story data');
+/* the LFC Foundry header comment names the forge's GitHub page; as a comment it is text, never loaded, so it is the one URL allowed */
+ok(!/https?:\/\//.test(exp.replace(/<script type="application\/json"[\s\S]*?<\/script>/,'').replace(/<!--\n {4}={20,}[\s\S]*?-->/,'')),'exported game contains no http(s) URLs outside the story data (the header comment is the one allowed)');
 ok(/Content-Security-Policy/.test(exp),'export carries a CSP');
 const g=await ctx.newPage();const glogs=[];g.on('console',m=>{if(m.type()==='error')glogs.push(m.text())});g.on('pageerror',e=>glogs.push(e.message));
 await g.goto('file://'+outp);await g.waitForSelector('.kl-choices button');

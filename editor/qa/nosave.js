@@ -1,6 +1,6 @@
 /* A game whose browser will not keep its save (private window, blocked site data, full disk) says so on the page; a game that can save does not.
    Usage: node nosave.js [firefox|chromium]   (the game is made with packages/story-player, so run "npm run build" at the repo root first)
-   Copyright (c) 2026 JNFoo. MIT License. */
+   Copyright (c) 2026 LFC Foundry. MIT License. */
 const which = process.argv[2] || 'firefox';
 const B = require('./engine').pick(which), fs = require('fs'), path = require('path');
 let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };

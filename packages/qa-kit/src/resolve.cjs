@@ -2,7 +2,7 @@
    Order: a plain require (this folder's node_modules, parents, NODE_PATH), then the folder named by QA_NODE_MODULES,
    then /opt/npm-tools/node_modules (a shared tools folder some CI images use).
 
-   Copyright (c) 2026 JNFoo. MIT License. */
+   Copyright (c) 2026 LFC Foundry. MIT License. */
 const path = require('path');
 
 const extraDirs = () => [process.env.QA_NODE_MODULES, '/opt/npm-tools/node_modules'].filter(Boolean);

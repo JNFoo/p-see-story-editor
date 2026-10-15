@@ -7,7 +7,7 @@
    renderer for those three views; the Map tab draws more (folding, colors by Given, river, arc, matrix) and you can use the other
    layout functions (arcLayout, matrixLayout, shapeLayout) directly if you want to draw those yourself.
 
-   Copyright (c) 2026 JNFoo. MIT License. */
+   Copyright (c) 2026 LFC Foundry. MIT License. */
 import { mapGraph, layered, MAP_W, MAP_H } from './generated.js';
 
 export function layoutStory(project, opts = {}) {

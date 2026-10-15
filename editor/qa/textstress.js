@@ -2,7 +2,7 @@
    Larger text, Roomy spacing and Choice numbers, plus the text-spacing values of WCAG 1.4.12 (line height 1.5, paragraph spacing 2x, letters 0.12 em,
    words 0.16 em) forced on every element. Any page where text is cut off, a button's words overflow, or the page scrolls sideways is reported by name.
    Each page is drawn by making it the story's first page (so only text that does not depend on what the player holds is seen).
-   Usage: node textstress.js [firefox|chromium]   Copyright (c) 2026 JNFoo. MIT License. */
+   Usage: node textstress.js [firefox|chromium]   Copyright (c) 2026 LFC Foundry. MIT License. */
 const which = process.argv[2] || 'firefox';
 const B = require('./engine').pick(which), fs = require('fs'), path = require('path');
 let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };

@@ -1,4 +1,4 @@
-/* Twine import: the fixtures are original, hand-written test files (not anyone's story). Copyright (c) 2026 JNFoo. MIT License. */
+/* Twine import: the fixtures are original, hand-written test files (not anyone's story). Copyright (c) 2026 LFC Foundry. MIT License. */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

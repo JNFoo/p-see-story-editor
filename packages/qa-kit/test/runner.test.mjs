@@ -1,6 +1,6 @@
 /* Exercises src/runner.js on a tiny fake project: one passing suite, one that fails the first time and passes on the retry
    (flaky), and one that always fails. Checks the printed lines, the summary, the exit code, the retry log, and what "smart" does.
-   Copyright (c) 2026 JNFoo. MIT License. */
+   Copyright (c) 2026 LFC Foundry. MIT License. */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';

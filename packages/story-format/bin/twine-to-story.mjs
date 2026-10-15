@@ -11,7 +11,7 @@
    translated into flags, numbers and conditions as far as the rules can say it; everything else stays as flagged text and is listed.
    Nothing in the story is run.
 
-   Copyright (c) 2026 JNFoo. MIT License. */
+   Copyright (c) 2026 LFC Foundry. MIT License. */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { basename } from 'node:path';
 import { importTwine, twineRead } from '../dist/story-format.mjs';

@@ -6,7 +6,7 @@
      4. the editor's contract test: the checker against brute-force play on random stories
    The browser suites (editor/qa) need Firefox/Chromium and are run separately: see editor/qa/README.md.
 
-   Copyright (c) 2026 JNFoo. MIT License. */
+   Copyright (c) 2026 LFC Foundry. MIT License. */
 import { spawn } from 'node:child_process';
 import { readdirSync, existsSync } from 'node:fs';
 

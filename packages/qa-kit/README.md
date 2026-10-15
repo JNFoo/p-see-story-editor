@@ -108,4 +108,4 @@ node --test test/
 `runner.test.mjs` runs the runner on a fake project (a passing suite, a flaky one and a failing one). `bidi.test.mjs` opens a page in real Firefox; it is
 **skipped** unless `FIREFOX_PATH` (or `FIREFOX_158`) names a binary and puppeteer is installed.
 
-Copyright (c) 2026 JNFoo. MIT License.
+Copyright (c) 2026 LFC Foundry. MIT License.

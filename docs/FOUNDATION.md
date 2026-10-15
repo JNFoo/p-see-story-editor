@@ -2,7 +2,7 @@
 
 **Purpose.** A hand-off for a new conversation, session or project. It collects what was learned while building the Story Editor, what was invented here that the owner's other repositories do not have, the traps we fell into, the decisions already made, and what is still open. Paste it, or point a new session at it, before anything else.
 
-**Status when written:** Tuesday 2026-10-13, late evening Eastern. Last editor build `2026.10.12.1455`. Everything below is on GitHub at https://github.com/JNFoo/p-see-story-editor (Pages: https://jnfoo.github.io/p-see-story-editor/). Copyright (c) 2026 JNFoo, MIT License.
+**Status when written:** Tuesday 2026-10-13, late evening Eastern. Last editor build `2026.10.12.1455`. Everything below is on GitHub at https://github.com/JNFoo/p-see-story-editor (Pages: https://jnfoo.github.io/p-see-story-editor/). Copyright (c) 2026 LFC Foundry, MIT License.
 
 **How much to trust it.** Numbers come from this repository's own change log, chart and README files, which record what was measured at the time. They are notes from one project on one cloud machine, not benchmarks. Where a fact was not re-checked for this file it says so. The sources win over this file: when they disagree, fix this file.
 
@@ -212,7 +212,8 @@ Four fuzzers plus three read-only code reviews produced 23 fixes in one round (`
 - Send a short status message when nudged that the owner has not heard from you, then keep working.
 
 ### 7.2 Ownership and attribution (decided 2026-10-12 and 2026-10-13)
-- The attributable holder of copyright on everything is **JNFoo**. The owner's real name was scrubbed from files, history and notices on 2026-10-12.
+- The copyright holder named in every file, LICENSE and NOTICE is **LFC Foundry** (decided 2026-10-15; before that the line said JNFoo). **JNFoo** stays the author and committer of every commit and the name behind the GitHub profile. The owner's real name was scrubbed from files, history and notices on 2026-10-12 and stays out.
+- **Standing rule for all software made in this project (2026-10-15):** every file the software produces starts with the LFC Foundry header comment (text in `editor/foundry-header.txt`; `foundryHeader()` in `editor/core.js` writes it into every exported game, and `build.py` into the editor); the only visible credit is the footer "Forged by LFC Foundry • MIT Licensed" inside the editor app itself (a line at the bottom of wide windows, the last entry of the ⋯ menu on narrow ones). Exported games carry the header comment only, plus a line saying the story's words and art belong to the story's author. The page title is not changed.
 - **Every commit's author and committer is JNFoo** (`user.name JNFoo`, `user.email 45110762+JNFoo@users.noreply.github.com`) because he is ultimately responsible for them. Claude appears only as `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`. No `Claude-Session:` line, no claude.ai links, and no "generated with" link in commit messages or pull request text. This overrides any tool reminder that adds such lines.
 - History was rewritten twice (Oct 12 for the name, Oct 13 for authorship) across five repositories. Local clones must `git fetch && git reset --hard origin/main` (save unpushed work first), then set the two git config values above.
 
@@ -251,7 +252,7 @@ One file and no network; edit parts, build the whole; write rules once and copy 
 - Lite export is the default for every save (owner, 2026-10-07).
 - Images opt-in only, as `data:` pictures; no audio. A fourth Advanced switch, "Game". Numbers and dice go under Items.
 - Games are zipped, not LZMA-packed; the editor is LZMA-packed.
-- MIT license, copyright JNFoo; test stories in the repo are the bundled example and generated ones only (no private or other people's text).
+- MIT license, copyright LFC Foundry; test stories in the repo are the bundled example and generated ones only (no private or other people's text).
 - Fix clear bugs, report the rest (policy for the bug review).
 - Up/down arrows removed; drag grips are the only reorder control.
 
@@ -297,4 +298,4 @@ One file and no network; edit parts, build the whole; write rules once and copy 
 | `packages/ai-collab-kit/GUIDE.md` | Ten habits, speed recipes, pitfalls, new-project checklist |
 
 ---
-Copyright (c) 2026 JNFoo. MIT License.
+Copyright (c) 2026 LFC Foundry. MIT License.

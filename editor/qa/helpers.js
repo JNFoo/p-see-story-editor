@@ -1,6 +1,6 @@
 /* The offline writing helpers: the outline reader and the writing checks as pure functions (run on the built source), then in the editor:
    File → Paste an outline, one Undo, and the Writing notes in the Check tab with Ignore and the status-line count.
-   Usage: node helpers.js [chromium|firefox]   Copyright (c) 2026 JNFoo. MIT License. */
+   Usage: node helpers.js [chromium|firefox]   Copyright (c) 2026 LFC Foundry. MIT License. */
 const which = process.argv[2] || 'firefox'; const B = require('./engine').pick(which);
 const fs = require('fs'); const vm = require('vm');
 const EDITOR = require('url').pathToFileURL(process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html')).href;

@@ -134,4 +134,4 @@ Test: a 300-page story, script time of the first Map visit and of later visits, 
 7. When you find something reusable, cut it out **from the real sources** with a script and a drift check (`tools/extract-packages.mjs` here), so there is still only one copy to maintain.
 
 ---
-Part of [p-see-story-editor](../../README.md) · MIT License · Copyright (c) 2026 JNFoo
+Part of [p-see-story-editor](../../README.md) · MIT License · Copyright (c) 2026 LFC Foundry

@@ -14,7 +14,7 @@ The page is made of the story data, the rules, a small player and its stylesheet
 Copy `dist/story-player.mjs` (ES module) or `dist/story-player.global.js` (`<script>`, defines `StoryPlayer`), or:
 
 ```js
-import { buildGame } from 'https://cdn.jsdelivr.net/gh/JNFoo/p-see-story-editor@main/packages/story-player/dist/story-player.mjs';
+import { buildGame } from 'https://cdn.jsdelivr.net/gh/lfcfoundry/p-see-story-editor@main/packages/story-player/dist/story-player.mjs';
 ```
 
 ## Quick start

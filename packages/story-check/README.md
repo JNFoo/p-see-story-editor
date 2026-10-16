@@ -13,7 +13,7 @@ Zero dependencies. One file. Runs in Node 18+ and in browsers. It is the checker
 Nothing to install. Copy one file from this folder: `dist/story-check.mjs` (ES module) or `dist/story-check.global.js` (a plain `<script>`, defines `StoryCheck`). Or load it straight from GitHub:
 
 ```js
-import { analyze } from 'https://cdn.jsdelivr.net/gh/JNFoo/p-see-story-editor@main/packages/story-check/dist/story-check.mjs';
+import { analyze } from 'https://cdn.jsdelivr.net/gh/lfcfoundry/p-see-story-editor@main/packages/story-check/dist/story-check.mjs';
 ```
 
 ## Quick start

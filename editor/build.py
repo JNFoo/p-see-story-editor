@@ -158,7 +158,7 @@ BODY = """<!-- Page frame. The editor fills #side, #main and #itemside with Java
     <main id="main"></main>
     <aside id="itemside" aria-label="Items"></aside>
   </div>
-  <footer id="foundry">Forged by <a href="https://github.com/JNFoo" target="_blank" rel="noopener noreferrer" title="LFC Foundry on GitHub">LFC Foundry</a> • MIT Licensed</footer>
+  <footer id="foundry">Forged by <a href="https://github.com/lfcfoundry" target="_blank" rel="noopener noreferrer" title="LFC Foundry on GitHub">LFC Foundry</a> • MIT Licensed</footer>
   <div id="scrim"></div>
   <div id="keyrow" hidden></div>
 </div>

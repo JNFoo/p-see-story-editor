@@ -6,7 +6,7 @@ The comparison covers five formats, each with the editor people most often write
 
 | Format | Editor compared | Who makes the editor |
 |---|---|---|
-| This format (`story-editor` JSON) | Story Editor (this repository) | JNFoo |
+| This format (`story-editor` JSON) | Story Editor (this repository) | LFC Foundry |
 | Twine 2 (HTML or Twee 3) | Twine 2.6 editor | Chris Klimas and contributors; the name is a trademark of the Interactive Fiction Technology Foundation |
 | Ink | Inky | inkle |
 | Yarn Spinner | Yarn Spinner Editor (a Visual Studio Code extension) | Yarn Spinner |

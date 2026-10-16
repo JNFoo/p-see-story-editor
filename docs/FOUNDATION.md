@@ -2,7 +2,7 @@
 
 **Purpose.** A hand-off for a new conversation, session or project. It collects what was learned while building the Story Editor, what was invented here that the owner's other repositories do not have, the traps we fell into, the decisions already made, and what is still open. Paste it, or point a new session at it, before anything else.
 
-**Status when written:** Tuesday 2026-10-13, late evening Eastern. Last editor build `2026.10.12.1455`. Everything below is on GitHub at https://github.com/JNFoo/p-see-story-editor (Pages: https://jnfoo.github.io/p-see-story-editor/). Copyright (c) 2026 LFC Foundry, MIT License.
+**Status when written:** Tuesday 2026-10-13, late evening Eastern. Last editor build `2026.10.12.1455`. Everything below is on GitHub at https://github.com/lfcfoundry/p-see-story-editor (Pages: https://lfcfoundry.github.io/p-see-story-editor/). Copyright (c) 2026 LFC Foundry, MIT License.
 
 **How much to trust it.** Numbers come from this repository's own change log, chart and README files, which record what was measured at the time. They are notes from one project on one cloud machine, not benchmarks. Where a fact was not re-checked for this file it says so. The sources win over this file: when they disagree, fix this file.
 
@@ -280,7 +280,7 @@ One file and no network; edit parts, build the whole; write rules once and copy 
 5. Before building anything, ask (pop-up only) the questions that decide shape: what the output file is, who opens it and on what device, and what must never be lost.
 6. For a different project, copy the pattern, not the code: `build.py` (join, check, budget), a no-DOM `core`, a contract test, `qa.js quick` before any feature, and the templates in `packages/ai-collab-kit/templates/`.
 
-**Suggested first message for a new session:** "Read `docs/FOUNDATION.md` in JNFoo/p-see-story-editor first. Work as JNFoo (author and committer) with Claude as co-author only, no session links. Ask questions only through the multiple-choice pop-up. Report real elapsed time and approximate compute at the end."
+**Suggested first message for a new session:** "Read `docs/FOUNDATION.md` in lfcfoundry/p-see-story-editor first. Work as JNFoo (author and committer) with Claude as co-author only, no session links. Ask questions only through the multiple-choice pop-up. Report real elapsed time and approximate compute at the end."
 
 ---
 

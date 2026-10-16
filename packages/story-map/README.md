@@ -15,7 +15,7 @@ Zero dependencies; pure functions (no DOM); Node 18+ or browsers.
 Copy `dist/story-map.mjs` or `dist/story-map.global.js` (`StoryMap`), or:
 
 ```js
-import { layoutStory, toSvg } from 'https://cdn.jsdelivr.net/gh/JNFoo/p-see-story-editor@main/packages/story-map/dist/story-map.mjs';
+import { layoutStory, toSvg } from 'https://cdn.jsdelivr.net/gh/lfcfoundry/p-see-story-editor@main/packages/story-map/dist/story-map.mjs';
 ```
 
 ## Quick start

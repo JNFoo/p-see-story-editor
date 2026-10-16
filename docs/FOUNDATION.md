@@ -21,7 +21,7 @@ A single-file, offline editor for interactive (choose-your-own-adventure) storie
 
 Source of truth (never edit the built files): `editor/core.js` (model, game rules, checker, export, no DOM), `editor/player.js` (the game), `editor/maplayout.js` (map layout and simulated players, no DOM), `editor/ui1-state.js` through `ui5-app.js` (editor screens), `editor/ui.css` and `game.css`, `editor/build.py` (joins everything and enforces budgets). `packages/*` are generated from those sources.
 
-Related repositories (all JNFoo): `JS-modules` (small reusable browser modules and tools, with a task board), `fancy-banana`, `apple-press`, `pineapple-defense` (games). Local clones in the working container: `/home/claude/p-see-story-editor`, `/home/claude/js-modules`, `/home/claude/fancy-banana`; the earlier working folder `/home/claude/twine` holds the pre-GitHub history, the starter guide and loose exports.
+Related repositories: `JS-modules` (now at https://github.com/lfcfoundry/JS-modules; small reusable browser modules and tools, with a task board), `fancy-banana`, `apple-press`, `pineapple-defense` (games, under JNFoo). Local clones in the working container: `/home/claude/p-see-story-editor`, `/home/claude/js-modules`, `/home/claude/fancy-banana`; the earlier working folder `/home/claude/twine` holds the pre-GitHub history, the starter guide and loose exports.
 
 ---
 

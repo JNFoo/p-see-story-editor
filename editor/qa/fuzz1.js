@@ -40,7 +40,9 @@ const SIZES = [[1280, 900], [820, 1100], [390, 780], [1600, 1000], [600, 800]];
           const root = dlg && rv < 0.8 ? dlg : document;
           const els = [...root.querySelectorAll('button, [role=tab], [role=menuitem], label, summary, input[type=checkbox], input[type=radio], .grip, .node, select')].filter(e => {
             if (e.disabled || !e.getClientRects().length) return false; const tx = (e.innerText || e.title || e.getAttribute('aria-label') || '').trim(); if (skip.test(tx) || skip.test(e.title || '')) return false;
-            if (e.closest('#tour')) return false; return true; });
+            if (e.closest('#tour')) return false;
+            if (e.tagName === 'SELECT' && dlg && !dlg.contains(e)) return false; // a person cannot reach a select behind an open dialog, and the change event below would skip that
+            return true; });
           if (!els.length) return null; const e = els[Math.floor(rv * 9973) % els.length];
           e.scrollIntoView({ block: 'center', inline: 'center' });
           if (e.tagName === 'SELECT') { const o = [...e.options]; e.value = o[Math.floor(rv * 7919) % o.length].value; e.dispatchEvent(new Event('change', { bubbles: true })); return { sel: true, t: (e.id || e.className) }; }

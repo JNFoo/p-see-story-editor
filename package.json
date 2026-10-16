@@ -1,12 +1,12 @@
 {
-  "name": "p-see-story-editor",
+  "name": "story-editor",
   "version": "1.0.0",
   "private": true,
   "description": "A single-file offline editor for interactive stories, and the reusable packages cut from its sources.",
   "license": "MIT",
   "author": "LFC Foundry",
-  "homepage": "https://lfcfoundry.github.io/p-see-story-editor/",
-  "repository": { "type": "git", "url": "https://github.com/lfcfoundry/p-see-story-editor.git" },
+  "homepage": "https://lfcfoundry.github.io/story-editor/",
+  "repository": { "type": "git", "url": "https://github.com/lfcfoundry/story-editor.git" },
   "type": "module",
   "engines": { "node": ">=18" },
   "scripts": {

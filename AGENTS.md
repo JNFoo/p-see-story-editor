@@ -4,7 +4,7 @@ This repository holds a single-file offline story editor (`editor/`) and small p
 
 ## Using a package in someone else's project
 1. Open `packages/index.json` (or `llms.txt`), pick the package, read its `README.md` (the "Limits" section matters) and `AGENTS.md`.
-2. Copy `dist/<name>.mjs` (ES module) or `dist/<name>.global.js` (a `<script>`) into the project. No install step, no dependencies. Or import from `https://cdn.jsdelivr.net/gh/lfcfoundry/p-see-story-editor@main/packages/<name>/dist/<name>.mjs`.
+2. Copy `dist/<name>.mjs` (ES module) or `dist/<name>.global.js` (a `<script>`) into the project. No install step, no dependencies. Or import from `https://cdn.jsdelivr.net/gh/lfcfoundry/story-editor@main/packages/<name>/dist/<name>.mjs`.
 3. Run the package's `examples/quickstart.mjs` to see it work (`node examples/quickstart.mjs`).
 
 ## Changing this repository

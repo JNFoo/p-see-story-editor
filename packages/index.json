@@ -1,9 +1,9 @@
 {
-  "name": "p-see-story-editor packages",
+  "name": "story-editor packages",
   "license": "MIT",
   "copyright": "LFC Foundry",
-  "repository": "https://github.com/lfcfoundry/p-see-story-editor",
-  "pages": "https://lfcfoundry.github.io/p-see-story-editor/",
+  "repository": "https://github.com/lfcfoundry/story-editor",
+  "pages": "https://lfcfoundry.github.io/story-editor/",
   "packages": [
     {
       "id": "story-format",

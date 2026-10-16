@@ -15,7 +15,7 @@ Zero dependencies; pure functions (no DOM); Node 18+ or browsers.
 Copy `dist/story-map.mjs` or `dist/story-map.global.js` (`StoryMap`), or:
 
 ```js
-import { layoutStory, toSvg } from 'https://cdn.jsdelivr.net/gh/lfcfoundry/p-see-story-editor@main/packages/story-map/dist/story-map.mjs';
+import { layoutStory, toSvg } from 'https://cdn.jsdelivr.net/gh/lfcfoundry/story-editor@main/packages/story-map/dist/story-map.mjs';
 ```
 
 ## Quick start
@@ -96,4 +96,4 @@ General graph-layout libraries (dagre, ELK, d3-dag and others) already draw laye
 See [AGENTS.md](AGENTS.md).
 
 ---
-Part of [p-see-story-editor](../../README.md) · MIT License · Copyright (c) 2026 LFC Foundry
+Part of [story-editor](../../README.md) · MIT License · Copyright (c) 2026 LFC Foundry

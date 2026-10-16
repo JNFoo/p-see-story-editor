@@ -3,7 +3,7 @@
 Write interactive "choose your own path" stories without touching code. Add pages and choices, let the editor check that every path
 works, see your story as a map, and turn each story into one small game file that anyone can play in a browser, online or offline.
 
-**Open the editor:** https://lfcfoundry.github.io/p-see-story-editor/
+**Open the editor:** https://lfcfoundry.github.io/story-editor/
 (or download `index.html` from this page and double-click it; nothing needs installing).
 
 MIT License · Copyright (c) 2026 LFC Foundry (see [LICENSE](LICENSE) and [NOTICE.md](NOTICE.md)). This is a beta.

@@ -14,7 +14,7 @@ The page is made of the story data, the rules, a small player and its stylesheet
 Copy `dist/story-player.mjs` (ES module) or `dist/story-player.global.js` (`<script>`, defines `StoryPlayer`), or:
 
 ```js
-import { buildGame } from 'https://cdn.jsdelivr.net/gh/lfcfoundry/p-see-story-editor@main/packages/story-player/dist/story-player.mjs';
+import { buildGame } from 'https://cdn.jsdelivr.net/gh/lfcfoundry/story-editor@main/packages/story-player/dist/story-player.mjs';
 ```
 
 ## Quick start
@@ -106,4 +106,4 @@ Twine and Ink can publish playable pages too, usually with a runtime of tens or 
 See [AGENTS.md](AGENTS.md).
 
 ---
-Part of [p-see-story-editor](../../README.md) · MIT License · Copyright (c) 2026 LFC Foundry
+Part of [story-editor](../../README.md) · MIT License · Copyright (c) 2026 LFC Foundry

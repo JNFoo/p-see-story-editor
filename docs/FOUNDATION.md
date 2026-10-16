@@ -2,7 +2,7 @@
 
 **Purpose.** A hand-off for a new conversation, session or project. It collects what was learned while building the Story Editor, what was invented here that the owner's other repositories do not have, the traps we fell into, the decisions already made, and what is still open. Paste it, or point a new session at it, before anything else.
 
-**Status when written:** Tuesday 2026-10-13, late evening Eastern. Last editor build `2026.10.12.1455`. Everything below is on GitHub at https://github.com/lfcfoundry/p-see-story-editor (Pages: https://lfcfoundry.github.io/p-see-story-editor/). Copyright (c) 2026 LFC Foundry, MIT License.
+**Status when written:** Tuesday 2026-10-13, late evening Eastern. Last editor build `2026.10.12.1455`. Everything below is on GitHub at https://github.com/lfcfoundry/story-editor (Pages: https://lfcfoundry.github.io/story-editor/). Copyright (c) 2026 LFC Foundry, MIT License.
 
 **How much to trust it.** Numbers come from this repository's own change log, chart and README files, which record what was measured at the time. They are notes from one project on one cloud machine, not benchmarks. Where a fact was not re-checked for this file it says so. The sources win over this file: when they disagree, fix this file.
 
@@ -21,7 +21,7 @@ A single-file, offline editor for interactive (choose-your-own-adventure) storie
 
 Source of truth (never edit the built files): `editor/core.js` (model, game rules, checker, export, no DOM), `editor/player.js` (the game), `editor/maplayout.js` (map layout and simulated players, no DOM), `editor/ui1-state.js` through `ui5-app.js` (editor screens), `editor/ui.css` and `game.css`, `editor/build.py` (joins everything and enforces budgets). `packages/*` are generated from those sources.
 
-Related repositories: `JS-modules` (now at https://github.com/lfcfoundry/JS-modules; small reusable browser modules and tools, with a task board), `fancy-banana`, `apple-press`, `pineapple-defense` (games, under JNFoo). Local clones in the working container: `/home/claude/p-see-story-editor`, `/home/claude/js-modules`, `/home/claude/fancy-banana`; the earlier working folder `/home/claude/twine` holds the pre-GitHub history, the starter guide and loose exports.
+Related repositories: `JS-modules` (now at https://github.com/lfcfoundry/JS-modules; small reusable browser modules and tools, with a task board), `fancy-banana`, `apple-press`, `pineapple-defense` (games, under JNFoo). Local clones in the working container: `/home/claude/story-editor`, `/home/claude/js-modules`, `/home/claude/fancy-banana`; the earlier working folder `/home/claude/twine` holds the pre-GitHub history, the starter guide and loose exports.
 
 ---
 
@@ -274,13 +274,13 @@ One file and no network; edit parts, build the whole; write rules once and copy 
 ## 10. Starting a new context from this file
 
 1. Read sections 1, 2, 7 and 9. Skim 3 so you know what already exists before writing anything.
-2. `cd p-see-story-editor && git fetch && git status`, then `git log -5`. Check `JS-modules/TASKS.md` for claimed work.
+2. `cd story-editor && git fetch && git status`, then `git log -5`. Check `JS-modules/TASKS.md` for claimed work.
 3. Confirm the git identity (7.2) before the first commit.
 4. `npm install && npm test` (13.6 s, no browser). For browser suites set the environment in section 8 and run `cd editor/qa && node qa.js quick`.
 5. Before building anything, ask (pop-up only) the questions that decide shape: what the output file is, who opens it and on what device, and what must never be lost.
 6. For a different project, copy the pattern, not the code: `build.py` (join, check, budget), a no-DOM `core`, a contract test, `qa.js quick` before any feature, and the templates in `packages/ai-collab-kit/templates/`.
 
-**Suggested first message for a new session:** "Read `docs/FOUNDATION.md` in lfcfoundry/p-see-story-editor first. Work as JNFoo (author and committer) with Claude as co-author only, no session links. Ask questions only through the multiple-choice pop-up. Report real elapsed time and approximate compute at the end."
+**Suggested first message for a new session:** "Read `docs/FOUNDATION.md` in lfcfoundry/story-editor first. Work as JNFoo (author and committer) with Claude as co-author only, no session links. Ask questions only through the multiple-choice pop-up. Report real elapsed time and approximate compute at the end."
 
 ---
 

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://lfcfoundry.github.io/p-see-story-editor/packages/story-format/story.schema.json",
+  "$id": "https://lfcfoundry.github.io/story-editor/packages/story-format/story.schema.json",
   "title": "Story project",
   "description": "A branching interactive story: pages, choices, things the player carries, numbers, dice checks and start-of-story questions. This is the shape the Story Editor saves. Only `passages` is required; normalizeProject() fills in every other field and removes anything broken, so hand-written or AI-written files may leave fields out. Ids are short strings (letters, digits, _ and -, up to 64 characters). A page whose `ending` is true shows no choices.",
   "type": "object",

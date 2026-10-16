@@ -33,10 +33,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/lfcfoundry/p-see-story-editor.git",
+    "url": "https://github.com/lfcfoundry/story-editor.git",
     "directory": "packages/story-check"
   },
-  "homepage": "https://github.com/lfcfoundry/p-see-story-editor/tree/main/packages/story-check",
+  "homepage": "https://github.com/lfcfoundry/story-editor/tree/main/packages/story-check",
   "keywords": [
     "interactive-fiction",
     "static-analysis",

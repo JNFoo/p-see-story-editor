@@ -35,10 +35,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/lfcfoundry/p-see-story-editor.git",
+    "url": "https://github.com/lfcfoundry/story-editor.git",
     "directory": "packages/story-format"
   },
-  "homepage": "https://github.com/lfcfoundry/p-see-story-editor/tree/main/packages/story-format",
+  "homepage": "https://github.com/lfcfoundry/story-editor/tree/main/packages/story-format",
   "keywords": [
     "interactive-fiction",
     "choose-your-own-adventure",

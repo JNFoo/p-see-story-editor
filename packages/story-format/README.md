@@ -11,7 +11,7 @@ It is the model inside a single-file story editor, cut out so that **people and 
 Copy `dist/story-format.mjs` (ES module) or `dist/story-format.global.js` (`<script>`, defines `StoryFormat`), or:
 
 ```js
-import { normalizeProject } from 'https://cdn.jsdelivr.net/gh/lfcfoundry/p-see-story-editor@main/packages/story-format/dist/story-format.mjs';
+import { normalizeProject } from 'https://cdn.jsdelivr.net/gh/lfcfoundry/story-editor@main/packages/story-format/dist/story-format.mjs';
 ```
 
 ## The shape of a story
@@ -145,4 +145,4 @@ A summary of each format's public design, written from its documentation as I un
 See [AGENTS.md](AGENTS.md).
 
 ---
-Part of [p-see-story-editor](../../README.md) · MIT License · Copyright (c) 2026 LFC Foundry
+Part of [story-editor](../../README.md) · MIT License · Copyright (c) 2026 LFC Foundry

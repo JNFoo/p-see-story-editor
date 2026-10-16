@@ -51,4 +51,4 @@ This repository's sibling [JS-modules](https://github.com/lfcfoundry/JS-modules)
 See [AGENTS.md](AGENTS.md).
 
 ---
-Part of [p-see-story-editor](../../README.md) · MIT License · Copyright (c) 2026 LFC Foundry
+Part of [story-editor](../../README.md) · MIT License · Copyright (c) 2026 LFC Foundry

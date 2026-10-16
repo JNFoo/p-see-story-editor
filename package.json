@@ -4,9 +4,9 @@
   "private": true,
   "description": "A single-file offline editor for interactive stories, and the reusable packages cut from its sources.",
   "license": "MIT",
-  "author": "JNFoo",
-  "homepage": "https://jnfoo.github.io/p-see-story-editor/",
-  "repository": { "type": "git", "url": "https://github.com/JNFoo/p-see-story-editor.git" },
+  "author": "LFC Foundry",
+  "homepage": "https://lfcfoundry.github.io/p-see-story-editor/",
+  "repository": { "type": "git", "url": "https://github.com/lfcfoundry/p-see-story-editor.git" },
   "type": "module",
   "engines": { "node": ">=18" },
   "scripts": {

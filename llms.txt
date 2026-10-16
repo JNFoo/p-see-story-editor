@@ -2,7 +2,7 @@
 
 > A single-file, offline editor for branching interactive stories ("choose your own path"), and small zero-dependency JavaScript packages cut from its sources: a story data model with JSON Schema, an exact story checker, a game builder and headless player, story-graph layout with simulated players, a self-unzipping page packer, and a Playwright-style shim for stock Firefox. MIT License, Copyright (c) 2026 LFC Foundry.
 
-The editor: https://jnfoo.github.io/p-see-story-editor/ (also `index.html` in this repository; double-click it to run, nothing to install).
+The editor: https://lfcfoundry.github.io/p-see-story-editor/ (also `index.html` in this repository; double-click it to run, nothing to install).
 
 ## Packages (each: README.md, AGENTS.md, index.d.ts, examples/quickstart.mjs, tests)
 - [story-format](packages/story-format/README.md): create, clean, import, export, search and measure stories as JSON. `story.schema.json` is the JSON Schema. Start here to write a story.

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Exact checker for branching stories with items, numbers and dice: dead ends, unreachable pages, endings no player can reach. Zero dependencies.",
   "license": "MIT",
-  "author": "JNFoo",
+  "author": "LFC Foundry",
   "type": "module",
   "main": "dist/story-check.mjs",
   "module": "dist/story-check.mjs",
@@ -33,10 +33,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/JNFoo/p-see-story-editor.git",
+    "url": "https://github.com/lfcfoundry/p-see-story-editor.git",
     "directory": "packages/story-check"
   },
-  "homepage": "https://github.com/JNFoo/p-see-story-editor/tree/main/packages/story-check",
+  "homepage": "https://github.com/lfcfoundry/p-see-story-editor/tree/main/packages/story-check",
   "keywords": [
     "interactive-fiction",
     "static-analysis",

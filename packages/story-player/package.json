@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Builds one offline HTML game from a story, plays stories from code, and plays them in a terminal. Zero dependencies.",
   "license": "MIT",
-  "author": "JNFoo",
+  "author": "LFC Foundry",
   "type": "module",
   "main": "dist/story-player.mjs",
   "module": "dist/story-player.mjs",
@@ -33,10 +33,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/JNFoo/p-see-story-editor.git",
+    "url": "https://github.com/lfcfoundry/p-see-story-editor.git",
     "directory": "packages/story-player"
   },
-  "homepage": "https://github.com/JNFoo/p-see-story-editor/tree/main/packages/story-player",
+  "homepage": "https://github.com/lfcfoundry/p-see-story-editor/tree/main/packages/story-player",
   "keywords": [
     "interactive-fiction",
     "game-builder",

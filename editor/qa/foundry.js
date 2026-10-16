@@ -17,7 +17,7 @@ const SETTINGS = JSON.stringify({ chosen: true, remember: true, tourDone: true }
     ok(head.includes(want('Story Editor')), f + ' starts with the LFC Foundry header, application name filled in');
   }
   const top = fs.readFileSync(EDITOR_FILE, 'utf8').slice(0, 2500);
-  ok(/APPLICATION : Story Editor\n/.test(top) && top.includes('FORGED BY : LFC Foundry (https://github.com/JNFoo)') && top.includes('Copyright (c) 2026 LFC Foundry') && top.includes('BRANDING NOTICE'), 'the delivered file names the application, the forge, the copyright holder and the branding notice');
+  ok(/APPLICATION : Story Editor\n/.test(top) && top.includes('FORGED BY : LFC Foundry (https://github.com/lfcfoundry)') && top.includes('Copyright (c) 2026 LFC Foundry') && top.includes('BRANDING NOTICE'), 'the delivered file names the application, the forge, the copyright holder and the branding notice');
   ok(!/Copyright \(c\) 2026 JNFoo/.test(fs.readFileSync(path.join(__dirname, '..', '..', 'LICENSE'), 'utf8')) && /Copyright \(c\) 2026 LFC Foundry/.test(fs.readFileSync(path.join(__dirname, '..', '..', 'LICENSE'), 'utf8')), 'LICENSE names LFC Foundry');
 
   const b = await B.launch(); const errs = [];
@@ -32,7 +32,7 @@ const SETTINGS = JSON.stringify({ chosen: true, remember: true, tourDone: true }
   ok(f && f.shown && /^Forged by LFC Foundry • MIT Licensed$/.test(f.text.trim()), 'a wide window shows the footer "Forged by LFC Foundry • MIT Licensed": ' + (f && JSON.stringify(f.text)));
   ok(f && f.y + f.h >= 795 && f.h < 30, 'it is one slim line at the very bottom: ' + JSON.stringify(f));
   const href = await pg.evaluate(() => { const a = document.querySelector('#foundry a'); return a && [a.href, a.target, a.rel]; });
-  ok(href && href[0] === 'https://github.com/JNFoo' && /noopener/.test(href[2]), 'the name links to https://github.com/JNFoo in a new tab, safely: ' + JSON.stringify(href));
+  ok(href && href[0] === 'https://github.com/lfcfoundry' && /noopener/.test(href[2]), 'the name links to https://github.com/lfcfoundry in a new tab, safely: ' + JSON.stringify(href));
   const ov = await pg.evaluate(() => document.documentElement.scrollHeight <= innerHeight + 1 && document.body.scrollHeight <= innerHeight + 1);
   ok(ov, 'the footer does not make the page scroll');
 

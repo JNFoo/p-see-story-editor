@@ -1825,7 +1825,7 @@ function init() {
     null,
     ...optionEntries(),
     null,
-    ['Forged by LFC Foundry • MIT Licensed', () => window.open('https://github.com/JNFoo', '_blank', 'noopener,noreferrer'), 'Opens LFC Foundry on GitHub in a new tab (needs the internet).']
+    ['Forged by LFC Foundry • MIT Licensed', () => window.open('https://github.com/lfcfoundry', '_blank', 'noopener,noreferrer'), 'Opens LFC Foundry on GitHub in a new tab (needs the internet).']
   ]);
 
   /* Top bar buttons */

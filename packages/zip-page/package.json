@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Shrinks one HTML page into a self-unzipping page; includes a small pure-JavaScript inflate fallback. Zero dependencies.",
   "license": "MIT",
-  "author": "JNFoo",
+  "author": "LFC Foundry",
   "type": "module",
   "main": "dist/zip-page.mjs",
   "module": "dist/zip-page.mjs",
@@ -33,10 +33,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/JNFoo/p-see-story-editor.git",
+    "url": "https://github.com/lfcfoundry/p-see-story-editor.git",
     "directory": "packages/zip-page"
   },
-  "homepage": "https://github.com/JNFoo/p-see-story-editor/tree/main/packages/zip-page",
+  "homepage": "https://github.com/lfcfoundry/p-see-story-editor/tree/main/packages/zip-page",
   "keywords": [
     "single-file",
     "compression",

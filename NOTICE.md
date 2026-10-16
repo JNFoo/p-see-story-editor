@@ -1,6 +1,6 @@
 # Notices
 
-**Story Editor and the packages in this repository**: Copyright (c) 2026 LFC Foundry, MIT License (see [LICENSE](LICENSE)). The software is forged by LFC Foundry (https://github.com/JNFoo).
+**Story Editor and the packages in this repository**: Copyright (c) 2026 LFC Foundry, MIT License (see [LICENSE](LICENSE)). The software is forged by LFC Foundry (https://github.com/lfcfoundry).
 
 **Branding notice.** While the code is open under the MIT License, the name "LFC Foundry" and associated project identities are reserved. If you fork, significantly modify, or commercially redistribute this software, you must change the external public product name and branding.
 

@@ -951,7 +951,7 @@ function foundryHeader(name, note) {
   return `<!--
     ===================================================================================
     🛠️ APPLICATION : ${nm}
-    🏭 FORGED BY : LFC Foundry (https://github.com/JNFoo)
+    🏭 FORGED BY : LFC Foundry (https://github.com/lfcfoundry)
     📜 LICENSE : MIT License
     ===================================================================================
     Copyright (c) 2026 LFC Foundry

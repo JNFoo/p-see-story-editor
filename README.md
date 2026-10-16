@@ -82,7 +82,7 @@ editor does (roughly Chrome/Edge 80, Firefox 74, iOS 13.4 for games; Chrome/Edge
 
 The Inter Tight typeface is used under the SIL Open Font License (it is not covered by the MIT License; see NOTICE.md).
 
-## More from JNFoo
+## More from LFC Foundry
 
 - [Apple Press](https://github.com/JNFoo/apple-press): a clicker game for kids ([play](https://jnfoo.github.io/apple-press/))
 - [Fancy, the Banana](https://github.com/JNFoo/fancy-banana): a one-tap flying-banana arcade game ([play](https://jnfoo.github.io/fancy-banana/))

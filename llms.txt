@@ -23,4 +23,4 @@ The editor: https://lfcfoundry.github.io/story-editor/ (also `index.html` in thi
 
 ## Related
 - [JS-modules](https://github.com/lfcfoundry/JS-modules): small pieces for single-file browser games (https://lfcfoundry.github.io/JS-modules/)
-- [Apple Press](https://github.com/JNFoo/apple-press), [Fancy, the Banana](https://github.com/JNFoo/fancy-banana), [Pineapple Defense](https://github.com/JNFoo/pineapple-defense): the games.
+- [Apple Press](https://github.com/JNFoo/apple-press), [Fancy, the Banana](https://github.com/lfcfoundry/fancy-banana), [Pineapple Defense](https://github.com/JNFoo/pineapple-defense): the games.

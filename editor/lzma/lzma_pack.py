@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Copied from https://github.com/JNFoo/JS-modules (tools/lzma-pack, commit d750784); the only change is the DECODER path below.
-lzma-pack: turn one HTML file into a smaller self-unpacking HTML file.  MIT License, Copyright (c) 2026 LFC Foundry. https://github.com/JNFoo/JS-modules
+"""Copied from https://github.com/lfcfoundry/JS-modules (tools/lzma-pack, commit d750784); the only change is the DECODER path below.
+lzma-pack: turn one HTML file into a smaller self-unpacking HTML file.  MIT License, Copyright (c) 2026 LFC Foundry. https://github.com/lfcfoundry/JS-modules
 
   python3 tools/pack.py INPUT.html OUTPUT.html [--title T] [--head HTML] [--encoding bytes|base64] [--tune] [--minifier auto|terser|esbuild|none]
 

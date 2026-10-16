@@ -215,7 +215,7 @@ artifact = FOUNDRY + "\n<title>Story Editor</title>\n" + STYLE + BODY + "\n" + D
 # ---- the editor as delivered is a PACKED page: the plain page above, compressed with LZMA (much tighter than zip; it costs build time, a few
 #      seconds) inside a tiny page that unpacks itself when opened and checks a hash of the result first. The compressed bytes are stored as
 #      base64 text, which works from a file and from any web server (the smaller "raw bytes" form fails on a server that sends a UTF-8 header,
-#      such as GitHub Pages). The packer and the decoder in lzma/ are copied from https://github.com/JNFoo/JS-modules (tools/lzma-pack).
+#      such as GitHub Pages). The packer and the decoder in lzma/ are copied from https://github.com/lfcfoundry/JS-modules (tools/lzma-pack).
 #      story-editor.plain.html keeps the plain page: size budgets and the tests that read the text use it. Exported games are still zipped by
 #      the Export button (core.js), because the browser can zip but has no LZMA compressor.
 open(HERE + "story-editor.plain.html", "w", encoding="utf8").write(standalone)

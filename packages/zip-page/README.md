@@ -33,7 +33,7 @@ Types: [index.d.ts](index.d.ts).
 
 ## How it differs from what exists
 
-This repository's sibling [JS-modules](https://github.com/JNFoo/JS-modules) already has the Zopfli packer in its `tools/single-file-tools` folder (Zopfli, Python) and `tools/lzma-pack` (LZMA, a smaller result with a bigger decoder). Use those for the very smallest files. `zip-page` is the Node/JavaScript route with **no install** and adds the readable inflater for browsers without `DecompressionStream` (browsers from before about 2023).
+This repository's sibling [JS-modules](https://github.com/lfcfoundry/JS-modules) already has the Zopfli packer in its `tools/single-file-tools` folder (Zopfli, Python) and `tools/lzma-pack` (LZMA, a smaller result with a bigger decoder). Use those for the very smallest files. `zip-page` is the Node/JavaScript route with **no install** and adds the readable inflater for browsers without `DecompressionStream` (browsers from before about 2023).
 
 ## Limits
 

@@ -19,7 +19,7 @@ The expensive mistakes in AI-assisted building are not typos. They are a feature
 2. Copy the templates into your repository and edit them for your project.
 3. Paste the session brief at the start of every new AI session.
 
-Related, in this repository: the [editor's QA suites](../../editor/qa/README.md) and the [Firefox test shim](../qa-kit/README.md) are the working examples of the testing habits. In [JS-modules](https://github.com/JNFoo/JS-modules), `AGENTS.md` and `TASKS.md` show the same task-board idea used by several sessions at once.
+Related, in this repository: the [editor's QA suites](../../editor/qa/README.md) and the [Firefox test shim](../qa-kit/README.md) are the working examples of the testing habits. In [JS-modules](https://github.com/lfcfoundry/JS-modules), `AGENTS.md` and `TASKS.md` show the same task-board idea used by several sessions at once.
 
 ---
 Part of [p-see-story-editor](../../README.md) · MIT License · Copyright (c) 2026 LFC Foundry

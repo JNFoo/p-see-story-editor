@@ -25,7 +25,7 @@ cd editor/qa && FIREFOX_PATH=/path/to/firefox node qa.js quick     # browser sui
 ```
 
 ## Working with other sessions
-Several AI sessions and people may work on these repositories (see also [JS-modules](https://github.com/JNFoo/JS-modules), whose `TASKS.md` is a task board). Before you start, `git fetch`; rebase on the latest `main` before you push; never force-push; say in the commit message when you touch a file another session wrote.
+Several AI sessions and people may work on these repositories (see also [JS-modules](https://github.com/lfcfoundry/JS-modules), whose `TASKS.md` is a task board). Before you start, `git fetch`; rebase on the latest `main` before you push; never force-push; say in the commit message when you touch a file another session wrote.
 
 ## House-rule hooks
 

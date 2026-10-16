@@ -7,7 +7,7 @@ browser, online or off.
 `build.py` puts the parts below together into **`story-editor.html`**. That file is *packed*: the whole editor is stored
 compressed with LZMA (as base64 text) inside a tiny page that unpacks itself when it is opened and checks a hash of the result first, so it
 is under half the size on disk (224 KB for a 536 KB editor) and works from a file or any web server. The packer and decoder in `lzma/`
-are copied from [JS-modules](https://github.com/JNFoo/JS-modules) (`tools/lzma-pack`, `modules/lzma-decode`). Two companions are written beside it: `story-editor.plain.html` (the same editor, readable; the size budgets and
+are copied from [JS-modules](https://github.com/lfcfoundry/JS-modules) (`tools/lzma-pack`, `modules/lzma-decode`). Two companions are written beside it: `story-editor.plain.html` (the same editor, readable; the size budgets and
 the checks that read the text use it) and `story-editor.artifact.html` (the same page without its `<html>`/`<head>`, for hosts that
 wrap it). Edit the parts, never the built files.
 

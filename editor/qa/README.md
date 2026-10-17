@@ -68,6 +68,7 @@ What the adapter does, and what WebKitGTK 2.52.6 cannot do (each is checked for 
 - **No `navigator.storage` and no `CloseWatcher`:** `safety.js` adds a stand-in for the first and also checks the real "cannot say" path (section 1b); `gamefeel.js` expects Esc not to go Back there.
 - A held key does not reach the driver's wheel action, so Ctrl+wheel is sent as a script event; a right or middle click makes the driver type small letters, so capitals are sent with an explicit Shift.
 - `twowin` (two real windows) is run alone at the end of the lane (`SOLO`), because several suites opening windows at once made a new window hang.
+- **GNOME Web (Epiphany) 46.5:** `WEBKIT=epiphany node <suite> webkit` runs one suite in it instead of the plain WebKitGTK window (the driver starts Epiphany in automation mode). Only the `csp` check has been run there so far (2026-10-17); it refuses driver clicks, so suites that click need webkit-driver 1.2.0 from JS-modules, which is not copied here yet.
 - `WK_TRACE=1 node <suite> webkit` prints each call and each window command with its time, which is how the hangs were found. If a run is killed, stray `Xvfb` and `WebKitWebDriver` processes may stay: end them with `pkill -x Xvfb; pkill -x WebKitWebDriver` (not `pkill -f`).
 
 Notes on the shim: it answers a selector like `text=Back` or `button:has-text("Play")` in the page itself (`bidi-engine.js`), waits for a page's own timers

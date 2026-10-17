@@ -1,6 +1,6 @@
 /* The editor's own page policy (the Content-Security-Policy meta tag build.py writes): no network, no 'unsafe-eval', and WebAssembly allowed ('wasm-unsafe-eval' in
    script-src, the owner's rule of 2026-10-17). Checks the text of the tag, then asks the browser: a tiny WebAssembly module compiles in a script of the page (it is refused without the token).
-   Usage: node csp.js [chromium|firefox|webkit]   Copyright (c) 2026 LFC Foundry. MIT License. */
+   Usage: node csp.js [chromium|firefox|webkit]   (WEBKIT=epiphany node csp.js webkit  runs it in GNOME Web)   Copyright (c) 2026 LFC Foundry. MIT License. */
 const which = process.argv[2] || 'firefox'; const B = require('./engine').pick(which);
 const fs = require('fs'), path = require('path');
 const EDITOR_FILE = process.env.QA_EDITOR || path.join(__dirname, '..', 'story-editor.html');
@@ -43,7 +43,7 @@ let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); 
   ok(!!gm && gm[1] === policy, 'an exported game carries the same policy as the editor page, token included');
   const GAME_FILE = path.join(__dirname, 'work', 'csp-game.html');
   fs.writeFileSync(GAME_FILE, game);
-  const gp = await ctx.newPage(); gp.on('pageerror', e => errs.push('GAME ' + e.message));
+  const gp = pg; /* the same window: one window is all this needs, which GNOME Web (WEBKIT=epiphany) handles best */
   await gp.goto(require('url').pathToFileURL(GAME_FILE).href); await gp.waitForTimeout(500);
   await gp.evaluate(() => {
     const s = document.createElement('script');

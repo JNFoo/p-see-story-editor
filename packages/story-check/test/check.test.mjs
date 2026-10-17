@@ -69,3 +69,42 @@ test('bigger stories (many objects and states, wide numbers) also match', () => 
     }
   }
 });
+
+test('a key behind a one-way door is noted, and a story where the key can be fetched is not', () => {
+  const build = oneWay => {
+    const s = makeProject('Door');
+    const start = s.passages[0];
+    start.blocks[0].text = 'Start.';
+    const key = makeItem('Key', 'object');
+    s.items.push(key);
+    const take = makeChoice('Take the key', '');
+    take.gives = [key.id];
+    const skip = makeChoice('Skip it', '');
+    const hall = makePassage('Hall');
+    hall.blocks[0].text = 'A hall.';
+    const end = makePassage('Vault');
+    end.ending = true;
+    end.blocks[0].text = 'Done.';
+    take.to = hall.id;
+    skip.to = hall.id;
+    start.choices.push(take, skip);
+    const open = makeChoice('Open the door', end.id);
+    open.needs = [key.id];
+    hall.choices.push(open);
+    if (!oneWay) hall.choices.push(makeChoice('Go back', start.id));
+    s.passages.push(hall, end);
+    return normalizeProject(s);
+  };
+  const note = r => r.notes.filter(n => /miss this choice for good/.test(n.msg));
+  assert.equal(note(analyze(build(true))).length, 1);
+  assert.equal(note(analyze(build(false))).length, 0);
+});
+
+test('the minified builds give the same answers as the readable ones', async () => {
+  const min = await import('../dist/story-check.min.mjs');
+  assert.deepEqual(Object.keys(min).sort(), Object.keys(await import('../dist/story-check.mjs')).sort());
+  for (let seed = 1; seed <= 20; seed++) {
+    const p = genStory(seed);
+    assert.equal(flat(p, min.analyze(p)), flat(p, analyze(p)), `seed ${seed}`);
+  }
+});

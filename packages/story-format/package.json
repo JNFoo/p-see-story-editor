@@ -8,14 +8,15 @@
   "main": "dist/story-format.mjs",
   "module": "dist/story-format.mjs",
   "types": "index.d.ts",
-  "unpkg": "dist/story-format.global.js",
-  "jsdelivr": "dist/story-format.global.js",
+  "unpkg": "dist/story-format.min.global.js",
+  "jsdelivr": "dist/story-format.min.global.js",
   "exports": {
     ".": {
       "types": "./index.d.ts",
       "import": "./dist/story-format.mjs"
     },
     "./global": "./dist/story-format.global.js",
+    "./min": "./dist/story-format.min.mjs",
     "./package.json": "./package.json",
     "./schema": "./story.schema.json"
   },

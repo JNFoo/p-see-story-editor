@@ -8,14 +8,15 @@
   "main": "dist/story-map.mjs",
   "module": "dist/story-map.mjs",
   "types": "index.d.ts",
-  "unpkg": "dist/story-map.global.js",
-  "jsdelivr": "dist/story-map.global.js",
+  "unpkg": "dist/story-map.min.global.js",
+  "jsdelivr": "dist/story-map.min.global.js",
   "exports": {
     ".": {
       "types": "./index.d.ts",
       "import": "./dist/story-map.mjs"
     },
     "./global": "./dist/story-map.global.js",
+    "./min": "./dist/story-map.min.mjs",
     "./package.json": "./package.json"
   },
   "files": [

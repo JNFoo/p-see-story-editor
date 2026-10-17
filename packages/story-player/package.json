@@ -8,14 +8,15 @@
   "main": "dist/story-player.mjs",
   "module": "dist/story-player.mjs",
   "types": "index.d.ts",
-  "unpkg": "dist/story-player.global.js",
-  "jsdelivr": "dist/story-player.global.js",
+  "unpkg": "dist/story-player.min.global.js",
+  "jsdelivr": "dist/story-player.min.global.js",
   "exports": {
     ".": {
       "types": "./index.d.ts",
       "import": "./dist/story-player.mjs"
     },
     "./global": "./dist/story-player.global.js",
+    "./min": "./dist/story-player.min.mjs",
     "./package.json": "./package.json"
   },
   "files": [

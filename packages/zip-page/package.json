@@ -8,14 +8,15 @@
   "main": "dist/zip-page.mjs",
   "module": "dist/zip-page.mjs",
   "types": "index.d.ts",
-  "unpkg": "dist/zip-page.global.js",
-  "jsdelivr": "dist/zip-page.global.js",
+  "unpkg": "dist/zip-page.min.global.js",
+  "jsdelivr": "dist/zip-page.min.global.js",
   "exports": {
     ".": {
       "types": "./index.d.ts",
       "import": "./dist/zip-page.mjs"
     },
     "./global": "./dist/zip-page.global.js",
+    "./min": "./dist/zip-page.min.mjs",
     "./package.json": "./package.json"
   },
   "files": [

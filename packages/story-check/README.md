@@ -10,7 +10,7 @@ Zero dependencies. One file. Runs in Node 18+ and in browsers. It is the checker
 
 ## Install
 
-Nothing to install. Copy one file from this folder: `dist/story-check.mjs` (ES module) or `dist/story-check.global.js` (a plain `<script>`, defines `StoryCheck`). Or load it straight from GitHub:
+Nothing to install. Copy one file from this folder: `dist/story-check.mjs` (ES module) or `dist/story-check.global.js` (a plain `<script>`, defines `StoryCheck`). For a smaller download use `dist/story-check.min.mjs` or `dist/story-check.min.global.js`: the same code with the names shortened (about 40% smaller; gzipped about 20% smaller). Or load it straight from GitHub:
 
 ```js
 import { analyze } from 'https://cdn.jsdelivr.net/gh/lfcfoundry/story-editor@main/packages/story-check/dist/story-check.mjs';

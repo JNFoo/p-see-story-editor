@@ -297,7 +297,7 @@ var StoryMap = (() => {
   var STORY_VERSION = 1;
   var MIGRATIONS = {};
   var startFixNote = "";
-  function normalizeProject(raw) {
+  function normalizeProject(raw, opt) {
     if (!raw || typeof raw !== "object" || !Array.isArray(raw.passages)) {
       throw new Error("This file is not a story backup.");
     }
@@ -307,10 +307,13 @@ var StoryMap = (() => {
     const taken = /* @__PURE__ */ Object.create(null);
     const itemMap = /* @__PURE__ */ Object.create(null);
     const passMap = /* @__PURE__ */ Object.create(null);
+    const seq = /* @__PURE__ */ Object.create(null);
+    const fresh = (prefix) => opt && opt.ids === "sequential" ? prefix + (seq[prefix] = (seq[prefix] || 0) + 1) : uid(prefix);
+    const newId = /* @__PURE__ */ new Map();
     function cleanId(found, prefix, map) {
       let id = String(found === void 0 || found === null ? "" : found);
-      if (!/^[A-Za-z0-9_\-]{1,64}$/.test(id) || RESERVED_IDS.includes(id) || taken[id]) id = uid(prefix);
-      while (taken[id]) id = uid(prefix);
+      if (!/^[A-Za-z0-9_\-]{1,64}$/.test(id) || RESERVED_IDS.includes(id) || taken[id]) id = fresh(prefix);
+      while (taken[id]) id = fresh(prefix);
       taken[id] = true;
       if (map && found !== void 0 && found !== null && map[String(found)] === void 0) map[String(found)] = id;
       return id;
@@ -318,7 +321,7 @@ var StoryMap = (() => {
     const p = {
       format: "story-editor",
       version: STORY_VERSION,
-      id: String(raw.id || uid("s_")).slice(0, 64),
+      id: String(raw.id || fresh("s_")).slice(0, 64),
       title: String(raw.title || "Untitled story"),
       author: String(raw.author || ""),
       start: "",
@@ -373,7 +376,7 @@ var StoryMap = (() => {
     });
     const rawPages = raw.passages.filter((q) => q && typeof q === "object");
     rawPages.forEach((q) => {
-      if (q) q._newId = cleanId(q.id, "p_", passMap);
+      if (q) newId.set(q, cleanId(q.id, "p_", passMap));
     });
     function item(id) {
       return itemMap[String(id)];
@@ -426,7 +429,7 @@ var StoryMap = (() => {
         });
       }
       p.passages.push({
-        id: q._newId,
+        id: newId.get(q),
         name: String(q.name || "Untitled page"),
         heading: String(q.heading || ""),
         ending: !!q.ending,
@@ -458,7 +461,11 @@ var StoryMap = (() => {
         })
       });
     });
-    if (!p.passages.length) p.passages.push(makePassage("The beginning"));
+    if (!p.passages.length) {
+      const first = makePassage("The beginning");
+      first.id = cleanId("", "p_");
+      p.passages.push(first);
+    }
     p.start = passMap[String(raw.start)] || p.passages[0].id;
     startFixNote = "";
     const sp0 = p.passages.find((q) => q.id === p.start);
@@ -475,6 +482,7 @@ var StoryMap = (() => {
     if (typeof raw.lang0c === "string" && LANG_CODE.test(raw.lang0c.trim()) && raw.lang0c.trim().toLowerCase() !== "en") p.lang0c = raw.lang0c.trim();
     pruneVirtual(p);
     if (fileVersion > STORY_VERSION && !startFixNote) startFixNote = `This story was saved by a newer version of the editor (file format ${fileVersion}; this editor reads format ${STORY_VERSION}). It opened, but anything this editor does not know about was left out. Do not save over the original file.`;
+    if (opt && Array.isArray(opt.notes) && startFixNote) opt.notes.push(startFixNote);
     return p;
   }
   var LANG_MAX = 12;

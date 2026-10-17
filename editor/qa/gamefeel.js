@@ -43,7 +43,8 @@ let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); 
   /* ---- 2. back swipe (CloseWatcher; Esc is a close request too) ---- */
   t = await open(); pg = t.pg;
   const hasCW = await pg.evaluate(() => typeof window.CloseWatcher === 'function');
-  ok(hasCW, 'this browser has CloseWatcher');
+  /* WebKitGTK 2.52.6 has no CloseWatcher; the game uses it only where it exists, so there Esc must leave the page alone (checked below) */
+  ok(hasCW || which === 'webkit', 'this browser has CloseWatcher' + (hasCW ? '' : ' (WebKit: it has not, so Esc does not go Back)'));
   const p1 = await head(pg);
   await pg.keyboard.press('Escape'); await settle(pg);
   ok(await head(pg) === p1, 'on the first page a close request changes nothing (nothing to go back to)');
@@ -56,9 +57,9 @@ let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); 
   await pg.keyboard.press('Escape'); await settle(pg);
   ok(await pg.locator('.kl-aa[open]').count() === 0 && await head(pg) === p2, 'Esc closed only the Aa panel: still on the second page');
   await pg.keyboard.press('Escape'); await settle(pg);
-  ok(await head(pg) === p1, 'a close request (Esc / back swipe) went Back to the first page');
+  ok(await head(pg) === (hasCW ? p1 : p2), hasCW ? 'a close request (Esc / back swipe) went Back to the first page' : 'without CloseWatcher, Esc does not go Back (still on the second page)');
   await pg.keyboard.press('Escape'); await settle(pg);
-  ok(await head(pg) === p1 && errs.length === 0, 'and on the first page it changes nothing again');
+  ok(await head(pg) === (hasCW ? p1 : p2) && errs.length === 0, hasCW ? 'and on the first page it changes nothing again' : 'and a second Esc changes nothing either');
   await t.ctx.close();
 
   /* ---- 3. contrast follows the system until the reader chooses ---- */

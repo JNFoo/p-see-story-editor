@@ -6,6 +6,11 @@ Two small things the story editor's own test suites are built on, cut out so oth
    keeps one log per suite, and ends with a one-paragraph summary.
 2. **A Playwright-style call surface over Puppeteer's WebDriver BiDi** (`src/bidi.js`), so a suite written for Playwright runs on **stock Firefox**.
 
+A third part (added in 0.2.0): **`src/webkit.js`**, the same call surface over **WebKitGTK**, so the same suites also run in WebKit. It uses `src/webkit-driver.js`, a copy of
+JS-modules `tools/webkit-driver` 1.1.0 (W3C WebDriver to `WebKitWebDriver`, run under `xvfb-run` and `dbus-run-session`; Linux only). `require('qa-kit/src/webkit.js').webkit.launch()`
+gives the same `newContext` / `newPage` calls as `bidi.js`; `.version()` says which WebKitGTK is installed. What it cannot do in WebKitGTK 2.52.6 (no touch events, no `navigator.storage`,
+no `CloseWatcher`, a 447 px smallest window, one browser per context) is listed in [editor/qa/README.md](../../editor/qa/README.md).
+
 Both are plain CommonJS, a few hundred lines, no build step. MIT license.
 
 ## What the Firefox part is, and is not

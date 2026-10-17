@@ -2,6 +2,11 @@
 
 What changed in each version, newest first, in plain words. Each entry says what is new or how much better it got, with numbers where there are numbers. Figures not measured say "about" or "not measured".
 
+## 0.2.0 · 2026-10-17
+**New:** the same Playwright-style calls now also drive **WebKitGTK** (`src/webkit.js`, 310 lines, plus `src/webkit-driver.js`, a 218-line copy of JS-modules `tools/webkit-driver` 1.1.0). The Story Editor's suites ran on it unchanged apart from four small edits: 34 suites, 107 of 108 full-tier jobs passed first time on Firefox, Chromium and WebKitGTK together (the other passed on its retry and was then fixed). Windows of one context share one WebKitGTK like tabs do; the pages load through a small local server that puts the selector engine and start-up scripts first in the page. `bidi.js` now loads Puppeteer only when Firefox is launched (so WebKit-only use needs neither Puppeteer nor a Firefox program) and passes a click to the driver when it has its own pointer. A new package test (`test/webkit.test.mjs`) is skipped unless `WebKitWebDriver`, `xvfb-run` and `dbus-run-session` are installed. Linux only. Not changed: the runner and the Firefox part behave as before.
+
+**Tested in:** WebKitGTK 2.52.6 (the package test and the editor's suites, full tier), Firefox 158.0b5 and ungoogled Chromium 155.0.8059.39-1 (the editor's suites). Node 22.22.0.
+
 ## 0.1.0 · 2026-10-12
 **New:** two small things cut out of the Story Editor's own test setup so other projects can use them (642 lines in all, no build step). (1) A test runner that runs your suites in three tiers, retries a failure once, keeps one log per suite and ends with a one-paragraph summary. (2) A Playwright-style call surface over Puppeteer's WebDriver BiDi, so a test written for Playwright (`page.click('text=Save')` and similar) runs unchanged on stock Firefox, not only on Playwright's patched build. Also a seeded generator of random stories that use every feature of the story format, and a loader that runs the editor's sources without a browser. The same day, an audit of the editor's own test suites, which run on this kit, took the full check from 677 s to 331 s and the quick check from 149 s to about 100 s (measured then; several changes together, listed in the main changelog, so not all of it is the runner).
 

@@ -80,7 +80,7 @@ ok((await pg.$$('.mapbox g.node.hit')).length>=5,'map search highlights matching
 await pg.click('#help');ok(await pg.isVisible('.dlg.guide'),'quick guide opens');await pg.keyboard.press('Escape');
 // export and play offline
 await pg.click('#export');await pg.click('#export');          // a double click
-await pg.waitForTimeout(150);
+await pg.waitForFunction(()=>window.__pickerOpen===1);await pg.waitForTimeout(150);   // the Save window is open, then a short look for anything that should not happen
 ok(await pg.evaluate(()=>window.__saves.length===0 && ![...document.querySelectorAll('#toast:not([hidden]) .toastbtn')].some(b=>b.textContent.trim()!=='Redo')),'export writes nothing (and says nothing) while the Save window is open');
 await pg.waitForTimeout(700);
 ok(await pg.evaluate(()=>window.__saves.length===1 && window.__pickerOpen===1),'export saves exactly once, after the choice, even after a double click');

@@ -75,7 +75,7 @@ body.splashing #brandlogo{opacity:0}
 #title{flex:1 1 200px;min-width:0;text-overflow:ellipsis;font:650 1.05rem var(--sans);border:1px solid transparent;background:transparent;padding:6px 8px}
 #title:hover,#title:focus{border-color:var(--line);background:var(--field)}
 #tabrow{display:flex;align-items:center;background:var(--paper);border-bottom:1px solid var(--line);min-width:0}
-#tabs{display:flex;gap:2px;align-items:center;padding:0 16px;flex:1 1 auto;min-width:0;overflow-x:auto}
+#tabs{display:flex;gap:2px;align-items:center;padding:0 16px;flex:1 1 auto;min-width:0;overflow-x:auto;scrollbar-width:none}
 #statusline{display:flex;gap:6px;align-items:center;flex:0 0 auto;padding:0 16px 0 8px;font-size:.8rem;white-space:nowrap}
 .schip{display:inline-flex;gap:4px;align-items:center;border:1px solid var(--line);border-radius:99px;padding:2px 9px;background:var(--node);color:var(--muted);font:inherit}
 .schip.ok{color:var(--ok);border-color:var(--ok);background:var(--okbg)}.schip.bad{color:var(--signal);border-color:var(--signal);background:var(--signalbg)}.schip.warn{color:var(--warn);border-color:var(--warn);background:var(--warnbg)}.schip.btn{padding:2px 9px;border-radius:4px;color:var(--fg)}

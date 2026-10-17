@@ -69,7 +69,7 @@ const proj=pg=>pg.evaluate(()=>JSON.parse(JSON.stringify(window.__editor.project
 
 /* ---------- 2. find and replace in the editor ---------- */
 let pg=await open(storyA());
-await pg.click('#pages >> text=Find…').catch(async()=>{await pg.click('button:has-text("Find…")')});
+await pg.click('button:has-text("Find…")');
 await pg.waitForTimeout(200);
 ok(await pg.isVisible('dialog.finder'),'Find… opens the window');
 await pg.fill('dialog.finder input[aria-label="Find"]','red');await pg.waitForTimeout(200);

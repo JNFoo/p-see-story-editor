@@ -318,9 +318,17 @@ if (process.env.PROFILE) {
     Page.prototype[name] = function (...a) {
       const t = Date.now(); const r = f.apply(this, a);
       if (!r || !r.then) return r;
-      return r.finally(() => { const k = (T[name] = T[name] || { n: 0, ms: 0 }); k.n++; k.ms += Date.now() - t; });
+      return r.finally(() => {
+        const ms = Date.now() - t, k = (T[name] = T[name] || { n: 0, ms: 0 }); k.n++; k.ms += ms;
+        if (ms >= 500) SLOW.push({ ms, what: `${name}(${typeof a[0] === 'string' ? JSON.stringify(a[0].slice(0, 70)) : ''})`, at: ((new Error().stack.split('\n').find(l => /\/qa\/[^/]+\.js/.test(l)) || '').match(/\/qa\/([^/]+\.js:\d+)/) || [])[1] || '' });
+      });
     };
   }
+  const SLOW = [];
   const t0 = Date.now();
-  process.on('exit', () => process.stderr.write(`PROFILE total ${Date.now() - t0} ms :: ` + Object.entries(T).sort((a, b) => b[1].ms - a[1].ms).slice(0, 7).map(([k, v]) => `${k} ${v.n}x ${v.ms}ms`).join(' | ') + '\n'));
+  process.on('exit', () => {
+    process.stderr.write(`PROFILE total ${Date.now() - t0} ms :: ` + Object.entries(T).sort((a, b) => b[1].ms - a[1].ms).slice(0, 7).map(([k, v]) => `${k} ${v.n}x ${v.ms}ms`).join(' | ') + '\n');
+    /* the single calls that took half a second or more, slowest first: a sleep, or a wait that ran into its timeout, shows up here with the line that made it */
+    SLOW.sort((x, y) => y.ms - x.ms).slice(0, 8).forEach(c => process.stderr.write(`  slow call ${String(c.ms).padStart(6)} ms  ${c.what}  ${c.at}\n`));
+  });
 }

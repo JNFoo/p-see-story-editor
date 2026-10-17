@@ -39,6 +39,6 @@ const chromium = {
     return b;
   }
 };
-exports.pick = which => (which === 'firefox' ? require('../../packages/qa-kit/src/bidi.js').firefox : chromium);
+exports.pick = which => (which === 'firefox' ? require('../../packages/qa-kit/src/bidi.js').firefox : which === 'webkit' ? require('../../packages/qa-kit/src/webkit.js').webkit : chromium);
 exports.devices = pw.devices;
 exports.chromiumPath = () => CHROMIUM_PATH || pw.chromium.executablePath();

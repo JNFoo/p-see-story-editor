@@ -29,7 +29,10 @@ const SETTINGS = JSON.stringify({ chosen: true, remember: true, advanced: { writ
   const toastText = pg => pg.evaluate(() => document.getElementById('toast').innerText.replace(/\s+/g, ' '));
 
   /* ---- 1. the panel on a story never saved to a file ---- */
-  let pg = await open(sample, { script: "navigator.storage.persisted = async () => false; navigator.storage.persist = async () => true;" });
+  /* WebKitGTK 2.52.6 has no navigator.storage at all. There the answers below come from a stand-in (the panel's own wording is what is checked), and the real
+     "browser cannot say" path is checked on its own right after (section 1b). */
+  const stand = which === 'webkit' ? "if (!navigator.storage) Object.defineProperty(navigator, 'storage', { configurable: true, value: { estimate: async () => ({ usage: 51200, quota: 1073741824 }) } }); " : '';
+  let pg = await open(sample, { script: stand + "navigator.storage.persisted = async () => false; navigator.storage.persist = async () => true;" });
   await openSafety(pg);
   let t = await dlg(pg);
   ok(/Safety/.test(t) && /autosaved here after every change/.test(t), 'the box opens and says the browser autosaves: ' + t.slice(0, 80));
@@ -63,6 +66,16 @@ const SETTINGS = JSON.stringify({ chosen: true, remember: true, advanced: { writ
   ok(kept[0] === 2 && !!kept[1], 'the autosave keeps revision 2 and its time across a reload: ' + kept.slice(0, 2));
   if (kept[0] !== 2) console.log('DEBUG', JSON.stringify(kept));
   await pg.context().close();
+
+  /* ---- 1b. a browser with no storage API at all (WebKitGTK 2.52.6): the box must say it cannot tell, not hang on "checking…" ---- */
+  if (which === 'webkit') {
+    pg = await open(sample);
+    ok(await pg.evaluate(() => typeof navigator.storage === 'undefined'), 'this browser really has no navigator.storage');
+    await openSafety(pg); t = await dlg(pg);
+    ok(/cannot say/.test(t) && !/checking…/.test(t), 'with no storage API the box says the browser cannot say, and nothing is left on "checking…": ' + t.slice(-170));
+    ok(await pg.locator('dialog.dlg button:has-text("Ask the browser")').count() === 0 || !(await pg.locator('dialog.dlg button:has-text("Ask the browser")').isVisible()), 'and offers no "Ask the browser" button that could not work');
+    await pg.context().close();
+  }
 
   /* ---- 2. a save that is only a download also stamps the revision ---- */
   pg = await open(sample);

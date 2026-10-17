@@ -19,9 +19,7 @@
    do not use that wait.
    --------------------------------------------------------------------------- */
 /* Puppeteer is found the normal way (npm i puppeteer; NODE_PATH works), else in QA_NODE_MODULES (see resolve.cjs). The Firefox program comes from FIREFOX_PATH (or FIREFOX_158). */
-const puppeteer = require('./resolve.cjs').load('puppeteer');
-const FIREFOX = process.env.FIREFOX_PATH || process.env.FIREFOX_158;
-if (!FIREFOX) throw new Error('Set FIREFOX_PATH to the Firefox program (stock Firefox 129 or newer speaks WebDriver BiDi), e.g. FIREFOX_PATH=/usr/bin/firefox');
+/* (loaded when Firefox is launched, so webkit.js can reuse the classes below without Puppeteer or a Firefox program) */
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 /* The selector engine, injected into every page (one call finds, filters and counts). Plain JavaScript in its own file. */
@@ -202,7 +200,7 @@ class Page {
     for (let i = 0; i < (o.clickCount || 1); i++) acts.push({ type: 'pointerDown', button }, { type: 'pointerUp', button });
     const mods = (o.modifiers || []).map(m => (m === 'Shift' ? 'Shift' : m === 'Control' ? 'Control' : m === 'Alt' ? 'Alt' : m));
     for (const m of mods) await this.pp.keyboard.down(m);
-    try { await this.pp.mainFrame().browsingContext.performActions([{ type: 'pointer', id: 'mouse', parameters: { pointerType: 'mouse' }, actions: acts }]); }
+    try { await (this.pp.pointer ? this.pp.pointer(acts) : this.pp.mainFrame().browsingContext.performActions([{ type: 'pointer', id: 'mouse', parameters: { pointerType: 'mouse' }, actions: acts }])); }
     finally { for (const m of mods.reverse()) await this.pp.keyboard.up(m); }
   }
   async dblclick(sel, o) { return this.click(sel, { ...o, clickCount: 2 }); }
@@ -304,10 +302,16 @@ class Browser {
 
 exports.firefox = {
   async launch(o = {}) {
+    const puppeteer = require('./resolve.cjs').load('puppeteer');
+    const FIREFOX = process.env.FIREFOX_PATH || process.env.FIREFOX_158;
+    if (!FIREFOX) throw new Error('Set FIREFOX_PATH to the Firefox program (stock Firefox 129 or newer speaks WebDriver BiDi), e.g. FIREFOX_PATH=/usr/bin/firefox');
     const b = await puppeteer.launch({ browser: 'firefox', executablePath: FIREFOX, headless: o.headless !== false, args: [], extraPrefsFirefox: { ...JSON.parse(process.env.QA_FIREFOX_PREFS || '{}'), ...(o.prefs || {}) } });
     return new Browser(b);
   }
 };
+
+/* for webkit.js, which drives WebKitGTK through the same call surface */
+exports.Page = Page; exports.Context = Context; exports.Browser = Browser; exports.ENGINE = ENGINE; exports.initSource = initSource;
 
 /* PROFILE=1 node suite.js firefox  ->  at exit, where the time went (per kind of call), to find what to trim */
 if (process.env.PROFILE) {

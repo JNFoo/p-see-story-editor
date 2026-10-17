@@ -11,6 +11,9 @@ node qa.js full      about 5.5 minutes  the check before a file is delivered: ev
 node qa.js full --only lite     only suites with "lite" in the name        --verbose  also print each suite's own output
 node qa.js full --reset-counts  accept a smaller number of checks on purpose (see "lost checks" below)
 node qa.js sample    about 1 minute  a cheap look between edits: the contract test, a rotating quarter of the quick suites and any suite whose files changed
+node qa.js quick --webkit      add WebKitGTK as the third browser (Firefox first, then WebKitGTK; the full tier does this by itself)
+node qa.js full --no-webkit    the full tier on Firefox and Chromium only
+node qa.js quick --webkit-only run only the WebKitGTK lane (nothing is written to .stamp or counts.json)
 node qa.js quick --against <rev> [--expect-fail]   run against the editor as built from an older git revision (see below)
 node qa.js --history  how each suite has done over the recorded runs
 ```
@@ -51,11 +54,27 @@ node qa.js quick
 Line 1 of every run prints the real browser versions (`browsers: Firefox = Mozilla Firefox 158.0b5 (...); Chromium = 155.0.8059.39 (...)`),
 so a result is never filed under the wrong version. In the full tier all Firefox suites run first and then all Chromium suites, one browser at a time.
 
+### WebKitGTK, the third browser (added 2026-10-17)
+
+`../../packages/qa-kit/src/webkit.js` gives the suites the same Playwright-style calls on top of WebKitGTK, through `webkit-driver.js` (a copy of JS-modules
+`tools/webkit-driver` 1.1.0; it talks W3C WebDriver to `WebKitWebDriver` under `xvfb-run`). The full tier runs it after Firefox and Chromium; `--webkit` adds it to any tier. Browsers run
+one at a time. Line 1 of a run prints its real version (`WebKitGTK = WebKitGTK 2.52.6`), read from the installed package. It needs `WebKitWebDriver`, `xvfb-run` and `dbus-run-session`.
+
+What the adapter does, and what WebKitGTK 2.52.6 cannot do (each is checked for honestly in the suite, not skipped quietly):
+- Every page loads through a small local server that puts the error hook, the selector engine and the suite's start-up scripts first in the page. `file://` and `http://127.0.0.1:<port>` addresses both work.
+- **Windows:** the pages of one browser context are windows of one WebKitGTK, so they share storage like two real tabs. When the last page of a context closes, that WebKitGTK ends and the next page starts a fresh one with empty storage.
+- **Smallest window is 447 px wide.** A suite that asks for 390 px gets 447 and prints a `NOTE WebKitGTK window is 447x844, not the 390x844 asked for` line; `write1.js` compares against the real width.
+- **No touch events**, so `touch1` is not run there. `ffsmoke` (it checks the Firefox stand-in itself) is not run there either (`NOT_IN_WEBKIT` in `qa.js`).
+- **No `navigator.storage` and no `CloseWatcher`:** `safety.js` adds a stand-in for the first and also checks the real "cannot say" path (section 1b); `gamefeel.js` expects Esc not to go Back there.
+- A held key does not reach the driver's wheel action, so Ctrl+wheel is sent as a script event; a right or middle click makes the driver type small letters, so capitals are sent with an explicit Shift.
+- `twowin` (two real windows) is run alone at the end of the lane (`SOLO`), because several suites opening windows at once made a new window hang.
+- `WK_TRACE=1 node <suite> webkit` prints each call and each window command with its time, which is how the hangs were found. If a run is killed, stray `Xvfb` and `WebKitWebDriver` processes may stay: end them with `pkill -x Xvfb; pkill -x WebKitWebDriver` (not `pkill -f`).
+
 Notes on the shim: it answers a selector like `text=Back` or `button:has-text("Play")` in the page itself (`bidi-engine.js`), waits for a page's own timers
 instead of guessing (`settle`/`idle`), and fakes drag-and-drop by sending the same events (it tests the editor's handlers, not a native drag;
 Chromium does the native one). `PROFILE=1 node <suite> firefox` prints where a suite's time went and the eight slowest single calls (`slow call 30012 ms  click(...)  tools8.js:72`); a call over 500 ms is worth a look, and a repeat of a round number such as 30 000 ms is a wait that ran out; screenshots are off unless `SHOTS=1`.
 
-## The suites (`*.js`; each takes `firefox` or `chromium`)
+## The suites (`*.js`; each takes `firefox`, `chromium` or `webkit`)
 
 | Suite | What it covers |
 |---|---|

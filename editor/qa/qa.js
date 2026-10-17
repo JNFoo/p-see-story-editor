@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 /* ---------------------------------------------------------------------------
-   qa.js - runs the Story Editor's checks. Firefox is the main browser; Chromium runs only in the full tier.
+   qa.js - runs the Story Editor's checks. Firefox is the main browser; Chromium and WebKitGTK run in the full tier (one browser at a time).
 
      node qa.js quick     the fast suites that catch most breakage (about 1 minute)
      node qa.js smart     quick, plus every suite whose watched source files changed since the last all-green run
-     node qa.js full      everything on Firefox, then everything again on Chromium (the check before a file goes out)
+     node qa.js full      everything on Firefox, then again on Chromium, then again on WebKitGTK (the check before a file goes out; --no-webkit leaves WebKit out)
+     node qa.js quick --webkit    the quick suites on Firefox, then the same ones on WebKitGTK;  --webkit-only runs just the WebKitGTK lane
      node qa.js sample    contract plus a rotating quarter of the quick suites (and any whose files changed): a cheap look between edits,
                           never the check before delivery
      node qa.js <tier> --only lite      run only suites whose name contains "lite"
@@ -90,6 +91,14 @@ const verbose = args.includes('--verbose');
 const only = args.includes('--only') ? args[args.indexOf('--only') + 1] : '';
 const against = args.includes('--against') ? args[args.indexOf('--against') + 1] : '';
 const expectFail = args.includes('--expect-fail');
+const WEBKIT_ONLY = args.includes('--webkit-only'); /* run just the WebKitGTK lane (no Firefox, no Node-only checks): for looking at that browser alone */
+/* WebKitGTK (the third approved browser) runs after Firefox, and after Chromium in the full check, one browser at a time. The full check includes it;
+   the quick, smart and sample tiers add it with --webkit; --no-webkit leaves it out of the full check. */
+const WEBKIT = WEBKIT_ONLY || args.includes('--webkit') || (tier === 'full' && !args.includes('--no-webkit') && !against);
+/* suites that do not run in WebKitGTK, and why (everything else that runs in Firefox does) */
+/* two WebKitGTK windows in one browser hang about half the time when other suites load the machine (30 s alone, 3 of 3 runs) */
+const SOLO = { 'twowin webkit': 'two windows in one WebKitGTK' };
+const NOT_IN_WEBKIT = { ffsmoke: 'it checks the Firefox stand-in itself', touch1: 'WebKitGTK 2.52.6 has no touch events' };
 const RUN = new Date().toISOString();
 
 /* ---- the ledger: one JSON line per suite per run ---- */
@@ -165,7 +174,7 @@ const waitForServer = async () => {
   let cr = process.env.CHROMIUM_PATH || '', stock = false;
   if (!cr) { try { cr = require('./engine').chromiumPath(); stock = true; } catch (e) { cr = ''; } }
   const usesCr = tier === 'full' || against || args.includes('--chromium');
-  console.log(`browsers: Firefox = ${ff ? ver(ff) + ' (' + ff + ')' : 'FIREFOX_PATH not set'}; Chromium = ${usesCr ? (cr ? ver(cr) + ' (' + cr + ')' + (stock ? ' STOCK Playwright build, not the approved ungoogled one; set CHROMIUM_PATH' : '') : 'not found') : 'not used in this tier'}`);
+  console.log(`browsers: Firefox = ${ff ? ver(ff) + ' (' + ff + ')' : 'FIREFOX_PATH not set'}; Chromium = ${usesCr ? (cr ? ver(cr) + ' (' + cr + ')' + (stock ? ' STOCK Playwright build, not the approved ungoogled one; set CHROMIUM_PATH' : '') : 'not found') : 'not used in this tier'}; WebKitGTK = ${WEBKIT ? require('../../packages/qa-kit/src/webkit.js').version() : 'not used in this tier'}`);
 }
 /* the jobs for this tier */
 const jobs = [];
@@ -180,18 +189,21 @@ const watched = s => {
   return live;
 };
 const want = s => against ? true : tier === 'full' ? true : tier === 'sample' ? (s.quick ? quickNames.indexOf(s.name) % 4 === sampleTurn || watched(s) : watched(s)) : s.quick || (tier === 'smart' && watched(s));
-if (!against && (!only || 'contract'.includes(only))) if (want(CONTRACT) || tier === 'sample') jobs.push({ label: 'contract', cmd: CONTRACT.cmd, lane: 'firefox' });
-if (!against && (!only || 'twine-diff'.includes(only))) if (want(TWINE_DIFF) || tier === 'sample') jobs.push({ label: 'twine-diff', cmd: TWINE_DIFF.cmd, lane: 'firefox' });
-if (!against && tier === 'full' && (!only || 'fuzz3'.includes(only))) jobs.push({ label: 'fuzz3', cmd: FUZZ3.cmd, lane: 'firefox' });
-if (!only && !against) jobs.push({ label: 'lines-selftest', cmd: ['node', 'lines.js'], lane: 'firefox' });
+if (!against && !WEBKIT_ONLY && (!only || 'contract'.includes(only))) if (want(CONTRACT) || tier === 'sample') jobs.push({ label: 'contract', cmd: CONTRACT.cmd, lane: 'firefox' });
+if (!against && !WEBKIT_ONLY && (!only || 'twine-diff'.includes(only))) if (want(TWINE_DIFF) || tier === 'sample') jobs.push({ label: 'twine-diff', cmd: TWINE_DIFF.cmd, lane: 'firefox' });
+if (!against && !WEBKIT_ONLY && tier === 'full' && (!only || 'fuzz3'.includes(only))) jobs.push({ label: 'fuzz3', cmd: FUZZ3.cmd, lane: 'firefox' });
+if (!only && !against && !WEBKIT_ONLY) jobs.push({ label: 'lines-selftest', cmd: ['node', 'lines.js'], lane: 'firefox' });
 const lane = engine => SUITES.forEach(s => {
-  if (!s.engines.includes(engine) || !want(s)) return;
+  if (WEBKIT_ONLY && engine !== 'webkit') return;
+  if (!(s.engines.includes(engine) || (engine === 'webkit' && s.engines.includes('firefox') && !NOT_IN_WEBKIT[s.name])) || !want(s)) return;
   if (engine === 'chromium' && tier !== 'full' && !against) return; /* Chromium only in the full check */
+  if (engine === 'webkit' && !WEBKIT) return; /* WebKitGTK only when asked for (--webkit) or in the full check */
   if (only && !s.name.includes(only)) return;
   jobs.push({ label: `${s.name} ${engine}`, cmd: ['node', s.file, engine], lane: engine });
 });
 lane('firefox');
 lane('chromium');
+lane('webkit');
 
 if (tier === 'smart' || tier === 'sample') console.log('changed since the last all-green run:', changed.join(', ') || 'nothing');
 if (skipped.length) console.log('left out because their history shows the changed files never broke them (5 or more runs): ' + [...new Set(skipped)].join(', ') + ' (a full check still runs them)');
@@ -261,9 +273,11 @@ const runOne = async job => {
 const worker = async () => { for (let job; (job = queue.shift()); ) await runOne(job); };
 (async () => {
 await waitForServer();
-for (const lane of ['firefox', 'chromium']) {
-  queue = jobs.filter(j => j.lane === lane).sort(byTime);
+for (const lane of ['firefox', 'chromium', 'webkit']) {
+  queue = jobs.filter(j => j.lane === lane && !SOLO[j.label]).sort(byTime);
   await Promise.all(Array.from({ length: WORKERS }, worker));
+  /* suites that need the machine to themselves run last, one at a time */
+  for (const j of jobs.filter(j => j.lane === lane && SOLO[j.label])) { queue = [j]; await worker(); }
 }
 if (!bad && !against) { rows.forEach(r => { TIMES[r.label] = Math.round(r.sec); }); fs.writeFileSync(timesFile, JSON.stringify(TIMES, null, 1)); }
 const slow = rows.slice().sort((a, b) => b.sec - a.sec).slice(0, 3).map(r => `${r.label} ${r.sec.toFixed(0)} s`).join(', ');
@@ -274,11 +288,11 @@ if (against) {
   console.log(`against ${against}: ${noticed} of ${rows.length} suites FAIL on the old build (they notice the bug); ${rows.length - noticed} pass there (they do not notice it)`);
   process.exit(expectFail ? (noticed === rows.length && rows.length ? 0 : 1) : 0);
 }
-if (!bad && tier === 'full' && !only) { /* the check counts of this all-green full run are what later runs are held to */
+if (!bad && tier === 'full' && !only && !WEBKIT_ONLY) { /* the check counts of this all-green full run are what later runs are held to */
   const counts = {};
   rows.forEach(r => { if (r.passes) counts[r.label] = r.passes; });
   fs.writeFileSync(countsFile, JSON.stringify(counts, null, 1));
 }
-if (!bad && tier !== 'quick' && tier !== 'sample' && !only) fs.writeFileSync(stampFile, new Date().toISOString());
+if (!bad && tier !== 'quick' && tier !== 'sample' && !only && !WEBKIT_ONLY) fs.writeFileSync(stampFile, new Date().toISOString());
 process.exit(bad ? 1 : 0);
 })();

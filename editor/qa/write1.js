@@ -117,7 +117,8 @@ const ph=await fresh(390,844);pg=ph;
 ok(await pg.locator('.crow>.cdest').count()>0,'phone shows choice destination buttons');
 await pg.locator('.crow>.cdest').first().click();await pg.waitForTimeout(200);
 const box=await pg.locator('.picker').first().boundingBox().catch(()=>null);
-ok(!box||box.x>=0&&box.x+box.width<=391,'picker fits the phone width');
+const vw=await pg.evaluate(()=>innerWidth); /* 390 where the browser can be that narrow; WebKitGTK's window is never narrower than 447 */
+ok(!box||box.x>=0&&box.x+box.width<=vw+1,'picker fits the phone width ('+vw+' px wide window)');
 await nm.press('Escape');
 ok(ph.errs.length===0,'no errors (phone) '+JSON.stringify(ph.errs));
 console.log(fails?fails+' FAILED':'all green');process.exit(fails?1:0);

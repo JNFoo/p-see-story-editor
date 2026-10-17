@@ -9,63 +9,18 @@
 const OUTLINE_EXAMPLE = `Start
   The ferry leaves you on the rock. Fog is coming in.
   Walk to the lighthouse → Lighthouse door
-  Wait for the next ferry → Cold night (bad ending)
+  Wait for the next ferry → Cold night
 Lighthouse door
   The door is open a hand's width.
   Go in → Hall
+Cold night (bad ending)
+  The ferry never comes.
 Hall
   Climb the stairs → Lamp room`;
 
-/** Turns what was read into the pages to add: names made unique, choices pointed at pages, endings given no choices. */
+/** Turns what was read into the pages to add to this story (planOutline in helpers.js, applied to the open story). */
 function planOutline(parsed) {
-  const issues = parsed.issues.slice();
-  const taken = new Set(project.passages.map(p => pname(p).trim().toLowerCase()));
-  const blank = project.passages.length === 1 && isBlankPage(project.passages[0]) ? project.passages[0] : null;
-  if (blank) taken.delete(pname(blank).trim().toLowerCase());
-  const made = new Map(); // outline name (lowercase) -> the page to make
-  const create = [];
-  parsed.pages.forEach(op => {
-    let name = op.name;
-    let n = 2;
-    while (taken.has(name.toLowerCase())) name = `${op.name} ${n++}`;
-    if (name !== op.name) issues.push(`A page called “${op.name}” is already in the story, so the new one is named “${name}”.`);
-    taken.add(name.toLowerCase());
-    const p = makePassage(name);
-    if (op.texts.length) p.blocks = op.texts.map(makeBlock);
-    if (op.ending) {
-      p.ending = true;
-      p.valence = op.valence;
-      if (op.choices.length) issues.push(`“${op.name}” is an ending, so its ${op.choices.length === 1 ? 'choice was' : 'choices were'} left out.`);
-    }
-    made.set(op.name.toLowerCase(), p);
-    create.push({ p, op });
-  });
-  const existing = new Map(project.passages.filter(p => p !== blank).map(p => [pname(p).trim().toLowerCase(), p]));
-  const empties = []; // pages named only in a choice
-  create.forEach(({ p, op }) => {
-    if (p.ending) return;
-    op.choices.forEach(c => {
-      let dest = '';
-      if (c.to) {
-        const key = c.to.toLowerCase();
-        const target = made.get(key) || existing.get(key) || empties.find(e => e.name.toLowerCase() === key);
-        if (target) dest = target.id;
-        else {
-          const e = makePassage(c.to);
-          empties.push(e);
-          dest = e.id;
-        }
-      }
-      p.choices.push(makeChoice(c.label, dest));
-    });
-  });
-  if (empties.length) issues.push(`${empties.length === 1 ? 'A page is' : `${empties.length} pages are`} named in a choice but not written yet, so ${empties.length === 1 ? 'it was' : 'they were'} added empty: ${empties.slice(0, 5).map(e => `“${e.name}”`).join(', ')}${empties.length > 5 ? ', …' : ''}.`);
-  return { pages: create.map(x => x.p), empties, blank, issues };
-}
-
-/** A page with nothing written on it (the one a new story starts with). */
-function isBlankPage(p) {
-  return !p.blocks.some(b => String(b.text).trim()) && !p.choices.length && !p.ending && !p.todo && !p.note && !p.heading && !p.gives.length && !p.takes.length;
+  return outlinePlan(parsed, project);
 }
 
 /** Adds the planned pages to the story as one Undo step. */

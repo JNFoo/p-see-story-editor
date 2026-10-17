@@ -37,6 +37,8 @@ const CORE = 'editor/core.js';
 const PLAYER = 'editor/player.js';
 const MAP = 'editor/maplayout.js';
 const TWINE = 'editor/twine.js';
+const HELPERS = 'editor/helpers.js';
+const CHANGES = 'editor/changes.js';
 
 /* The rules every package that "plays" a story needs. */
 const RULES = ['klStatMap', 'klInit', 'klAdd', 'klChoose', 'klArrive', 'klVisibleBlocks', 'klVisibleChoices', 'klShown', 'klCondOk', 'klHas', 'klTarget', 'klOdds'];
@@ -45,15 +47,33 @@ const MODEL = ['makeProject', 'makePassage', 'makeChoice', 'makeBlock', 'makeIte
 export const PACKAGES = {
   'story-format': {
     global: 'StoryFormat',
-    files: [CORE, TWINE],
-    what: 'The story data model: create, normalize, import (old text format and Twine), export, search and measure interactive stories.',
+    files: [CORE],
+    what: 'The story data model: create, normalize, import (old text format), export, search and measure interactive stories.',
     roots: [
       ...MODEL,
       'FIELD_CONTRACT', 'GAME_DEFAULTS', 'GAME_OPTIONS', 'BACK_MODES', 'PALETTES', 'STARTERS', 'STAT_MIN', 'STAT_MAX',
       'statTest', 'parseStatTest', 'givenOf', 'condSummary',
-      'parseLegacy', 'twineRead', 'twineConvert', 'importTwine', 'exportStory', 'klFingerprint', 'klShortIds',
+      'parseLegacy', 'exportStory', 'klFingerprint', 'klShortIds',
       'storyFind', 'storyReplace', 'storyOrder', 'storyManuscript', 'storyStats'
     ]
+  },
+  'twine-import': {
+    global: 'TwineImport',
+    files: [CORE, TWINE],
+    what: 'Reads Twine stories (Twine 2 HTML, Twee 3, Twine 1) and turns SugarCube and Harlowe code into rules, with a plain-words report.',
+    roots: [...MODEL, 'twineRead', 'twineConvert', 'importTwine']
+  },
+  'story-outline': {
+    global: 'StoryOutline',
+    files: [CORE, HELPERS],
+    what: 'Turns an indented outline (page names at the left edge, choices indented under them) into pages and choices, or into a whole story.',
+    roots: [...MODEL, 'parseOutline', 'outlinePlan', 'outlineToProject']
+  },
+  'story-diff': {
+    global: 'StoryDiff',
+    files: [CHANGES],
+    what: 'Says in plain words what one edit did to a story: "Add page “The Cellar”", "Delete a choice on “Start”".',
+    roots: ['describeChange']
   },
   'story-check': {
     global: 'StoryCheck',

@@ -15,11 +15,15 @@ Everything is MIT-licensed and has no dependencies. The editor's logic was cut o
 | Package | One line |
 |---|---|
 | [story-format](packages/story-format/README.md) | The data model for branching stories as plain JSON, with a JSON Schema, a safe sanitizer for any input, a plain-text story syntax, find/replace, Markdown manuscript. |
+| [twine-import](packages/twine-import/README.md) | Reads Twine stories (Twine 2 HTML, Twee 3, Twine 1) and turns SugarCube and Harlowe code into rules, with a plain-words report of what it could not carry over. |
+| [story-outline](packages/story-outline/README.md) | Turns an indented outline (page names, choices indented under them) into pages and choices, or into a whole story. |
+| [story-diff](packages/story-diff/README.md) | Says in plain words what one edit did to a story: "Add page “The Cellar”", "Delete a choice on “Start”". |
 | [story-check](packages/story-check/README.md) | An exact checker: explores every combination of items, numbers and dice to find dead ends and endings no player can reach, and says why. |
 | [story-player](packages/story-player/README.md) | One story in, one small offline HTML game out; plus a "play it from code" session and a terminal player. |
 | [story-map](packages/story-map/README.md) | Layered, arc, matrix and shape drawings of a story graph, choke points, simulated players, drawing metrics, SVG output. |
 | [zip-page](packages/zip-page/README.md) | Shrinks one HTML page into a self-unzipping page, with a small readable inflater as fallback. |
 | [qa-kit](packages/qa-kit/README.md) | A tiered test runner and a Playwright-style call surface over Puppeteer's WebDriver BiDi, so suites also run on stock Firefox; a seeded random-story generator. |
+| [contract-kit](packages/contract-kit/README.md) | A guide, with a small helper, for keeping two implementations of one rule set from drifting apart (a fast checker and a slow reference, an editor and its exported game): random inputs, side-by-side comparison, a field table, a time limit. |
 | [ai-collab-kit](packages/ai-collab-kit/README.md) | A written process for a person and an AI assistant building software together: ten habits, test and speed recipes, pitfalls, templates. |
 | [editor/](editor/README.md) | The full editor sources, its build, and its browser test suites ([editor/qa](editor/qa/README.md)). |
 

@@ -1,0 +1,49 @@
+{
+  "name": "story-outline",
+  "version": "1.0.0",
+  "description": "Turns an indented outline into pages and choices, or into a whole branching story. Zero dependencies.",
+  "license": "MIT",
+  "author": "LFC Foundry",
+  "type": "module",
+  "main": "dist/story-outline.mjs",
+  "module": "dist/story-outline.mjs",
+  "types": "index.d.ts",
+  "unpkg": "dist/story-outline.min.global.js",
+  "jsdelivr": "dist/story-outline.min.global.js",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./dist/story-outline.mjs"
+    },
+    "./global": "./dist/story-outline.global.js",
+    "./min": "./dist/story-outline.min.mjs",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "index.d.ts",
+    "README.md",
+    "AGENTS.md",
+    "examples"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lfcfoundry/story-editor.git",
+    "directory": "packages/story-outline"
+  },
+  "homepage": "https://github.com/lfcfoundry/story-editor/tree/main/packages/story-outline",
+  "keywords": [
+    "outline",
+    "interactive-fiction",
+    "choose-your-own-adventure",
+    "story"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  }
+}

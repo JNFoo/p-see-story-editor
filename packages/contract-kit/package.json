@@ -1,0 +1,45 @@
+{
+  "name": "contract-kit",
+  "version": "1.0.0",
+  "description": "A guide and a small helper for keeping two implementations of one rule set from drifting apart: seeded random inputs, a side-by-side comparison, a field table and a time limit. Zero dependencies.",
+  "license": "MIT",
+  "author": "LFC Foundry",
+  "type": "module",
+  "main": "src/contract.mjs",
+  "module": "src/contract.mjs",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./src/contract.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "index.d.ts",
+    "README.md",
+    "AGENTS.md",
+    "examples"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lfcfoundry/story-editor.git",
+    "directory": "packages/contract-kit"
+  },
+  "homepage": "https://github.com/lfcfoundry/story-editor/tree/main/packages/contract-kit",
+  "keywords": [
+    "testing",
+    "contract-test",
+    "differential-testing",
+    "property-testing",
+    "fuzzing"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  }
+}

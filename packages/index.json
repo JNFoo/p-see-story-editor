@@ -18,6 +18,45 @@
       "dependencies": "none"
     },
     {
+      "id": "twine-import",
+      "summary": "Reads Twine stories (Twine 2 HTML, Twee 3, Twine 1) and turns SugarCube and Harlowe code into rules, with a plain-words report. Zero dependencies.",
+      "esm": "packages/twine-import/dist/twine-import.mjs",
+      "global": "packages/twine-import/dist/twine-import.global.js",
+      "esmMin": "packages/twine-import/dist/twine-import.min.mjs",
+      "globalMin": "packages/twine-import/dist/twine-import.min.global.js",
+      "types": "packages/twine-import/index.d.ts",
+      "readme": "packages/twine-import/README.md",
+      "example": "packages/twine-import/examples/quickstart.mjs",
+      "dependencies": "none",
+      "bin": {
+        "twine-to-story": "bin/twine-to-story.mjs"
+      }
+    },
+    {
+      "id": "story-outline",
+      "summary": "Turns an indented outline into pages and choices, or into a whole branching story. Zero dependencies.",
+      "esm": "packages/story-outline/dist/story-outline.mjs",
+      "global": "packages/story-outline/dist/story-outline.global.js",
+      "esmMin": "packages/story-outline/dist/story-outline.min.mjs",
+      "globalMin": "packages/story-outline/dist/story-outline.min.global.js",
+      "types": "packages/story-outline/index.d.ts",
+      "readme": "packages/story-outline/README.md",
+      "example": "packages/story-outline/examples/quickstart.mjs",
+      "dependencies": "none"
+    },
+    {
+      "id": "story-diff",
+      "summary": "Says in plain words what one edit did to a story, such as \"Add page “The Cellar”\". Zero dependencies.",
+      "esm": "packages/story-diff/dist/story-diff.mjs",
+      "global": "packages/story-diff/dist/story-diff.global.js",
+      "esmMin": "packages/story-diff/dist/story-diff.min.mjs",
+      "globalMin": "packages/story-diff/dist/story-diff.min.global.js",
+      "types": "packages/story-diff/index.d.ts",
+      "readme": "packages/story-diff/README.md",
+      "example": "packages/story-diff/examples/quickstart.mjs",
+      "dependencies": "none"
+    },
+    {
       "id": "story-check",
       "summary": "Exact checker for branching stories with items, numbers and dice: dead ends, unreachable pages, endings no player can reach. Zero dependencies.",
       "esm": "packages/story-check/dist/story-check.mjs",
@@ -76,6 +115,14 @@
       "summary": "Tiered test runner, Playwright-style API over Puppeteer WebDriver BiDi for stock Firefox, seeded random-story generator.",
       "readme": "packages/qa-kit/README.md",
       "dependencies": "peer: puppeteer and/or playwright (optional)"
+    },
+    {
+      "id": "contract-kit",
+      "summary": "A guide and small helper for keeping two implementations of one rule set from drifting apart: seeded random inputs, side-by-side comparison, a field table, a time limit.",
+      "types": "packages/contract-kit/index.d.ts",
+      "readme": "packages/contract-kit/README.md",
+      "example": "packages/contract-kit/examples/quickstart.mjs",
+      "dependencies": "none"
     },
     {
       "id": "ai-collab-kit",

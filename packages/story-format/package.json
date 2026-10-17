@@ -1,7 +1,7 @@
 {
   "name": "story-format",
-  "version": "1.0.0",
-  "description": "Data model and file format for branching interactive stories: create, clean, import (including Twine), export, search and measure. Zero dependencies.",
+  "version": "2.0.0",
+  "description": "Data model and file format for branching interactive stories: create, clean, import, export, search and measure. Zero dependencies.",
   "license": "MIT",
   "author": "LFC Foundry",
   "type": "module",
@@ -23,7 +23,6 @@
   "files": [
     "dist",
     "src",
-    "bin",
     "index.d.ts",
     "README.md",
     "AGENTS.md",
@@ -37,21 +36,16 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/lfcfoundry/story-editor.git",
-    "directory": "packages/story-format"
+    "directory": "packages/twine-import"
   },
   "homepage": "https://github.com/lfcfoundry/story-editor/tree/main/packages/story-format",
   "keywords": [
     "interactive-fiction",
     "choose-your-own-adventure",
     "json-schema",
-    "story",
-    "twine",
-    "twee"
+    "story"
   ],
   "scripts": {
     "test": "node --test test/*.test.mjs"
-  },
-  "bin": {
-    "twine-to-story": "bin/twine-to-story.mjs"
   }
 }

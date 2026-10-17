@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { importTwine, twineRead, normalizeProject } from '../dist/story-format.mjs';
+import { importTwine, twineRead, normalizeProject } from '../dist/twine-import.mjs';
 import { analyze } from '../../story-check/dist/story-check.mjs';
 
 const fx = f => readFileSync(new URL(`./fixtures/${f}`, import.meta.url), 'utf8');

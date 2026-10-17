@@ -1,0 +1,52 @@
+{
+ "numbers": [
+  4,
+  2,
+  30,
+  "y"
+ ],
+ "bug": {
+  "ok": false,
+  "n": 1,
+  "smallest": {
+   "items": [
+    {
+     "id": 7,
+     "price": 1,
+     "off": 0.5
+    }
+   ]
+  },
+  "tries": 56
+ },
+ "good": {
+  "ok": true,
+  "runs": 100,
+  "tags": {
+   "short": 60,
+   "long": 40
+  }
+ },
+ "late": {
+  "ok": false,
+  "n": 12
+ },
+ "identity": true,
+ "reads": [
+  "passage.next",
+  "project.passages"
+ ],
+ "equal": [
+  true,
+  false,
+  false,
+  false
+ ],
+ "table": [
+  "The field “loan.tint” is not in the table. List it under “rules” if it can change the outcome, otherwise under “display”.",
+  "Nothing ever read “loan.end”, which the table says can change the outcome. Teach the analyzer about it, or move it to “display”."
+ ],
+ "kept": [
+  "The field “loan.end” can change the outcome but was lost or changed on the way through."
+ ]
+}

@@ -118,7 +118,7 @@
     },
     {
       "id": "contract-kit",
-      "summary": "A guide and small helper for keeping two implementations of one rule set from drifting apart: seeded random inputs, side-by-side comparison, a field table, a time limit.",
+      "summary": "A guide and small helper for keeping two implementations of one rule set from drifting apart: seeded random inputs, side-by-side comparison that cuts a failing input down, a field table, a time limit. The core also runs in browsers.",
       "types": "packages/contract-kit/index.d.ts",
       "readme": "packages/contract-kit/README.md",
       "example": "packages/contract-kit/examples/quickstart.mjs",

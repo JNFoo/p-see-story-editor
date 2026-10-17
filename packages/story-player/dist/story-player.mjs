@@ -793,7 +793,7 @@ function exportStory(project) {
 function escapeHtml(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
-var CSP_OFFLINE = "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'";
+var CSP_OFFLINE = "default-src 'none'; script-src 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'";
 var KL_LITE_FONT = /^[\u0020-\u007e\u00b7\u00d7\u2013\u2014\u2018-\u201a\u201c-\u201e\u2022\u2026\u2192]*$/;
 function klFingerprint(project) {
   const text = [project.passages, project.items, project.givens || []].map((list) => list.map((x) => x.id).join(",")).join("|");

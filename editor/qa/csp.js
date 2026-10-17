@@ -1,6 +1,6 @@
 /* The editor's own page policy (the Content-Security-Policy meta tag build.py writes): no network, no 'unsafe-eval', and WebAssembly allowed ('wasm-unsafe-eval' in
    script-src, the owner's rule of 2026-10-17). Checks the text of the tag, then asks the browser: a tiny WebAssembly module compiles in a script of the page (it is refused without the token).
-   Usage: node csp.js [chromium|firefox|webkit]   Copyright (c) 2026 LFC Foundry. MIT License. */
+   Usage: node csp.js [chromium|firefox|webkit]   (WEBKIT=epiphany node csp.js webkit  runs it in GNOME Web)   Copyright (c) 2026 LFC Foundry. MIT License. */
 const which = process.argv[2] || 'firefox'; const B = require('./engine').pick(which);
 const fs = require('fs'), path = require('path');
 const EDITOR_FILE = process.env.QA_EDITOR || path.join(__dirname, '..', 'story-editor.html');
@@ -35,5 +35,26 @@ let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); 
   const r = await pg.evaluate(() => window.__csp);
   ok(r.wasm === 'ok', 'a tiny WebAssembly module compiles in a script of the editor page' + (r.wasm === 'ok' ? '' : ': ' + r.wasm));
   ok(errs.length === 0, 'no page errors' + (errs.length ? ': ' + errs[0] : ''));
+
+  /* the same for a finished game: the policy line the games share (CSP_OFFLINE) carries the token, and the browser lets the game's page compile a module */
+  const { buildGame, makeProject } = await import(path.join(__dirname, '..', '..', 'packages', 'story-player', 'dist', 'story-player.mjs'));
+  const game = buildGame(makeProject('Policy test'));
+  const gm = /<meta http-equiv="Content-Security-Policy" content="([^"]*)">/.exec(game);
+  ok(!!gm && gm[1] === policy, 'an exported game carries the same policy as the editor page, token included');
+  const GAME_FILE = path.join(__dirname, 'work', 'csp-game.html');
+  fs.writeFileSync(GAME_FILE, game);
+  const gp = pg; /* the same window: one window is all this needs, which GNOME Web (WEBKIT=epiphany) handles best */
+  await gp.goto(require('url').pathToFileURL(GAME_FILE).href); await gp.waitForTimeout(500);
+  await gp.evaluate(() => {
+    const s = document.createElement('script');
+    s.textContent = `window.__csp = {};
+      try { new WebAssembly.Module(new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0])); window.__csp.wasm = 'ok'; } catch (e) { window.__csp.wasm = String(e && e.message || e).slice(0, 80); }
+      window.__csp.done = 1;`;
+    document.head.appendChild(s);
+  });
+  await gp.waitForFunction(() => window.__csp && window.__csp.done);
+  const gr = await gp.evaluate(() => window.__csp);
+  ok(gr.wasm === 'ok', 'a tiny WebAssembly module compiles in a script of an exported game' + (gr.wasm === 'ok' ? '' : ': ' + gr.wasm));
+  ok(errs.length === 0, 'no page errors in the game' + (errs.length ? ': ' + errs[0] : ''));
   await b.close(); console.log(fails ? 'FAILED' : 'ALL PASSED'); process.exit(fails ? 1 : 0);
 })().catch(e => { console.log('FAIL crashed: ' + e.message); process.exit(1); });

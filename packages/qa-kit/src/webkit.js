@@ -44,7 +44,7 @@ class WKPp {
       s.launch = (async () => {
         for (let tries = 0; ; tries++) { /* a start that is slow under load (or races the end of the browser before it) fails early or answers late; starting again works */
           try {
-            s.wd = await WD.launch({ width: (this.view && this.view.width) || 1280, height: (this.view && this.view.height) || 800, timeout: 120000, reducedMotion: !process.env.QA_MOTION });
+            s.wd = await WD.launch({ browser: process.env.WEBKIT === 'epiphany' ? 'epiphany' : undefined, width: (this.view && this.view.width) || 1280, height: (this.view && this.view.height) || 800, timeout: 120000, reducedMotion: !process.env.QA_MOTION });
             s.page = s.wd.page; s.cur = this;
             this.handle = await win(s, 'GET', '/window');
             s.first = this;
@@ -290,6 +290,11 @@ exports.webkit = {
   }
 };
 exports.version = () => {
+  if (process.env.WEBKIT === 'epiphany') { /* GNOME Web: its own version, and the WebKitGTK under it */
+    const e = require('child_process').spawnSync('dpkg-query', ['-W', '-f', '${Version}', 'epiphany-browser'], { encoding: 'utf8' });
+    const w = require('child_process').spawnSync('dpkg-query', ['-W', '-f', '${Version}', 'libwebkit2gtk-4.1-0'], { encoding: 'utf8' });
+    return 'GNOME Web (Epiphany) ' + (e.status === 0 ? e.stdout.trim().replace(/-.*$/, '') : '(version not found)') + ' on WebKitGTK ' + (w.status === 0 ? w.stdout.trim().replace(/-.*$/, '') : '(version not found)');
+  }
   const r = require('child_process').spawnSync('dpkg-query', ['-W', '-f', '${Version}', 'libwebkit2gtk-4.1-0'], { encoding: 'utf8' });
   return r.status === 0 ? 'WebKitGTK ' + r.stdout.trim().replace(/-.*$/, '') : 'WebKitGTK (version not found)';
 };

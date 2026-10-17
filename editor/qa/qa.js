@@ -58,7 +58,7 @@ const SUITES = [
   S('helpers', 'helpers.js', ['helpers.js', 'ui4-helpers.js', 'ui4-views.js', 'ui1-state.js', 'ui5-app.js', 'core.js'], true),
   S('undohist', 'undohist.js', ['changes.js', 'ui4-status.js', 'ui1-state.js', 'ui.css', 'player.js', 'core.js'], true),
   S('phone', 'phone.js', ['ui4-phone.js', 'ui5-app.js', 'ui3-write.js', 'ui4-status.js', 'ui1-state.js', 'ui.css', 'core.js'], true),
-  S('csp', 'csp.js', ['build.py'], true),
+  S('csp', 'csp.js', ['build.py', 'core.js'], true),
   S('foundry', 'foundry.js', ['foundry-header.txt', 'build.py', 'core.js', 'ui5-app.js', 'ui.css', 'ui4-phone.js'], true),
   S('translate', 'translate.js', ['translate.js', 'player.js', 'game.css', 'ui5-app.js', 'core.js'], true),
   S('gamefeel', 'gamefeel.js', ['player.js', 'game.css', 'core.js'], true),

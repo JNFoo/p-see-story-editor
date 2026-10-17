@@ -16,6 +16,7 @@ test('every starter becomes one self-contained page with no network references',
     assert.match(html, /^<!doctype html>/);
     assert.match(html, /<script type="application\/json" id="story-data">/);
     assert.match(html, /Content-Security-Policy/);
+    assert.match(html, /script-src 'unsafe-inline' 'wasm-unsafe-eval';/); // WebAssembly allowed everywhere (owner's rule, 2026-10-17)
     assert.ok(!/(src|href)=["']https?:/i.test(html), `${st.name}: no external files`);
     assert.ok(!/\bfetch\(|XMLHttpRequest|WebSocket/.test(html), `${st.name}: no network calls`);
   }

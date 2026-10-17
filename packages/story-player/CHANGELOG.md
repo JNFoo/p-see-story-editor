@@ -2,6 +2,11 @@
 
 What changed in each version, newest first, in plain words. Each entry says what is new or how much better it got, with numbers where there are numbers. Figures not measured say "about" or "not measured".
 
+## 1.0.1 · 2026-10-17
+**Changed:** the policy line every page this package builds carries now has `'wasm-unsafe-eval'` in its script rule, so a game can start a WebAssembly module (owner's rule for all our pages). Nothing else in the policy changed. Each built game grows 19 bytes (a standard 25-page game 51,742 to 51,761). No game uses WebAssembly yet, so nothing behaves differently today.
+
+**Tested in:** Node package tests; Firefox 158.0b5, ungoogled Chromium 155.0.8059.39-1 and WebKitGTK 2.52.6 and GNOME Web (Epiphany) 46.5 compile a tiny WebAssembly module inside a built game (the editor's `csp` check; without the change the browser refuses it).
+
 ## 1.0.0 · 2026-10-16
 **Smaller download:** a minified build, `dist/story-player.min.mjs`, is 56.5 KB (21.3 KB gzipped) against 71.3 KB for the readable file, about 21% less. The readable file is still there. The games it makes are unchanged.
 

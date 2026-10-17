@@ -101,6 +101,8 @@ Twine and Ink can publish playable pages too, usually with a runtime of tens or 
 
 `npm test` (Node 18+, no installs): every starter builds to a self-contained page with no network references; story text cannot close the script tag early; features are included only when used; **the page is byte-identical to the editor's own for the same story**; zipped pages round-trip; sessions obey items, numbers and locks; and across 200 random stories, random play **never reaches an ending the checker calls unreachable** (3,000 plays). The editor's browser suites (`editor/qa`) play exported games in Firefox and Chromium.
 
+**Browsers:** none. These tests run in Node (22.22.0 for the latest release run, earlier releases not recorded); the code is cut from the editor, whose browser runs are listed in [docs/CHANGELOG.md](../../docs/CHANGELOG.md).
+
 ## For AI agents
 
 See [AGENTS.md](AGENTS.md).

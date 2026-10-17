@@ -13,6 +13,8 @@ A written **process** for a person and an AI assistant building software togethe
 
 The expensive mistakes in AI-assisted building are not typos. They are a feature that quietly stopped working, a "tested" claim that tested nothing, a fix that broke the neighbor, a size that crept up, and a session that could not tell what the last one did. The habits in the guide each remove one of those, and each is cheap: a table that lists every field, a test that compares two implementations, a size ceiling that fails the build, a log with one line per check.
 
+*Tested in:* nothing to run; these are documents.
+
 ## How to use it
 
 1. Read the ten habits in [GUIDE.md](GUIDE.md) (five minutes).

@@ -46,6 +46,8 @@ This repository's sibling [JS-modules](https://github.com/lfcfoundry/JS-modules)
 
 `npm test`: the inflater matches zlib on 120 inputs at three compression levels (empty, tiny, repetitive, Unicode, stored/fixed/dynamic blocks); same answers as the editor's own code; the wrapper keeps the title; the command line tool round-trips a real page. The editor's browser suites open zipped pages in Firefox and Chromium.
 
+**Browsers:** none. These tests run in Node (22.22.0 for the latest release run, earlier releases not recorded); the code is cut from the editor, whose browser runs are listed in [docs/CHANGELOG.md](../../docs/CHANGELOG.md).
+
 ## For AI agents
 
 See [AGENTS.md](AGENTS.md).

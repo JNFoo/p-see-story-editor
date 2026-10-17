@@ -93,6 +93,8 @@ This is **differential testing** with **property-style random inputs**. Librarie
 
 `npm test`: the same seed gives the same numbers; `agree` finds a planted bug and the seed replays it; a throw counts as a difference; one side changing its input cannot change what the other sees; `watchReads` and `checkFieldTable` find an unread field and an unlisted field; `guarded` stops an endless loop.
 
+**Browsers:** none. These tests run in Node (22.22.0 for the latest release run). The helper does not touch a browser.
+
 ## For AI agents
 
 See [AGENTS.md](AGENTS.md).

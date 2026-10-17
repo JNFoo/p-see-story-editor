@@ -62,6 +62,8 @@ General JSON diff libraries (for example jsondiffpatch) give a structural list o
 
 `npm test`: every kind of label above, copies given as text and as objects, and unreadable input.
 
+**Browsers:** none. These tests run in Node (22.22.0 for the latest release run, earlier releases not recorded); the code is cut from the editor, whose browser runs are listed in [docs/CHANGELOG.md](../../docs/CHANGELOG.md).
+
 ## For AI agents
 
 See [AGENTS.md](AGENTS.md).

@@ -89,6 +89,8 @@ Twine's Twee 3 and Ink are also plain text, but each has its own syntax for link
 
 `npm test`: arrows, bullets, tabs, endings, repeated names, empty and huge input; `outlineToProject` makes stories that `normalizeProject` leaves unchanged and that the checker can read.
 
+**Browsers:** none. These tests run in Node (22.22.0 for the latest release run, earlier releases not recorded); the code is cut from the editor, whose browser runs are listed in [docs/CHANGELOG.md](../../docs/CHANGELOG.md).
+
 ## For AI agents
 
 See [AGENTS.md](AGENTS.md).

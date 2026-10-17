@@ -82,6 +82,8 @@ phones, tablets and computers.
 Current Firefox, Chrome, Edge and Safari on computers, Android and iPhone/iPad. Exported games work in somewhat older browsers than the
 editor does (roughly Chrome/Edge 80, Firefox 74, iOS 13.4 for games; Chrome/Edge 98, Firefox 98, iOS 15.4 for the editor).
 
+**Browsers used to test each release.** Each row of [docs/CHANGELOG.md](docs/CHANGELOG.md) ends with "Tested in": the browsers and versions behind that build, or "not recorded" where the run did not write them down. The latest editor build was tested on Firefox 157.0.1, Chromium 141.0.7390.37 (Playwright's bundled build) and Chromium 153.0.8010.0 (not ungoogled), which were the browsers available then. From 2026-10-17 the standing rule is Firefox 158, ungoogled Chromium 155 and WebKitGTK 2.52.6 (GNOME Web 46.5), one at a time. No run on those three is recorded yet.
+
 ## Fonts
 
 The Inter Tight typeface is used under the SIL Open Font License (it is not covered by the MIT License; see NOTICE.md).

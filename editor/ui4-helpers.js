@@ -9,10 +9,12 @@
 const OUTLINE_EXAMPLE = `Start
   The ferry leaves you on the rock. Fog is coming in.
   Walk to the lighthouse → Lighthouse door
-  Wait for the next ferry → Cold night (bad ending)
+  Wait for the next ferry → Cold night
 Lighthouse door
   The door is open a hand's width.
   Go in → Hall
+Cold night (bad ending)
+  The ferry never comes.
 Hall
   Climb the stairs → Lamp room`;
 

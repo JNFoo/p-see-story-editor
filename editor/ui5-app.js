@@ -1629,10 +1629,11 @@ function dropMenu(btn, pop, entries) {
    The autosave is one slot in this browser's storage, and every copy of the editor on this computer shares it (a page opened from a file
    shares storage with other files, measured in Firefox and Chromium). Two windows saving would silently overwrite each other, so only one
    holds the "writer" lock (Web Locks); another window shows a box with a Use-this-window button. Taking over steals the lock, the other
-   window flushes its last edit and pauses, and this one reloads so it starts from what was saved. Where Web Locks are missing, the
-   `storage` event stands in: a save by another window pauses this one and asks which version to keep. */
+   window flushes its last edit and pauses, and this one reloads so it starts from what was saved. A save by a window that does not share
+   the lock (or where Web Locks are missing) is noticed by the `storage` event, and again by the autosave itself before it writes: this
+   window pauses and asks which version to keep. */
 const WRITER_LOCK = 'story-editor-writer';
-let guardState = ''; // '', 'other' (another window had it first), 'taken' (another window took over), 'changed' (no Web Locks: another window saved)
+let guardState = ''; // '', 'other' (another window had it first), 'taken' (another window took over), 'changed' (another window saved without sharing our lock)
 function guardBox(state) {
   guardState = state;
   writerLost = true;
@@ -1687,6 +1688,12 @@ function guardStart() {
   } catch {
     /* a sandboxed page has no locks */
   }
+  /* A save by another window is noticed at once, with or without Web Locks (a copy of the editor that does not share our lock still shares our storage);
+     if this event never arrives (a sleeping tab), the autosave checks storage before it writes (persistNow). */
+  window.addEventListener('storage', e => {
+    if (e.key !== STORE || e.storageArea !== localStorage || writerLost || e.newValue === cur) return;
+    guardBox('changed');
+  });
   if (locks?.request) {
     try {
       locks
@@ -1707,10 +1714,6 @@ function guardStart() {
       logError('writer lock', e);
     }
   }
-  window.addEventListener('storage', e => {
-    if (e.key !== STORE || e.storageArea !== localStorage || writerLost || e.newValue === cur) return;
-    guardBox('changed');
-  });
 }
 
 function init() {
@@ -1721,6 +1724,7 @@ function init() {
   let saved = null;
   try {
     saved = localStorage.getItem(STORE);
+    storeSeen = saved;
     localStorage.setItem(`${STORE}-t`, '1');
     localStorage.removeItem(`${STORE}-t`);
   } catch (e) {

@@ -1,6 +1,7 @@
 /* One window at a time: a second window (or a second copy of the editor on this computer) must not silently overwrite the first one's autosave.
    Part 1 uses Web Locks: the second window is paused with a box; Use-this-window steals the lock, the first window saves its last edit and pauses.
    Part 2 hides Web Locks: a save by another window pauses this one and asks which version to keep.
+   Part 3 keeps Web Locks but writes from outside the lock: noticed at once by the storage event, and by the autosave itself when the event is missed.
    Usage: node twowin.js [chromium|firefox]   Copyright (c) 2026 LFC Foundry. MIT License. */
 const which = process.argv[2] || 'firefox'; const B = require('./engine').pick(which);
 const D = __dirname + '/work/';
@@ -79,6 +80,38 @@ const STORE = 'story-editor-v1', SPARE = 'story-editor-v1-backup';
   ok(await guard(A2) === '' && await stored(A2) === 'First', '"Keep mine" saves this window\'s version');
   const spare = await A2.evaluate(k => { const s = localStorage.getItem(k); return s && JSON.parse(s).title; }, SPARE);
   ok(spare === 'Second, from the other window', 'the other version became the spare copy (' + spare + ')');
+  await ctx.close();
+
+  /* ---- part 3: Web Locks present, but a save comes from a copy that does not share the lock ---- */
+  const theirs = pg => pg.evaluate(k => { const o = JSON.parse(localStorage.getItem(k)); o.title = 'Theirs'; localStorage.setItem(k, JSON.stringify(o)); }, STORE);
+  ctx = await b.newContext({ viewport: { width: 1200, height: 850 } }); await ctx.addInitScript(prefs);
+  const A3 = await open(ctx), B3 = await open(ctx);
+  ok(await guard(A3) === '' && await guard(B3) === 'other', 'with Web Locks the second window is paused as before');
+  await type(A3, 'Mine');
+  await theirs(B3); /* a write the lock cannot stop: the paused window's page writes storage directly, as another copy would */
+  await A3.waitForTimeout(300);
+  ok(await guard(A3) === 'changed', 'with Web Locks, a save from outside the lock is noticed at once ("changed")');
+  ok(/Another window saved/.test(await dlg(A3)), 'its box says another window saved: ' + (await dlg(A3)).replace(/\s+/g, ' ').slice(0, 60));
+  await A3.evaluate(() => window.__editor.persistNow()); /* what its autosave would do */
+  ok(await stored(A3) === 'Theirs', 'and nothing was written over it');
+  await ctx.close();
+  /* the same, when the storage event never reaches the window (a sleeping tab): the autosave looks before it writes.
+     A write made by the window's own page sends no event to that window, which is the same thing as a missed event. */
+  ctx = await b.newContext({ viewport: { width: 1200, height: 850 } }); await ctx.addInitScript(prefs);
+  const A4 = await open(ctx);
+  await type(A4, 'Mine');
+  await theirs(A4);
+  await A4.waitForTimeout(300);
+  ok(await guard(A4) === '', 'when the event is missed, nothing is shown yet');
+  await type(A4, 'Mine, edited on');
+  ok(await guard(A4) === 'changed', 'the next autosave notices the other save and asks first ("changed")');
+  ok(await stored(A4) === 'Theirs', 'and the other window\'s save is intact');
+  await A4.locator('dialog.dlg button.primary').click(); await A4.waitForTimeout(400);
+  ok(await guard(A4) === '' && await stored(A4) === 'Mine, edited on', '"Keep mine" saves this window\'s version');
+  const spare4 = await A4.evaluate(k => { const s = localStorage.getItem(k); return s && JSON.parse(s).title; }, SPARE);
+  ok(spare4 === 'Theirs', 'the other version became the spare copy (' + spare4 + ')');
+  await type(A4, 'Still mine');
+  ok(await guard(A4) === '' && await stored(A4) === 'Still mine', 'after Keep mine, saving carries on without asking again');
   await ctx.close();
   ok(errs.length === 0, 'no page errors' + (errs.length ? ': ' + errs[0] : ''));
   await b.close(); console.log(fails ? 'FAILED' : 'ALL PASSED'); process.exit(fails ? 1 : 0);

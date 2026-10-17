@@ -99,7 +99,7 @@ const SETTINGS = JSON.stringify({ chosen: true, remember: true, advanced: { writ
   ok((await pg.evaluate(() => window.__saves)).length === 1, 'the reminder\'s Save now saves');
   /* reload at once: not again within a day (the file save also just reset the clock) */
   await pg.reload(); await pg.waitForFunction(() => window.__editor && !document.getElementById('splash'), null, { timeout: 20000 }); await pg.waitForTimeout(3300);
-  ok(!/not been saved to a file for/.test(await toastText(pg)), 'no second reminder after saving: ' + await toastText(pg));
+  ok(!/not been saved to a file for/.test(await toastText(pg)), 'no second reminder after saving: ' + await toastText(pg) + ' (stored reminder record, saved-at, story id: ' + await pg.evaluate(() => JSON.stringify([localStorage.getItem('story-editor-v1-nudge'), window.__editor.project.savedAt || null, window.__editor.project.id])) + ')');
   await pg.context().close();
   /* 6 days: too soon. Reminded 2 hours ago: not again. */
   pg = await open(sample, { nudge: JSON.stringify({ id: SID, first: Date.now() - 6 * day, last: 0 }) }); await pg.waitForTimeout(3300);

@@ -7,6 +7,8 @@ const fs = require('fs'); const { genStory } = require('./genstory');
 const FILE = require('url').pathToFileURL((process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html'))).href;
 let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };
 const nap = ms => new Promise(r => setTimeout(r, ms)); // real time (the browser shim's own waits can run short)
+/* waits until what the next check looks at is there (polled, so a quick result costs nothing); if it never comes the check below fails with its own message */
+const until = (pg, fn, arg, ms = 5000) => pg.waitForFunction(fn, arg, { timeout: ms }).catch(() => {});
 const SETTINGS = JSON.stringify({ chosen: true, remember: true, advanced: { write: true, map: true, items: true, game: true } });
 (async () => {
   const b = await B.launch();
@@ -21,7 +23,7 @@ const SETTINGS = JSON.stringify({ chosen: true, remember: true, advanced: { writ
     const init = `window.__starts = 0; window.__saves = []; window.__gate = null;
       window.showSaveFilePicker = async o => ({ name: o.suggestedName, createWritable: async () => ({ write: async blob => { window.__starts++; if (window.__gate) await window.__gate; window.__saves.push(await blob.text()); }, close: async () => {} }), queryPermission: async () => 'granted' });`;
     const pg = await page(init);
-    await pg.click('#menubtn'); await pg.click('#menupop >> text=Save as…'); await nap(600);
+    await pg.click('#menubtn'); await pg.click('#menupop >> text=Save as…'); await until(pg, () => window.__saves.length === 1 && !document.querySelector('#savebtn').classList.contains('dirty'));
     ok(await pg.evaluate(() => window.__saves.length) === 1 && !(await pg.evaluate(() => document.querySelector('#savebtn').classList.contains('dirty'))), 'Save as writes the file and the Save button shows saved');
     await pg.fill('#title', 'Edited once'); await nap(100);
     await pg.evaluate(() => { window.__gate = new Promise(r => (window.__release = r)); window.__starts = 0; });
@@ -29,33 +31,33 @@ const SETTINGS = JSON.stringify({ chosen: true, remember: true, advanced: { writ
     await pg.keyboard.press('Control+s'); await pg.keyboard.press('Control+s'); await pg.keyboard.press('Control+s'); await nap(250);
     ok(await pg.evaluate(() => window.__starts) === 1, 'Ctrl+S pressed three times while the write is under way starts one write, not three');
     await pg.fill('#title', 'Edited twice'); await nap(100);
-    await pg.evaluate(() => window.__release()); await nap(500);
+    await pg.evaluate(() => window.__release()); await until(pg, () => window.__saves.length >= 2); await nap(100);
     ok(await pg.evaluate(() => document.querySelector('#savebtn').classList.contains('dirty')), 'an edit made while the write was under way still shows as unsaved');
-    await pg.evaluate(() => (window.__gate = null)); await pg.keyboard.press('Control+s'); await nap(500);
+    await pg.evaluate(() => (window.__gate = null)); await pg.keyboard.press('Control+s'); await until(pg, () => !document.querySelector('#savebtn').classList.contains('dirty'));
     ok(!(await pg.evaluate(() => document.querySelector('#savebtn').classList.contains('dirty'))), 'a later Save clears it');
     ok(!pg.errs.length, 'no errors: ' + pg.errs.join('; ')); await pg.ctx.close();
   }
   /* ---------- 2. the spare copy when a whole story is replaced; 3. a full disk; 4. nothing can be kept ---------- */
   {
     const pg = await page('');
-    await pg.fill('#title', 'My precious story'); await nap(1600);
-    await pg.click('#menubtn'); await pg.click('#menupop >> text=Example story'); await nap(300); await pg.click('dialog button:has-text("Load example")'); await nap(500);
+    await pg.fill('#title', 'My precious story'); await until(pg, () => { try { return JSON.parse(localStorage.getItem('story-editor-v1')).title === 'My precious story'; } catch (e) { return false; } });
+    await pg.click('#menubtn'); await pg.click('#menupop >> text=Example story'); await nap(300); await pg.click('dialog button:has-text("Load example")'); await until(pg, () => !!localStorage.getItem('story-editor-v1-backup'));
     const spare = await pg.evaluate(() => { try { return JSON.parse(localStorage.getItem('story-editor-v1-backup')).title; } catch (e) { return 'none'; } });
     ok(spare === 'My precious story', 'loading the example keeps the story it replaced as the spare copy right away (spare holds: ' + spare + ')');
     /* a full disk: writing the story fails while the spare copy exists; the spare gives up its room and the save goes through */
     await pg.evaluate(() => { const real = Storage.prototype.setItem; window.__realSet = real; Storage.prototype.setItem = function (k, v) { if (k === 'story-editor-v1' && localStorage.getItem('story-editor-v1-backup')) { const e = new Error('full'); e.name = 'QuotaExceededError'; throw e; } return real.call(this, k, v); }; });
-    await pg.fill('#title', 'After the disk filled'); await nap(1700);
+    await pg.fill('#title', 'After the disk filled'); await until(pg, () => { try { return JSON.parse(localStorage.getItem('story-editor-v1')).title === 'After the disk filled'; } catch (e) { return false; } });
     const saved = await pg.evaluate(() => { try { return JSON.parse(localStorage.getItem('story-editor-v1')).title; } catch (e) { return 'none'; } });
     ok(saved === 'After the disk filled', 'a full disk: the spare copy is dropped and the story still saves (saved: ' + saved + ')');
     ok(await pg.evaluate(() => document.querySelector('#nosave').hidden), 'no "cannot save" warning when the retry worked');
     /* nothing can be written at all */
     await pg.evaluate(() => { Storage.prototype.setItem = function (k, v) { if (k === 'story-editor-v1') throw new Error('blocked'); return window.__realSet.call(this, k, v); }; });
-    await pg.fill('#title', 'Cannot keep this'); await nap(1700);
+    await pg.fill('#title', 'Cannot keep this'); await until(pg, () => !document.querySelector('#nosave').hidden);
     ok(await pg.evaluate(() => !document.querySelector('#nosave').hidden), 'when the browser keeps nothing, the warning shows');
     const prevented = await pg.evaluate(() => { const e = new Event('beforeunload', { cancelable: true }); window.dispatchEvent(e); return e.defaultPrevented; });
     ok(prevented, 'closing the tab then asks first, because the changes exist nowhere else');
     await pg.evaluate(() => { Storage.prototype.setItem = window.__realSet; });
-    await pg.fill('#title', 'Works again'); await nap(1700);
+    await pg.fill('#title', 'Works again'); await until(pg, () => document.querySelector('#nosave').hidden);
     ok(await pg.evaluate(() => document.querySelector('#nosave').hidden), 'the warning goes away once saving works again');
     ok(!(await pg.evaluate(() => { const e = new Event('beforeunload', { cancelable: true }); window.dispatchEvent(e); return e.defaultPrevented; })), 'and closing no longer asks');
     ok(!pg.errs.length, 'no errors: ' + pg.errs.join('; ')); await pg.ctx.close();
@@ -73,10 +75,10 @@ const SETTINGS = JSON.stringify({ chosen: true, remember: true, advanced: { writ
   {
     const pg = await page('', { fresh: true, early: true }); // typing starts at once, before the tour's timer (4.6 s) fires
     await pg.fill('#title', 'Typing away'); await pg.focus('#title');
-    await nap(6500);
+    await pg.waitForTimeout(6500); /* returns once the tour's 4.6 s timer has run and chosen to wait (the page's own timers are what this waits for) */
     ok(!(await pg.locator('#tour').count()), 'the first-time tour waits while a text box has the focus');
     await pg.evaluate(() => document.activeElement.blur());
-    let started = false; for (let i = 0; i < 14 && !started; i++) { await nap(1000); started = (await pg.locator('#tour').count()) > 0; }
+    let started = true; await pg.waitForFunction(() => document.querySelector('#tour'), null, { timeout: 14000 }).catch(() => { started = false; });
     ok(started, 'and starts a few seconds after the typing stops');
     await pg.ctx.close();
   }

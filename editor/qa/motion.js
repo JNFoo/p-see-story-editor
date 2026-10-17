@@ -2,12 +2,16 @@
    splash plays for its full time, then leaves and the editor works. Usage: node motion.js [firefox|chromium]
    Copyright (c) 2026 LFC Foundry. MIT License. */
 process.env.QA_MOTION = '1'; /* before engine.js is read */
+delete process.env.QA_FIREFOX_PREFS; /* qa.js may have set the reduced-motion pref for its children (when it read engine.js to name the stock Chromium) */
 const which = process.argv[2] || 'firefox';
 const B = require('./engine').pick(which);
 const FILE = require('url').pathToFileURL((process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html'))).href;
 let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };
 (async () => {
-  const b = await B.launch(); const pg = await (await b.newContext()).newPage(); const errs = [];
+  const b = await B.launch(); const mc = await b.newContext();
+  /* the first-visit tour starts by itself 4.6 s after opening (round3 checks it); here it would cover the page just as this check clicks (it did once in Chromium), so it is marked as seen */
+  await mc.addInitScript(() => { try { localStorage.setItem('story-editor-v1-toured', '1'); } catch (e) {} });
+  const pg = await mc.newPage(); const errs = [];
   pg.on('pageerror', e => errs.push(e.message));
   const t = Date.now(); await pg.goto(FILE);
   await pg.waitForSelector('#splash', { timeout: 15000 });

@@ -5,9 +5,9 @@ not program. The short version for both: **run one line, read one summary.**
 
 ```
 cd qa
-node qa.js quick     about 1.5 minutes  after any change: the suites that catch most breakage, on Firefox
+node qa.js quick     about 1 minute  after any change: the suites that catch most breakage, on Firefox
 node qa.js smart     quick, plus every suite whose watched files changed since the last all-green run
-node qa.js full      about 5.5 minutes  the check before a file is delivered: everything on Firefox and on Chromium
+node qa.js full      about 6 minutes  the check before a file is delivered: everything on Firefox, Chromium and WebKitGTK, one browser at a time
 node qa.js full --only lite     only suites with "lite" in the name        --verbose  also print each suite's own output
 node qa.js full --reset-counts  accept a smaller number of checks on purpose (see "lost checks" below)
 node qa.js sample    about 1 minute  a cheap look between edits: the contract test, a rotating quarter of the quick suites and any suite whose files changed
@@ -68,7 +68,7 @@ What the adapter does, and what WebKitGTK 2.52.6 cannot do (each is checked for 
 - **No `navigator.storage` and no `CloseWatcher`:** `safety.js` adds a stand-in for the first and also checks the real "cannot say" path (section 1b); `gamefeel.js` expects Esc not to go Back there.
 - A held key does not reach the driver's wheel action, so Ctrl+wheel is sent as a script event; a right or middle click makes the driver type small letters, so capitals are sent with an explicit Shift.
 - `twowin` (two real windows) is run alone at the end of the lane (`SOLO`), because several suites opening windows at once made a new window hang.
-- **GNOME Web (Epiphany) 46.5:** `WEBKIT=epiphany node <suite> webkit` runs one suite in it instead of the plain WebKitGTK window (the driver starts Epiphany in automation mode). Only the `csp` check has been run there so far (2026-10-17); it refuses driver clicks, so suites that click need webkit-driver 1.2.0 from JS-modules, which is not copied here yet.
+- **GNOME Web (Epiphany) 46.5:** the fourth approved browser, with a short lane of its own after WebKitGTK (the full tier runs it; `--epiphany` adds it to any tier, `--no-webkit` leaves it out). It refuses WebDriver clicks, so it runs two jobs: `csp` (the policy check) and `epismoke` (`epismoke.js`: the editor opens, a typed title is saved, a script click on Map and Check switches views, a reload keeps the story, Copy game code gives a whole page with the policy that allows WebAssembly; about 8 s). `epismoke` fails on the build from before the games policy change (checked with `--against 9defa0c`). `WEBKIT=epiphany node <suite> webkit` runs any one suite in it; suites that click need webkit-driver 1.2.0 from JS-modules, which is not copied here yet. Line 1 of a run names its version.
 - `WK_TRACE=1 node <suite> webkit` prints each call and each window command with its time, which is how the hangs were found. If a run is killed, stray `Xvfb` and `WebKitWebDriver` processes may stay: end them with `pkill -x Xvfb; pkill -x WebKitWebDriver` (not `pkill -f`).
 
 Notes on the shim: it answers a selector like `text=Back` or `button:has-text("Play")` in the page itself (`bidi-engine.js`), waits for a page's own timers
@@ -145,6 +145,20 @@ are off, output goes to files. Then more suites were added (bug-fix rounds, thre
 | `npm test` | 19 s | 13.6 s |
 
 What changed, and why:
+- **Oct 17 (evening): shorter waits and cheaper start-ups** (4 cores, Firefox 158.0b5, ungoogled Chromium 155.0.8059.39, WebKitGTK 2.52.6). Quick tier: 74.7 s to 56.7 s
+  wall clock (smaller is better) and 151 s to 121 s of processor time. Full tier: 686 s (recorded earlier the same day) to 368 to 399 s in four full runs (113 suites with the two GNOME Web jobs in the last three; one retried pass each time, a different check each time, all since hardened).
+  - **A warm Firefox profile** (`bidi.js`): each launch copies a profile that has been started once (kept in the system temp folder, rebuilt when Firefox changes), so Firefox
+    starts in about 0.85 s instead of 1.7 s and closes in 0.2 s instead of 0.45 s (3 runs each). `QA_FF_COLD=1` starts with an empty profile as before.
+  - **Chromium brings its page to the front before acting on it** (`engine.js`, as the Firefox engine always did; `QA_NO_FRONT=1` turns it off). A second page left open made
+    Chromium redraw the editor page once a second, and every click then waited about 2 s for the page to hold still. `real` in Chromium: 46 s to 11 s.
+  - **Chromium waits end early** (`engine.js`, the same timer tracker Firefox uses; `QA_FIXED_WAITS=1` sleeps the whole time as before). `round3` 41.8 s to 24.9 s,
+    `safety` 32.6 s to 19.4 s, `twowin` 29.4 s to 20.5 s (alone, Chromium, same number of checks).
+  - **`fix2` no longer waits 30 s for a button that is not there** in each of the three browsers (42 s to 10 s in Firefox and 42 s to 9 s in Chromium, in the full run).
+  - **`bugs12` waits for the thing it checks** instead of sleeping 1.6 to 1.7 s after each save, 39 s to 31 s alone, 37 of 37 checks.
+  - **Seven workers on four cores for Firefox and Chromium, five for WebKitGTK** (default is cores + 3, at least 3, at most 7; was 5): quick 64 s with five, 57 s with seven, 78 s and one flaky pass with ten. The WebKitGTK lane alone (35 suites): 187 s and no flaky pass with five, 241 s and four flaky passes with seven, so that lane stays at five. `QA_JOBS=n` sets every lane.
+  - `motion` no longer fails when `CHROMIUM_PATH` is not set (the runner had passed it the reduced-motion setting by accident).
+  - `real` waits for what it checks in six places instead of fixed 120 to 800 ms looks (Enter adds a choice, the Save window, page type, Save as, Save, Ctrl+S) and clicks again if a click did not take; with 8 copies at once in WebKitGTK 3 of 8 failed before, 15 of 15 runs pass (43 of 43 checks) at 5 at once. `motion` marks the first-visit tour as seen, because it covered the page once in Chromium.
+  - Not changed: the waits that are the page's own timers (the opening 4.6 s tour timer, the 3.3 s reminder delay) and the WebKitGTK lane, which is now the longest (about 150 s of the full tier).
 - **Oct 17: five workers instead of three on a four-core machine** (default is cores + 1, at least 3 and at most 5), and one hidden 30 s wait removed from `tools8`.
   Quick tier, four cores, Firefox 158.0b5 and ungoogled Chromium 155.0.8059.39: 150 s with three workers, 112 s with five (same CPU time, about 250 s), 102 to 107 s with
   the wait gone: about 30% faster. `real` no longer uses three fixed sleeps, and now waits for the thing it checks (focus in the new choice box, the new page,

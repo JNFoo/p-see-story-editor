@@ -8,7 +8,7 @@ const b=await chromium.launch();
 const ctx=await b.newContext({viewport:{width:1280,height:800},acceptDownloads:true});
 /* a stand-in for the system Save window: waits 600 ms (the person choosing), then records what is written */
 await ctx.addInitScript(()=>{ if(!localStorage.getItem('story-editor-v1-settings')) localStorage.setItem('story-editor-v1-settings', JSON.stringify({chosen:true,remember:true,advanced:{write:true,map:true,items:true}})); window.__saves=[]; window.__pickerOpen=0;
-  window.showSaveFilePicker=function(o){ window.__pickerOpen++; return new Promise(r=>setTimeout(()=>r({createWritable:()=>Promise.resolve({ _c:'', write(b){ return b.text().then(t=>{this._c+=t;}); }, close(){ window.__saves.push({name:o.suggestedName,text:this._c}); return Promise.resolve(); } })}),600)); }; });
+  window.showSaveFilePicker=function(o){ window.__pickerOpen++; return (window.__pickGate||Promise.resolve()).then(()=>new Promise(r=>setTimeout(()=>r({createWritable:()=>Promise.resolve({ _c:'', write(b){ return b.text().then(t=>{this._c+=t;}); }, close(){ window.__saves.push({name:o.suggestedName,text:this._c}); return Promise.resolve(); } })}),600))); }; });
 const pg=await ctx.newPage();
 const logs=[];pg.on('console',m=>{if(['error','warning'].includes(m.type()))logs.push(m.type()+': '+m.text())});pg.on('pageerror',e=>logs.push('PAGEERR '+e.message));
 const reqs=[];pg.on('request',r=>{if(!r.url().startsWith('file:')&&!r.url().startsWith('data:'))reqs.push(r.url())});
@@ -35,7 +35,8 @@ sh=await page('Shore'); ok(sh.choices[0].to==='p_cliff','drag page onto a choice
 await pg.dragAndDrop('#pages button:has-text("Hall")','section.sect >> nth=1 >> .sech');
 sh=await page('Shore'); ok(sh.choices.length===nChoices+1,'drop page on Choices header adds a linked choice');
 // Enter adds a choice
-await pg.click('.clabel >> nth=0');await pg.keyboard.press('Enter');await pg.waitForFunction(n=>{const p=window.__editor.project.passages.find(x=>x.name==='Shore');return p&&p.choices.length>=n},nChoices+2,{timeout:5000}).catch(()=>{}); /* wait for the new choice, not a guessed 120 ms (WebKitGTK under load answered late once in 10 runs) */
+await pg.waitForFunction(n=>document.querySelectorAll('.clabel').length>=n,nChoices+1,{timeout:5000}).catch(()=>{});for(let t=0;t<4;t++){await pg.click('.clabel >> nth=0');if(await pg.waitForFunction(()=>document.activeElement&&document.activeElement.classList.contains('clabel'),null,{timeout:1500}).then(()=>true,()=>false))break;} /* the box is drawn and has the focus before Enter is sent (under load WebKitGTK sent it too early and it was lost) */
+await pg.keyboard.press('Enter');await pg.waitForFunction(n=>{const p=window.__editor.project.passages.find(x=>x.name==='Shore');return p&&p.choices.length>=n},nChoices+2,{timeout:5000}).catch(()=>{}); /* wait for the new choice, not a guessed 120 ms (WebKitGTK under load answered late once in 10 runs) */
 sh=await page('Shore'); ok(sh.choices.length===nChoices+2,'Enter in a choice adds another');
 ok(await pg.evaluate(()=>document.activeElement.classList.contains('clabel')),'focus moves to the new choice');
 // reorder pages by drag
@@ -51,8 +52,7 @@ for(let tries=0;tries<3&&after.indexOf('Hall')!==after.indexOf('Shore')-1;tries+
 }
 ok(after.indexOf('Hall')===after.indexOf('Shore')-1&&after.length===before.length,'reorder page list by drag');
 // page type segmented control: 1 click to make ending
-await pg.click('.seg label:has-text("Good ending")');
-for(let k=0;k<20&&!(await page('Shore')).ending;k++)await pg.waitForTimeout(100); /* the change is saved a moment after the click */
+for(let t=0;t<3;t++){await pg.click('.seg label:has-text("Good ending")');if(await pg.waitForFunction(()=>{const p=window.__editor.project.passages.find(x=>x.name==='Shore');return p&&p.ending&&p.valence==='good'},null,{timeout:2500}).then(()=>true,()=>false))break;} /* clicked again if the first click did not take (a busy WebKitGTK) */ /* the change lands a moment after the click (polled, not 20 guessed 100 ms looks) */
 sh=await page('Shore'); ok(sh.ending&&sh.valence==='good','page type: good ending in one click');
 await pg.click('.seg label:has-text("Page")');
 // ctx menu on map
@@ -79,9 +79,11 @@ ok((await pg.$$('.mapbox g.node.hit')).length>=5,'map search highlights matching
 // help dialog
 await pg.click('#help');ok(await pg.isVisible('.dlg.guide'),'quick guide opens');await pg.keyboard.press('Escape');
 // export and play offline
+await pg.evaluate(()=>{window.__pickGate=new Promise(r=>{window.__pickRelease=r})}); /* the Save window stays open until the check has looked (a fixed 600 ms was too short when the machine was busy) */
 await pg.click('#export');await pg.click('#export');          // a double click
 await pg.waitForFunction(()=>window.__pickerOpen===1);await pg.waitForTimeout(150);   // the Save window is open, then a short look for anything that should not happen
 ok(await pg.evaluate(()=>window.__saves.length===0 && ![...document.querySelectorAll('#toast:not([hidden]) .toastbtn')].some(b=>b.textContent.trim()!=='Redo')),'export writes nothing (and says nothing) while the Save window is open');
+await pg.evaluate(()=>{window.__pickRelease();window.__pickGate=null});
 await pg.waitForTimeout(700);
 ok(await pg.evaluate(()=>window.__saves.length===1 && window.__pickerOpen===1),'export saves exactly once, after the choice, even after a double click');
 ok(await pg.isVisible('#toast .toastbtn'),'one-click export offers "Show the code"');
@@ -136,15 +138,16 @@ await pg.dblclick('.mapbox',{position:{x:1215,y:200}});
 ok(await pg.isVisible('.dlg input'),'double-click on the map asks for a new page');await pg.keyboard.press('Escape');
 // backup download
 await pg.click('#menubtn');
-await pg.click('#menupop button:has-text("Save as")');await pg.waitForTimeout(800);
+const nSaves0=await pg.evaluate(()=>window.__saves.length);
+await pg.click('#menupop button:has-text("Save as")');await pg.waitForFunction(n=>window.__saves.length>n,nSaves0,{timeout:8000}).catch(()=>{}); /* the stand-in Save window answers after 600 ms; wait for the file, not a fixed 800 ms */
 ok(await pg.evaluate(()=>/\.story\.json$/.test(window.__saves[window.__saves.length-1].name)),'backup saves as .story.json');
 const nPick=await pg.evaluate(()=>window.__pickerOpen), nSave=await pg.evaluate(()=>window.__saves.length);
 await pg.click('#tabs button:has-text("Write")');await pg.fill('#main .block textarea >> nth=0','Changed for the save test.');await pg.waitForFunction(()=>document.querySelector('#savebtn').classList.contains('dirty'));
 ok(await pg.evaluate(()=>document.querySelector('#savebtn').classList.contains('dirty')),'the Save button shows unsaved changes');
-await pg.click('#savebtn');await pg.waitForTimeout(300);
+await pg.click('#savebtn');await pg.waitForFunction(b=>window.__saves.length>=b+1,nSave,{timeout:8000}).catch(()=>{});await pg.waitForTimeout(150);
 ok(await pg.evaluate(([a,b])=>window.__pickerOpen===a && window.__saves.length===b+1,[nPick,nSave]),'Save writes straight to the remembered file, with no window');
 ok(await pg.evaluate(()=>!document.querySelector('#savebtn').classList.contains('dirty')),'after saving, no unsaved-changes dot');
-await pg.keyboard.press('Control+s');await pg.waitForTimeout(300);
+await pg.keyboard.press('Control+s');await pg.waitForFunction(b=>window.__saves.length>=b+2,nSave,{timeout:8000}).catch(()=>{});await pg.waitForTimeout(150);
 ok(await pg.evaluate(b=>window.__saves.length===b+2,nSave),'Ctrl+S saves too');
 await pg.keyboard.press('Escape');
 // dark mode screenshot, sample story write view

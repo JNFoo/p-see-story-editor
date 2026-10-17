@@ -98,8 +98,12 @@ const WEBKIT_ONLY = args.includes('--webkit-only'); /* run just the WebKitGTK la
 const WEBKIT = WEBKIT_ONLY || args.includes('--webkit') || (tier === 'full' && !args.includes('--no-webkit') && !against);
 /* suites that do not run in WebKitGTK, and why (everything else that runs in Firefox does) */
 /* two WebKitGTK windows in one browser hang about half the time when other suites load the machine (30 s alone, 3 of 3 runs) */
-const SOLO = { 'twowin webkit': 'two windows in one WebKitGTK' };
+const SOLO = { 'twowin webkit': 'two windows in one WebKitGTK', 'csp gnome-web': 'one browser at a time', 'epismoke gnome-web': 'one browser at a time' };
 const NOT_IN_WEBKIT = { ffsmoke: 'it checks the Firefox stand-in itself', touch1: 'WebKitGTK 2.52.6 has no touch events' };
+/* GNOME Web 46.5 (Epiphany) is the fourth approved test browser. It refuses WebDriver clicks, so it gets a short lane of its own, after WebKitGTK and also one at a time:
+   the policy check (csp) and a smoke check with script clicks (epismoke). The full check includes it; --epiphany adds it to any tier; --no-webkit leaves it out with WebKitGTK. */
+const EPIPHANY = !WEBKIT_ONLY && (args.includes('--epiphany') || (tier === 'full' && WEBKIT)) && !args.includes('--no-webkit');
+const EPI_JOBS = [['csp gnome-web', 'csp.js'], ['epismoke gnome-web', 'epismoke.js']];
 const RUN = new Date().toISOString();
 
 /* ---- the ledger: one JSON line per suite per run ---- */
@@ -175,7 +179,7 @@ const waitForServer = async () => {
   let cr = process.env.CHROMIUM_PATH || '', stock = false;
   if (!cr) { try { cr = require('./engine').chromiumPath(); stock = true; } catch (e) { cr = ''; } }
   const usesCr = tier === 'full' || against || args.includes('--chromium');
-  console.log(`browsers: Firefox = ${ff ? ver(ff) + ' (' + ff + ')' : 'FIREFOX_PATH not set'}; Chromium = ${usesCr ? (cr ? ver(cr) + ' (' + cr + ')' + (stock ? ' STOCK Playwright build, not the approved ungoogled one; set CHROMIUM_PATH' : '') : 'not found') : 'not used in this tier'}; WebKitGTK = ${WEBKIT ? require('../../packages/qa-kit/src/webkit.js').version() : 'not used in this tier'}`);
+  console.log(`browsers: Firefox = ${ff ? ver(ff) + ' (' + ff + ')' : 'FIREFOX_PATH not set'}; Chromium = ${usesCr ? (cr ? ver(cr) + ' (' + cr + ')' + (stock ? ' STOCK Playwright build, not the approved ungoogled one; set CHROMIUM_PATH' : '') : 'not found') : 'not used in this tier'}; WebKitGTK = ${WEBKIT ? require('../../packages/qa-kit/src/webkit.js').version() : 'not used in this tier'}; GNOME Web = ${EPIPHANY ? (() => { const e = spawnSync('dpkg-query', ['-W', '-f', '${Version}', 'epiphany-browser'], { encoding: 'utf8' }); return e.status === 0 ? 'GNOME Web (Epiphany) ' + e.stdout.trim().replace(/-.*$/, '') : 'GNOME Web (version not found)'; })() : 'not used in this tier'}`);
 }
 /* the jobs for this tier */
 const jobs = [];
@@ -205,6 +209,7 @@ const lane = engine => SUITES.forEach(s => {
 lane('firefox');
 lane('chromium');
 lane('webkit');
+if (EPIPHANY) EPI_JOBS.forEach(([label, file]) => { if (!only || label.includes(only) || file.includes(only)) jobs.push({ label, cmd: ['env', 'WEBKIT=epiphany', 'node', file, 'webkit'], lane: 'epiphany' }); });
 
 if (tier === 'smart' || tier === 'sample') console.log('changed since the last all-green run:', changed.join(', ') || 'nothing');
 if (skipped.length) console.log('left out because their history shows the changed files never broke them (5 or more runs): ' + [...new Set(skipped)].join(', ') + ' (a full check still runs them)');
@@ -274,9 +279,9 @@ const runOne = async job => {
 const worker = async () => { for (let job; (job = queue.shift()); ) await runOne(job); };
 (async () => {
 await waitForServer();
-for (const lane of ['firefox', 'chromium', 'webkit']) {
+for (const lane of ['firefox', 'chromium', 'webkit', 'epiphany']) {
   queue = jobs.filter(j => j.lane === lane && !SOLO[j.label]).sort(byTime);
-  await Promise.all(Array.from({ length: WORKERS }, worker));
+  await Promise.all(Array.from({ length: lane === 'webkit' && !process.env.QA_JOBS ? Math.min(WORKERS, 5) : WORKERS }, worker)); /* WebKitGTK: 5 at a time (lane alone, 35 suites: 5 -> 187 s and 0 flaky, 7 -> 241 s and 4 flaky) */
   /* suites that need the machine to themselves run last, one at a time */
   for (const j of jobs.filter(j => j.lane === lane && SOLO[j.label])) { queue = [j]; await worker(); }
 }

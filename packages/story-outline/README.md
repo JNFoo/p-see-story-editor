@@ -93,5 +93,9 @@ Twine's Twee 3 and Ink are also plain text, but each has its own syntax for link
 
 See [AGENTS.md](AGENTS.md).
 
+## Changelog
+
+[CHANGELOG.md](CHANGELOG.md): what changed in each version, in plain words.
+
 ---
 Part of [story-editor](../../README.md) · MIT License · Copyright (c) 2026 LFC Foundry

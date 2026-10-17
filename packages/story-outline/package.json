@@ -24,6 +24,7 @@
     "src",
     "index.d.ts",
     "README.md",
+    "CHANGELOG.md",
     "AGENTS.md",
     "examples"
   ],

@@ -1105,7 +1105,7 @@ function escapeHtml(s) {
 
 /** The Content-Security-Policy used by the editor and by exported games: nothing may touch the network. */
 const CSP_OFFLINE =
-  "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; " +
+  "default-src 'none'; script-src 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'unsafe-inline'; img-src data:; font-src data:; " +
   "connect-src 'none'; form-action 'none'; base-uri 'none'";
 
 

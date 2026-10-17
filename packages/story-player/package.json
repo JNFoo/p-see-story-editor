@@ -1,6 +1,6 @@
 {
   "name": "story-player",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Builds one offline HTML game from a story, plays stories from code, and plays them in a terminal. Zero dependencies.",
   "license": "MIT",
   "author": "LFC Foundry",

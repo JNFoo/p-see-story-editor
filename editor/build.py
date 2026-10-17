@@ -166,7 +166,7 @@ BODY = """<!-- Page frame. The editor fills #side, #main and #itemside with Java
 <div id="tip" role="tooltip" aria-hidden="true"></div>
 """
 
-CSP = ("default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; "
+CSP = ("default-src 'none'; script-src 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'unsafe-inline'; img-src data:; font-src data:; "
        "connect-src 'none'; form-action 'none'; base-uri 'none'")
 
 DATA = ('<!-- Data, never run here: the built-in example story (JSON), and the code and styles of the game (one piece per optional feature; an exported game gets only the pieces its story uses). -->\n'

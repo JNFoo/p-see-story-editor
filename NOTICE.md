@@ -14,7 +14,7 @@
 
 **Not included.** Tools you install yourself keep their own licenses and are not part of this repository: esbuild and Prettier (build and format), Zopfli (optional, smaller output), Puppeteer, Playwright and a browser (the test suites).
 
-**Twine, its story formats and the import feature.** File → Import Twine… and `importTwine` read the *file formats* of Twine (Twine 2 HTML, Twee 3 text, Twine 1 HTML). They contain **no source code, text or data copied from Twine or any story format**; the readers were written from the formats' behavior, and the test files in `editor/qa/fixtures/twine/` and `packages/story-format/test/fixtures/` are original, written for these tests. A game exported from this editor contains only this project's code, not Twine's.
+**Twine, its story formats and the import feature.** File → Import Twine… and `importTwine` read the *file formats* of Twine (Twine 2 HTML, Twee 3 text, Twine 1 HTML). They contain **no source code, text or data copied from Twine or any story format**; the readers were written from the formats' behavior, and the test files in `editor/qa/fixtures/twine/` and `packages/twine-import/test/fixtures/` are original, written for these tests. A game exported from this editor contains only this project's code, not Twine's.
 
 Licenses of the projects involved, as stated on their own pages when checked on 2026-10-14 (a project's license applies to *its* code; it does not decide who owns a story written with it):
 

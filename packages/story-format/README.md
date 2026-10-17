@@ -103,7 +103,7 @@ The end of the road.
 | `exportStory(project)` | The compact data a game needs (no editor-only fields: page names, unfinished flags). |
 | `storyFind(project, text, { matchCase, whole })`, `storyReplace(project, text, replacement, opts, only?)` | Search and replace across names, headings, paragraphs, choice labels and reasons; `only` replaces one match. |
 | `storyOrder`, `storyManuscript`, `storyStats` | Reading order, the story as Markdown, counts. |
-| `importTwine(text, { code, story })`, `twineRead`, `twineConvert` | Turns a Twine story (Twine 2 HTML, a library archive, Twee 3 text or Twine 1 HTML) into this format, with a plain-words report. SugarCube, Twine 1 and Harlowe code becomes items and conditions as far as rules can say it; the rest stays as flagged text. The author is copied exactly as the file names it, never replaced. Command line: `npx twine-to-story story.html`. |
+| *(Twine import)* | Moved to its own package, [twine-import](../twine-import/README.md), on 2026-10-17 (story-format 2.0.0). It returns a project this package reads. |
 | `STARTERS` | Six small starter stories (time cave, branch and bottleneck, sorting hat, hub and spokes, gauntlet, quest with dice) that show common shapes. Each has `make()`. |
 | `GAME_OPTIONS`, `GAME_DEFAULTS`, `PALETTES`, `BACK_MODES`, `FIELD_CONTRACT` | The reader options table, color sets, and the contract of which fields change play. |
 
@@ -126,12 +126,11 @@ A summary of each format's public design, written from its documentation as I un
 | Checks "can this ending ever happen?" over items, numbers and dice | Yes, exhaustively (`story-check`) | Shows links; no rule analysis | Not as far as I know | Not as far as I know | Has test tools that play through by trying choices and random runs |
 | Checked file shape | JSON Schema and a sanitizer for old or damaged files | HTML/Twee specifications | Compiler errors | Compiler errors | Interpreter errors |
 | Made for | People and AI helpers writing stories as data | Writers who may use code | Games with a code engine | Games with a code engine | Text-choice games |
-| Reads Twine files | Yes (`importTwine`) | Is the source | No | No | No |
+| Reads Twine files | Yes (the [twine-import](../twine-import/README.md) package) | Is the source | No | No | No |
 | Writes a stand-alone game | Yes, one offline HTML file | Yes (publish) | Through a game engine or web player | Through a game engine | Yes |
 
 ## Limits
 
-- Twine import is best effort: only SugarCube, Twine 1 and Harlowe code is translated; values printed in text, arrays, objects and random numbers cannot be carried over and are flagged. The author named in the Twine file is kept word for word, and the story text remains that author’s work (see [NOTICE.md](../../NOTICE.md)).
 - No scripting, loops, text variables inside sentences, or inventory with quantities (objects are held or not; numbers are bounded integers).
 - American English messages in the helper functions.
 - The format name in files is `story-editor`, from the editor it came from.

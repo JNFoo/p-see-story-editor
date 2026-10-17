@@ -53,7 +53,8 @@ Honest comparison against `JS-modules` and the games, as of 2026-10-13. "Reuse" 
 |---|---|---|
 | **Exact story checker** (items, numbers, dice, locked choices, Given answers; bit masks, BigInt above 30 tracked items, honest "not checked" at a work limit, trap loops, why-unreachable) | `core.js` `analyze`; package `story-check` | New. No counterpart in JS-modules. |
 | **Contract test + field table** (`FIELD_CONTRACT`, `KL_RULES`, 400 random stories played two ways) | `editor/contract.mjs`, `core.js` | New as a pattern. JS-modules tests check modules; nothing there compares two implementations of one rule set. |
-| **Story model, cleaner, importer, exporter** | `core.js`; package `story-format` | New. |
+| **Story model, cleaner, exporter** | `core.js`; package `story-format` | New. |
+| **Twine importer** (links plus SugarCube/Harlowe code turned into rules, with a plain-words report) | `twine.js`; package `twine-import` (split out of story-format 2026-10-17) | New. |
 | **Lite export** (core player plus feature modules, `@part` styles, only the chosen palette and font) | `player.js` `klFeat…`, `game.css`, `build-game.mjs`, `klFeatures()` | New. |
 | **Map layout engine** (layered, crossing reduction with stable seeding, exact least-squares placement, choke points, arc/matrix/shape/river views, simulated players, layout metrics) | `maplayout.js`; package `story-map` | New. |
 | **Self-unzipping page with a pure-JS inflate fallback**, zipped in the browser with `CompressionStream` | `core.js` `zipPage`/`zipInflate`; package `zip-page` | Partly overlaps `JS-modules/tools/single-file-tools` (a Zopfli packer run at build time) and `lzma-pack`/`lzma-decode`. Difference: this one compresses **in the browser at export time**, which neither build-time tool can do. |

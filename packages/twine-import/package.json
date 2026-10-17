@@ -1,0 +1,56 @@
+{
+  "name": "twine-import",
+  "version": "1.0.0",
+  "description": "Reads Twine stories (Twine 2 HTML, Twee 3, Twine 1) and turns SugarCube and Harlowe code into rules, with a plain-words report. Zero dependencies.",
+  "license": "MIT",
+  "author": "LFC Foundry",
+  "type": "module",
+  "main": "dist/twine-import.mjs",
+  "module": "dist/twine-import.mjs",
+  "types": "index.d.ts",
+  "unpkg": "dist/twine-import.min.global.js",
+  "jsdelivr": "dist/twine-import.min.global.js",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./dist/twine-import.mjs"
+    },
+    "./global": "./dist/twine-import.global.js",
+    "./min": "./dist/twine-import.min.mjs",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "bin",
+    "index.d.ts",
+    "README.md",
+    "AGENTS.md",
+    "examples"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lfcfoundry/story-editor.git",
+    "directory": "packages/twine-import"
+  },
+  "homepage": "https://github.com/lfcfoundry/story-editor/tree/main/packages/twine-import",
+  "keywords": [
+    "twine",
+    "twee",
+    "harlowe",
+    "sugarcube",
+    "interactive-fiction",
+    "import",
+    "converter"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "bin": {
+    "twine-to-story": "bin/twine-to-story.mjs"
+  }
+}

@@ -45,15 +45,21 @@ const MODEL = ['makeProject', 'makePassage', 'makeChoice', 'makeBlock', 'makeIte
 export const PACKAGES = {
   'story-format': {
     global: 'StoryFormat',
-    files: [CORE, TWINE],
-    what: 'The story data model: create, normalize, import (old text format and Twine), export, search and measure interactive stories.',
+    files: [CORE],
+    what: 'The story data model: create, normalize, import (old text format), export, search and measure interactive stories.',
     roots: [
       ...MODEL,
       'FIELD_CONTRACT', 'GAME_DEFAULTS', 'GAME_OPTIONS', 'BACK_MODES', 'PALETTES', 'STARTERS', 'STAT_MIN', 'STAT_MAX',
       'statTest', 'parseStatTest', 'givenOf', 'condSummary',
-      'parseLegacy', 'twineRead', 'twineConvert', 'importTwine', 'exportStory', 'klFingerprint', 'klShortIds',
+      'parseLegacy', 'exportStory', 'klFingerprint', 'klShortIds',
       'storyFind', 'storyReplace', 'storyOrder', 'storyManuscript', 'storyStats'
     ]
+  },
+  'twine-import': {
+    global: 'TwineImport',
+    files: [CORE, TWINE],
+    what: 'Reads Twine stories (Twine 2 HTML, Twee 3, Twine 1) and turns SugarCube and Harlowe code into rules, with a plain-words report.',
+    roots: [...MODEL, 'twineRead', 'twineConvert', 'importTwine']
   },
   'story-check': {
     global: 'StoryCheck',

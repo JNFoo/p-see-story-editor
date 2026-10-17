@@ -18,6 +18,21 @@
       "dependencies": "none"
     },
     {
+      "id": "twine-import",
+      "summary": "Reads Twine stories (Twine 2 HTML, Twee 3, Twine 1) and turns SugarCube and Harlowe code into rules, with a plain-words report. Zero dependencies.",
+      "esm": "packages/twine-import/dist/twine-import.mjs",
+      "global": "packages/twine-import/dist/twine-import.global.js",
+      "esmMin": "packages/twine-import/dist/twine-import.min.mjs",
+      "globalMin": "packages/twine-import/dist/twine-import.min.global.js",
+      "types": "packages/twine-import/index.d.ts",
+      "readme": "packages/twine-import/README.md",
+      "example": "packages/twine-import/examples/quickstart.mjs",
+      "dependencies": "none",
+      "bin": {
+        "twine-to-story": "bin/twine-to-story.mjs"
+      }
+    },
+    {
       "id": "story-check",
       "summary": "Exact checker for branching stories with items, numbers and dice: dead ends, unreachable pages, endings no player can reach. Zero dependencies.",
       "esm": "packages/story-check/dist/story-check.mjs",

@@ -14,7 +14,7 @@
    Copyright (c) 2026 LFC Foundry. MIT License. */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { basename } from 'node:path';
-import { importTwine, twineRead } from '../dist/story-format.mjs';
+import { importTwine, twineRead } from '../dist/twine-import.mjs';
 
 const args = process.argv.slice(2);
 const flag = n => args.includes(n);

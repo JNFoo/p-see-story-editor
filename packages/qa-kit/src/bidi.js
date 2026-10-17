@@ -293,11 +293,33 @@ class Context {
 }
 
 class Browser {
-  constructor(b) { this.b = b; }
+  constructor(b, cleanup) { this.b = b; this.cleanup = cleanup; }
   async newContext(opts = {}) { return new Context(this, await this.b.createBrowserContext(), opts); }
   async newPage(opts) { return (await this.newContext(opts)).newPage(); }
   version() { return this.b.version(); }
-  async close() { try { await this.b.close(); } catch (e) { /* closed */ } }
+  async close() { try { await this.b.close(); } catch (e) { /* closed */ } if (this.cleanup) this.cleanup(); }
+}
+
+/* A started-once Firefox profile, copied for each launch: Firefox starts in about half the time with its start-up files already built
+   (measured Oct 17 on 4 cores: launch 1.7 s -> 0.85 s, close 0.45 s -> 0.2 s, 3 runs each) and nothing else differs: the same program,
+   the same prefs (they are written fresh on every launch), and no page data in the template. QA_FF_COLD=1 starts with an empty profile as before. */
+function warmProfile(puppeteer, FIREFOX) {
+  const fs = require('fs'), os = require('os'), path = require('path');
+  const st = fs.statSync(FIREFOX);
+  const key = require('crypto').createHash('sha1').update(fs.realpathSync(FIREFOX) + st.size + st.mtimeMs).digest('hex').slice(0, 12);
+  const tmpl = path.join(os.tmpdir(), 'qa-ff-template-' + key);
+  const make = async () => {
+    const part = tmpl + '.' + process.pid;
+    fs.rmSync(part, { recursive: true, force: true }); fs.mkdirSync(part);
+    const b = await puppeteer.launch({ browser: 'firefox', executablePath: FIREFOX, headless: true, args: [], userDataDir: part });
+    await b.close();
+    try { fs.renameSync(part, tmpl); } catch (e) { fs.rmSync(part, { recursive: true, force: true }); } /* another run made it first */
+  };
+  return { exists: () => fs.existsSync(tmpl), make, copy: () => {
+    const dir = path.join(os.tmpdir(), 'qa-ff-run-' + process.pid + '-' + Date.now());
+    fs.cpSync(tmpl, dir, { recursive: true });
+    return dir;
+  } };
 }
 
 exports.firefox = {
@@ -305,8 +327,14 @@ exports.firefox = {
     const puppeteer = require('./resolve.cjs').load('puppeteer');
     const FIREFOX = process.env.FIREFOX_PATH || process.env.FIREFOX_158;
     if (!FIREFOX) throw new Error('Set FIREFOX_PATH to the Firefox program (stock Firefox 129 or newer speaks WebDriver BiDi), e.g. FIREFOX_PATH=/usr/bin/firefox');
-    const b = await puppeteer.launch({ browser: 'firefox', executablePath: FIREFOX, headless: o.headless !== false, args: [], extraPrefsFirefox: { ...JSON.parse(process.env.QA_FIREFOX_PREFS || '{}'), ...(o.prefs || {}) } });
-    return new Browser(b);
+    let dir = '', warm = null;
+    if (!process.env.QA_FF_COLD) {
+      try { warm = warmProfile(puppeteer, FIREFOX); if (!warm.exists()) await warm.make(); dir = warm.exists() ? warm.copy() : ''; } catch (e) { dir = ''; } /* any trouble: start cold, as before */
+    }
+    const cleanup = dir ? () => { try { require('fs').rmSync(dir, { recursive: true, force: true }); } catch (e) { /* gone */ } } : undefined;
+    if (cleanup) process.on('exit', cleanup);
+    const b = await puppeteer.launch({ browser: 'firefox', executablePath: FIREFOX, headless: o.headless !== false, args: [], ...(dir ? { userDataDir: dir } : {}), extraPrefsFirefox: { ...JSON.parse(process.env.QA_FIREFOX_PREFS || '{}'), ...(o.prefs || {}) } });
+    return new Browser(b, cleanup);
   }
 };
 

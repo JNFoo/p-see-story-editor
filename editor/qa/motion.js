@@ -2,6 +2,7 @@
    splash plays for its full time, then leaves and the editor works. Usage: node motion.js [firefox|chromium]
    Copyright (c) 2026 LFC Foundry. MIT License. */
 process.env.QA_MOTION = '1'; /* before engine.js is read */
+delete process.env.QA_FIREFOX_PREFS; /* qa.js may have set the reduced-motion pref for its children (when it read engine.js to name the stock Chromium) */
 const which = process.argv[2] || 'firefox';
 const B = require('./engine').pick(which);
 const FILE = require('url').pathToFileURL((process.env.QA_EDITOR || require('path').join(__dirname, '..', 'story-editor.html'))).href;

@@ -35,7 +35,7 @@ sh=await page('Shore'); ok(sh.choices[0].to==='p_cliff','drag page onto a choice
 await pg.dragAndDrop('#pages button:has-text("Hall")','section.sect >> nth=1 >> .sech');
 sh=await page('Shore'); ok(sh.choices.length===nChoices+1,'drop page on Choices header adds a linked choice');
 // Enter adds a choice
-await pg.click('.clabel >> nth=0');await pg.keyboard.press('Enter');await pg.waitForTimeout(120);
+await pg.click('.clabel >> nth=0');await pg.keyboard.press('Enter');await pg.waitForFunction(n=>{const p=window.__editor.project.passages.find(x=>x.name==='Shore');return p&&p.choices.length>=n},nChoices+2,{timeout:5000}).catch(()=>{}); /* wait for the new choice, not a guessed 120 ms (WebKitGTK under load answered late once in 10 runs) */
 sh=await page('Shore'); ok(sh.choices.length===nChoices+2,'Enter in a choice adds another');
 ok(await pg.evaluate(()=>document.activeElement.classList.contains('clabel')),'focus moves to the new choice');
 // reorder pages by drag
@@ -102,6 +102,7 @@ ok((await g.$$('.kl-choices button')).length>0,'exported game plays');
   await oc.close(); }
 await g.click('.kl-choices button >> nth=0');
 ok(glogs.length===0,'exported game: no console errors '+glogs.join('|'));
+await g.close(); if(pg.bringToFront)await pg.bringToFront(); /* a page left open in front makes Chromium redraw the editor page once a second, and every click then waited about 2 s for the page to hold still (measured Oct 17: real in Chromium 46 s -> see changelog) */
 ok(/font-family:'Inter Tight'/.test(exp),'export embeds its typeface');
 // Givens: create one, it is asked before page one, it cannot go into Gets, and the recap starts with it
 await pg.click('#tabs button:has-text("Items")');await pg.click('#main button:has-text("+ New Given")');

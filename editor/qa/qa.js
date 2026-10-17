@@ -240,7 +240,7 @@ const TIMES = fs.existsSync(timesFile) ? JSON.parse(fs.readFileSync(timesFile, '
 /* One browser at a time (the owner's rule, Oct 17): all Firefox jobs finish before the first Chromium job starts. The Node-only jobs ride in the first group. */
 const byTime = (x, y) => (TIMES[y.label] ?? 40) - (TIMES[x.label] ?? 40);
 let queue = [];
-const WORKERS = Math.max(1, +process.env.QA_JOBS || Math.min(5, Math.max(3, require('os').cpus().length + 1))); /* measured Oct 17 on 4 cores: 3 at a time 150 s, 5 at a time 112 s, same compute, 28 of 28 pass */
+const WORKERS = Math.max(1, +process.env.QA_JOBS || Math.min(7, Math.max(3, require('os').cpus().length + 3))); /* measured Oct 17 on 4 cores: 3 at a time 150 s, 5 at a time 112 s (old start-up); with the warm profile quick took 5: 64 s, 7: 57 s, 10: 78 s and a flaky pass, 29 of 29 pass at 5 and 7 */
 {
   const known = jobs.filter(j => TIMES[j.label] !== undefined);
   const secs = jobs.reduce((t, j) => t + (TIMES[j.label] ?? 40), 0) / WORKERS;

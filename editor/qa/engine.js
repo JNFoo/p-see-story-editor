@@ -25,6 +25,36 @@ if (!MOTION) {
     };
   } catch (e) { /* different Playwright layout: the splash is simply waited out */ }
 }
+/* Chromium redraws a page that is not the front tab only once a second, so every click on it waited about 2 s for the page to hold still (found Oct 17: suite real
+   took 46 s in Chromium against 12 s with this; the Firefox engine already brings its page to the front, bidi.js _front). Before a page is acted on, bring it to the
+   front, once per change of page. QA_NO_FRONT=1 turns it off. */
+if (process.env.QA_NO_FRONT !== '1') {
+  try {
+    const dir = require('path').join(require('../../packages/qa-kit/src/resolve.cjs').dirOf('playwright-core'), 'lib/client/');
+    const { Frame } = require(dir + 'frame'); const { Keyboard, Mouse } = require(dir + 'input');
+    let front = null;
+    const raise = async pg => { if (pg && front !== pg) { front = pg; await pg.bringToFront().catch(() => { front = null; }); } };
+    const wrap = (proto, names, pageOf) => names.forEach(n => { const f = proto[n]; if (typeof f === 'function') proto[n] = async function (...a) { await raise(pageOf(this)); return f.apply(this, a); }; });
+    wrap(Frame.prototype, ['click', 'dblclick', 'dragAndDrop', 'fill', 'focus', 'hover', 'press', 'selectOption', 'setInputFiles', 'tap', 'type', 'check', 'uncheck', 'waitForSelector', 'waitForFunction', 'evaluate'], f => f.page());
+    wrap(Keyboard.prototype, ['down', 'up', 'insertText', 'type', 'press'], k => k._page);
+    wrap(Mouse.prototype, ['move', 'down', 'up', 'click', 'dblclick', 'wheel'], m => m._page);
+  } catch (e) { /* different Playwright layout: pages are simply not raised */ }
+}
+/* Waits that end early, as in Firefox: waitForTimeout(ms) in Chromium used to sleep the whole time. With the page's timer tracker (bidi-engine.js, the one the Firefox engine
+   uses) it returns as soon as nothing that would happen within ms is left (every timer due in that window has run and every animation that ends in it has ended).
+   QA_FIXED_WAITS=1 sleeps the whole time as before. */
+const ENGINE_SRC = process.env.QA_FIXED_WAITS === '1' ? '' : require('fs').readFileSync(require('path').join(__dirname, '..', '..', 'packages', 'qa-kit', 'src', 'bidi-engine.js'), 'utf8');
+if (ENGINE_SRC) {
+  try {
+    const dir = require('path').join(require('../../packages/qa-kit/src/resolve.cjs').dirOf('playwright-core'), 'lib/client/');
+    const { Page } = require(dir + 'page');
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+    Page.prototype.waitForTimeout = async function (ms) {
+      if (ms < 60) return sleep(ms);
+      try { await Promise.race([this.evaluate(m => (window.__pwq && window.__pwq.settle ? window.__pwq.settle(m) : new Promise(r => setTimeout(r, m))), ms), sleep(ms + 1500)]); } catch (e) { await sleep(ms); } /* the page went away or was reloaded under us */
+    };
+  } catch (e) { /* different Playwright layout: waits stay fixed */ }
+}
 /* CHROMIUM_PATH names the Chromium to drive (the approved ungoogled build). If it is set, that program is used or the run stops: there is no quiet
    fallback to Playwright's own Chromium, because a run labelled with one browser must really be that browser. Without it, Playwright's stock Chromium
    is used and qa.js says so on its first line. */
@@ -32,10 +62,10 @@ const CHROMIUM_PATH = process.env.CHROMIUM_PATH || '';
 if (CHROMIUM_PATH && !require('fs').existsSync(CHROMIUM_PATH)) throw new Error('CHROMIUM_PATH is set to ' + CHROMIUM_PATH + ' but there is no such file; refusing to fall back to another Chromium');
 const chromium = {
   async launch(o = {}) {
-    const b = await pw.chromium.launch(CHROMIUM_PATH ? { ...o, executablePath: CHROMIUM_PATH, args: [...(o.args || []), '--no-sandbox'] } : o);
+    const b = await pw.chromium.launch(CHROMIUM_PATH ? { ...o, executablePath: CHROMIUM_PATH, args: [...(o.args || []), '--no-sandbox', ...(process.env.QA_CHROMIUM_FLAGS || '').split(' ').filter(Boolean)] } : o);
     const nc = b.newContext.bind(b), np = b.newPage.bind(b);
-    b.newContext = x => nc(calm(x));
-    b.newPage = x => np(calm(x));
+    b.newContext = async x => { const c = await nc(calm(x)); if (ENGINE_SRC) await c.addInitScript(ENGINE_SRC); return c; };
+    b.newPage = async x => { const p = await np(calm(x)); if (ENGINE_SRC) await p.context().addInitScript(ENGINE_SRC); return p; };
     return b;
   }
 };

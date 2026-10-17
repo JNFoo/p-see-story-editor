@@ -47,7 +47,8 @@ const current=fs.readFileSync(up+'sample.story.json','utf8'), older=fs.readFileS
   await pg.evaluate(()=>document.documentElement.setAttribute('data-theme','dark')); await pg.locator('#tabs [data-tab=map]').click(); await pg.waitForTimeout(300);
   await pg.click('button[aria-label="Color by playtest heat"]'); await pg.waitForTimeout(300);
   await pg.screenshot({path:'work/shots/dark-heat.png'});
-  await pg.click('[aria-label="Map view"] button[aria-label="Given lanes"]').catch(()=>{}); 
+  /* the Given lanes button exists only when the story has Givens; clicking a missing button waited the full 30 s timeout on every run, and only a screenshot (off unless SHOTS=1) follows */
+  if (await pg.locator('[aria-label="Map view"] button[aria-label="Given lanes"]').count()) await pg.click('[aria-label="Map view"] button[aria-label="Given lanes"]');
   await pg.evaluate(()=>document.documentElement.setAttribute('data-theme','light'));
   console.log('errors', errs);
   // phone

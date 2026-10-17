@@ -61,10 +61,11 @@ const SETTINGS = JSON.stringify({ chosen: true, remember: true, advanced: { writ
   ok(saves.length === 2 && JSON.parse(saves[1]).rev === 2, 'Ctrl+S writes revision 2 (' + saves.length + ' saves, rev ' + (saves[1] && JSON.parse(saves[1]).rev) + ')');
   ok(/revision 2/.test(await toastText(pg)), 'the toast says revision 2: ' + await toastText(pg));
   /* the revision and time are part of the story: they survive a reload */
+  const pre = await pg.evaluate(() => [window.__editor.guard, (JSON.parse(localStorage.getItem('story-editor-v1')) || {}).title]);
   await pg.reload(); await pg.waitForFunction(() => window.__editor && !document.getElementById('splash'), null, { timeout: 20000 }); await pg.waitForTimeout(400);
   const kept = await pg.evaluate(() => { const o = JSON.parse(localStorage.getItem('story-editor-v1')); return [o.rev, o.savedAt, o.id, o.title, Object.keys(localStorage).join('+')]; });
   ok(kept[0] === 2 && !!kept[1], 'the autosave keeps revision 2 and its time across a reload: ' + kept.slice(0, 2));
-  if (kept[0] !== 2) console.log('DEBUG', JSON.stringify(kept));
+  if (kept[0] !== 2) console.log('DEBUG', JSON.stringify(kept), 'before the reload (guard, stored title):', JSON.stringify(pre));
   await pg.context().close();
 
   /* ---- 1b. a browser with no storage API at all (WebKitGTK 2.52.6): the box must say it cannot tell, not hang on "checking…" ---- */

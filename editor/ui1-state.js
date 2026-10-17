@@ -272,6 +272,7 @@ const DAMAGED_KEY = `${STORE}-damaged`; // an unreadable save, kept so nothing i
 const BACKUP_EVERY = 10 * 60 * 1000;
 let lastBackup = 0;
 let lastLocalSave = 0; // when the autosave last wrote to this browser (shown in the status line)
+let storeSeen; // the save text this window last read from storage or wrote to it; undefined while unknown (storage unreadable)
 /** Is this text a whole story the editor could open? Checked before every save so a broken state never overwrites a good one. */
 function savable(text) {
   try {
@@ -304,6 +305,12 @@ function persistNow(forceSpare) {
   };
   try {
     const before = localStorage.getItem(STORE);
+    /* Another window saved since this one last looked (its `storage` event did not reach us, or it does not share our lock): do not write over it.
+       A forced save is the person's own choice (Keep mine, New story, Open), and keeps their version as the spare. */
+    if (!forceSpare && storeSeen !== undefined && before !== storeSeen && before !== cur && savable(before)) {
+      guardBox('changed');
+      return;
+    }
     try {
       localStorage.setItem(STORE, cur);
     } catch (e) {
@@ -311,6 +318,7 @@ function persistNow(forceSpare) {
       localStorage.removeItem(BACKUP_KEY);
       localStorage.setItem(STORE, cur);
     }
+    storeSeen = cur;
     keepSpare(before);
     lastLocalSave = Date.now();
     if (typeof renderStatus === 'function') renderStatus();

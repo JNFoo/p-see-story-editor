@@ -16,7 +16,7 @@ const have = new Set(tracked);
 const bases = new Set(tracked.map(f => path.basename(f)));
 const HISTORY = new Set(['docs/CHANGELOG.md', 'docs/OPTIMIZATION-CHART.md']);
 /* made by a build or a test run, or kept outside this repository on purpose */
-const BUILT = new Set(['story-editor.html', 'story-editor.packed.html', 'counts.json', 'times.json', 'sizes-last.json', 'package-lock.json', 'CLAUDE.md']);
+const BUILT = new Set(['story-editor.html', 'story-editor.packed.html', 'counts.json', 'times.json', 'sizes-last.json', 'package-lock.json', 'CLAUDE.md', 'QA-AND-BROWSER-TESTING-UNIVERSAL-GUIDE.md']);
 /* other repositories' files, and made-up example names in how-to text */
 const ELSEWHERE = n => n === 'TASKS.md' || n.startsWith('JS-modules/') || ['something.html', 'game.html'].includes(n);
 const EXT = /\.(md|js|mjs|cjs|json|py|css|html|txt|sh|zip)$/;

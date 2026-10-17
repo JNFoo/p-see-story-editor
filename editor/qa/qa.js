@@ -157,6 +157,16 @@ const waitForServer = async () => {
   }
 };
 
+/* First line of every run: the browsers this run really drives, read from the programs themselves (never from a label), so a run cannot be
+   reported under the wrong browser. Chromium is only used by the full check, --against and the phone/touch suites. */
+{
+  const ver = exe => { try { return (spawnSync(exe, ['--version'], { encoding: 'utf8', timeout: 20000 }).stdout || '').trim().split('\n')[0] || 'version not readable'; } catch (e) { return 'version not readable'; } };
+  const ff = process.env.FIREFOX_PATH || process.env.FIREFOX_158 || '';
+  let cr = process.env.CHROMIUM_PATH || '', stock = false;
+  if (!cr) { try { cr = require('./engine').chromiumPath(); stock = true; } catch (e) { cr = ''; } }
+  const usesCr = tier === 'full' || against || args.includes('--chromium');
+  console.log(`browsers: Firefox = ${ff ? ver(ff) + ' (' + ff + ')' : 'FIREFOX_PATH not set'}; Chromium = ${usesCr ? (cr ? ver(cr) + ' (' + cr + ')' + (stock ? ' STOCK Playwright build, not the approved ungoogled one; set CHROMIUM_PATH' : '') : 'not found') : 'not used in this tier'}`);
+}
 /* the jobs for this tier */
 const jobs = [];
 const skipped = []; /* suites "smart" left out because their history says the changed files never broke them */
@@ -209,13 +219,15 @@ const COUNTS = !args.includes('--reset-counts') && fs.existsSync(countsFile) ? J
 const rows = [];
 let bad = 0;
 const T0 = Date.now();
-/* A pool of workers takes the longest suites first (by how long each took last time, in times.json), so no worker is left with one long suite at
+/* A pool of workers (one lane per browser, run one after the other) takes the longest suites first (by how long each took last time, in times.json), so no worker is left with one long suite at
    the end. Suites spend most of their time waiting for the page (about 40% of the two cores were busy with two lanes), so three run at once;
    QA_JOBS=n changes that. Each worker prints a line when its suite ends. */
 const timesFile = HERE + 'times.json';
 const TIMES = fs.existsSync(timesFile) ? JSON.parse(fs.readFileSync(timesFile, 'utf8')) : {};
-const queue = jobs.slice().sort((x, y) => (TIMES[y.label] ?? 40) - (TIMES[x.label] ?? 40));
-const WORKERS = Math.max(1, +process.env.QA_JOBS || 3);
+/* One browser at a time (the owner's rule, Oct 17): all Firefox jobs finish before the first Chromium job starts. The Node-only jobs ride in the first group. */
+const byTime = (x, y) => (TIMES[y.label] ?? 40) - (TIMES[x.label] ?? 40);
+let queue = [];
+const WORKERS = Math.max(1, +process.env.QA_JOBS || Math.min(5, Math.max(3, require('os').cpus().length + 1))); /* measured Oct 17 on 4 cores: 3 at a time 150 s, 5 at a time 112 s, same compute, 28 of 28 pass */
 {
   const known = jobs.filter(j => TIMES[j.label] !== undefined);
   const secs = jobs.reduce((t, j) => t + (TIMES[j.label] ?? 40), 0) / WORKERS;
@@ -249,7 +261,10 @@ const runOne = async job => {
 const worker = async () => { for (let job; (job = queue.shift()); ) await runOne(job); };
 (async () => {
 await waitForServer();
-await Promise.all(Array.from({ length: WORKERS }, worker));
+for (const lane of ['firefox', 'chromium']) {
+  queue = jobs.filter(j => j.lane === lane).sort(byTime);
+  await Promise.all(Array.from({ length: WORKERS }, worker));
+}
 if (!bad && !against) { rows.forEach(r => { TIMES[r.label] = Math.round(r.sec); }); fs.writeFileSync(timesFile, JSON.stringify(TIMES, null, 1)); }
 const slow = rows.slice().sort((a, b) => b.sec - a.sec).slice(0, 3).map(r => `${r.label} ${r.sec.toFixed(0)} s`).join(', ');
 console.log(`\n${tier}: ${rows.length} suites, ${rows.filter(r => r.mark === 'pass').length} pass, ${rows.filter(r => r.mark === 'pass*').length} pass* (flaky), ${bad} FAIL, ${((Date.now() - T0) / 1000).toFixed(0)} s in all. Slowest: ${slow}`);

@@ -125,7 +125,8 @@ for(let k=0;k<3;k++){ /* a tab click that arrives while the play view is still s
   if(await pg.waitForSelector('#main button:has-text("+ Choice")',{timeout:2500}).then(()=>true,()=>false))break;
 }
 const nBefore=(await pg.evaluate(()=>window.__editor.project.passages.length));
-await pg.click('#main button:has-text("+ Choice")');await pg.keyboard.type('Climb the tower');await pg.keyboard.press('Control+Enter');await pg.waitForTimeout(200);
+await pg.click('#main button:has-text("+ Choice")');await pg.waitForFunction(()=>document.activeElement&&document.activeElement.classList.contains('clabel')); /* the new box takes focus one turn after the click; typing before that goes nowhere */
+await pg.keyboard.type('Climb the tower');await pg.keyboard.press('Control+Enter');await pg.waitForFunction(n=>window.__editor.project.passages.length===n+1&&document.querySelector('#pname').value==='Climb the tower',nBefore);
 ok(await pg.evaluate(n=>window.__editor.project.passages.length===n+1&&document.querySelector('#pname').value==='Climb the tower',nBefore),'Ctrl+Enter creates and opens the linked page');
 await pg.waitForTimeout(800);
 ok(await pg.isVisible('#pagenotes .pn'),'checker notes show under the page bar');
@@ -137,7 +138,7 @@ await pg.click('#menubtn');
 await pg.click('#menupop button:has-text("Save as")');await pg.waitForTimeout(800);
 ok(await pg.evaluate(()=>/\.story\.json$/.test(window.__saves[window.__saves.length-1].name)),'backup saves as .story.json');
 const nPick=await pg.evaluate(()=>window.__pickerOpen), nSave=await pg.evaluate(()=>window.__saves.length);
-await pg.click('#tabs button:has-text("Write")');await pg.fill('#main .block textarea >> nth=0','Changed for the save test.');await pg.waitForTimeout(100);
+await pg.click('#tabs button:has-text("Write")');await pg.fill('#main .block textarea >> nth=0','Changed for the save test.');await pg.waitForFunction(()=>document.querySelector('#savebtn').classList.contains('dirty'));
 ok(await pg.evaluate(()=>document.querySelector('#savebtn').classList.contains('dirty')),'the Save button shows unsaved changes');
 await pg.click('#savebtn');await pg.waitForTimeout(300);
 ok(await pg.evaluate(([a,b])=>window.__pickerOpen===a && window.__saves.length===b+1,[nPick,nSave]),'Save writes straight to the remembered file, with no window');

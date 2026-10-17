@@ -25,9 +25,14 @@ if (!MOTION) {
     };
   } catch (e) { /* different Playwright layout: the splash is simply waited out */ }
 }
+/* CHROMIUM_PATH names the Chromium to drive (the approved ungoogled build). If it is set, that program is used or the run stops: there is no quiet
+   fallback to Playwright's own Chromium, because a run labelled with one browser must really be that browser. Without it, Playwright's stock Chromium
+   is used and qa.js says so on its first line. */
+const CHROMIUM_PATH = process.env.CHROMIUM_PATH || '';
+if (CHROMIUM_PATH && !require('fs').existsSync(CHROMIUM_PATH)) throw new Error('CHROMIUM_PATH is set to ' + CHROMIUM_PATH + ' but there is no such file; refusing to fall back to another Chromium');
 const chromium = {
-  async launch(o) {
-    const b = await pw.chromium.launch(o);
+  async launch(o = {}) {
+    const b = await pw.chromium.launch(CHROMIUM_PATH ? { ...o, executablePath: CHROMIUM_PATH, args: [...(o.args || []), '--no-sandbox'] } : o);
     const nc = b.newContext.bind(b), np = b.newPage.bind(b);
     b.newContext = x => nc(calm(x));
     b.newPage = x => np(calm(x));
@@ -36,3 +41,4 @@ const chromium = {
 };
 exports.pick = which => (which === 'firefox' ? require('../../packages/qa-kit/src/bidi.js').firefox : chromium);
 exports.devices = pw.devices;
+exports.chromiumPath = () => CHROMIUM_PATH || pw.chromium.executablePath();

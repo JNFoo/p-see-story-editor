@@ -44,12 +44,16 @@ in the parent folder) when a source is newer.
 
 ```
 export FIREFOX_PATH=/path/to/firefox
+export CHROMIUM_PATH=/path/to/chrome      # the approved Chromium build; without it the stock Playwright build runs and the first line says so
 node qa.js quick
 ```
 
+Line 1 of every run prints the real browser versions (`browsers: Firefox = Mozilla Firefox 158.0b5 (...); Chromium = 155.0.8059.39 (...)`),
+so a result is never filed under the wrong version. In the full tier all Firefox suites run first and then all Chromium suites, one browser at a time.
+
 Notes on the shim: it answers a selector like `text=Back` or `button:has-text("Play")` in the page itself (`bidi-engine.js`), waits for a page's own timers
 instead of guessing (`settle`/`idle`), and fakes drag-and-drop by sending the same events (it tests the editor's handlers, not a native drag;
-Chromium does the native one). `PROFILE=1 node <suite> firefox` prints where a suite's time went; screenshots are off unless `SHOTS=1`.
+Chromium does the native one). `PROFILE=1 node <suite> firefox` prints where a suite's time went and the eight slowest single calls (`slow call 30012 ms  click(...)  tools8.js:72`); a call over 500 ms is worth a look, and a repeat of a round number such as 30 000 ms is a wait that ran out; screenshots are off unless `SHOTS=1`.
 
 ## The suites (`*.js`; each takes `firefox` or `chromium`)
 
@@ -120,6 +124,10 @@ are off, output goes to files. Then more suites were added (bug-fix rounds, thre
 | `npm test` | 19 s | 13.6 s |
 
 What changed, and why:
+- **Oct 17: five workers instead of three on a four-core machine** (default is cores + 1, at least 3 and at most 5), and one hidden 30 s wait removed from `tools8`.
+  Quick tier, four cores, Firefox 158.0b5 and ungoogled Chromium 155.0.8059.39: 150 s with three workers, 112 s with five (same CPU time, about 250 s), 102 to 107 s with
+  the wait gone: about 30% faster. `real` no longer uses three fixed sleeps, and now waits for the thing it checks (focus in the new choice box, the new page,
+  the unsaved dot); it failed on Chromium 155 because typing started before the box had focus (the editor gives it focus one turn after the click).
 - **A pool of three workers** replaces the fixed Firefox and Chromium lanes. A suite spends most of its time waiting for the page, so with two lanes the
   two cores were about 40% busy. Suites start longest first (`times.json` remembers how long each took), so no worker is left with one long suite.
   `QA_JOBS=n` changes the number; four was faster still (90 s quick) but slowed single suites by up to 40%, which risks timing-based checks.

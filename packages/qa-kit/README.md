@@ -108,4 +108,10 @@ node --test test/
 `runner.test.mjs` runs the runner on a fake project (a passing suite, a flaky one and a failing one). `bidi.test.mjs` opens a page in real Firefox; it is
 **skipped** unless `FIREFOX_PATH` (or `FIREFOX_158`) names a binary and puppeteer is installed.
 
+**Browsers:** the Firefox test is skipped unless `FIREFOX_PATH` is set. In the latest release run (Node 22.22.0) it was skipped, so no browser was used; earlier runs on Firefox 158 are not recorded per release.
+
+## Changelog
+
+[CHANGELOG.md](CHANGELOG.md): what changed in each version, in plain words.
+
 Copyright (c) 2026 LFC Foundry. MIT License.

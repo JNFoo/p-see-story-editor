@@ -38,7 +38,7 @@ suites Playwright-style calls on top of Puppeteer over WebDriver BiDi, which dri
 [the qa-kit README](../../packages/qa-kit/README.md) for what it does and does not do).
 
 Setup, once: `npm i puppeteer playwright` somewhere Node can find them (or set `NODE_PATH`), install Chromium for Playwright
-(`npx playwright install chromium`), and point `FIREFOX_PATH` at a stock Firefox 129 or newer. Python 3 is needed for the build and for a
+(`npx playwright install chromium`), and point `FIREFOX_PATH` at a stock Firefox 129 or newer. (Browsers used so far: Firefox 142.0.1, 157.0.1 and 158; Chromium 141.0.7390.37 and 153.0.8010.0; see [../../docs/CHANGELOG.md](../../docs/CHANGELOG.md) for which release used which. From 2026-10-17 the standing rule is Firefox 158, ungoogled Chromium 155 and WebKitGTK 2.52.6, one at a time.) Python 3 is needed for the build and for a
 small local web server one suite uses. The suites open the built file `../story-editor.html`, which the runner builds (`python3 build.py`
 in the parent folder) when a source is newer.
 

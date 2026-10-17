@@ -13,6 +13,8 @@ A written **process** for a person and an AI assistant building software togethe
 
 The expensive mistakes in AI-assisted building are not typos. They are a feature that quietly stopped working, a "tested" claim that tested nothing, a fix that broke the neighbor, a size that crept up, and a session that could not tell what the last one did. The habits in the guide each remove one of those, and each is cheap: a table that lists every field, a test that compares two implementations, a size ceiling that fails the build, a log with one line per check.
 
+*Tested in:* nothing to run; these are documents.
+
 ## How to use it
 
 1. Read the ten habits in [GUIDE.md](GUIDE.md) (five minutes).
@@ -20,6 +22,10 @@ The expensive mistakes in AI-assisted building are not typos. They are a feature
 3. Paste the session brief at the start of every new AI session.
 
 Related, in this repository: the [editor's QA suites](../../editor/qa/README.md) and the [Firefox test shim](../qa-kit/README.md) are the working examples of the testing habits. In [JS-modules](https://github.com/lfcfoundry/JS-modules), `AGENTS.md` and `TASKS.md` show the same task-board idea used by several sessions at once.
+
+## Changelog
+
+[CHANGELOG.md](CHANGELOG.md): what changed in each version, in plain words.
 
 ---
 Part of [story-editor](../../README.md) · MIT License · Copyright (c) 2026 LFC Foundry

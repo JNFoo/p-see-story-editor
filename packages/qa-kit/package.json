@@ -6,7 +6,7 @@
   "author": "LFC Foundry",
   "main": "src/bidi.js",
   "bin": { "qa-kit-run": "src/runner.js" },
-  "files": ["src", "README.md", "AGENTS.md"],
+  "files": ["src", "README.md", "CHANGELOG.md", "AGENTS.md"],
   "scripts": { "test": "node --test test/" },
   "engines": { "node": ">=18" },
   "peerDependencies": { "puppeteer": ">=23", "playwright": ">=1.40" },

@@ -93,9 +93,15 @@ Link checkers (Twine's broken-link markers and similar tools) see arrows. Story 
 
 `npm test` in this folder (Node 18+, no installs). Besides unit tests, one test runs the package and the Story Editor's own sources side by side on 150 random stories that use every feature, and requires **identical** results; the editor's build also checks the checker against brute-force play (`editor/contract.mjs`).
 
+**Browsers:** none. These tests run in Node (22.22.0 for the latest release run, earlier releases not recorded); the code is cut from the editor, whose browser runs are listed in [docs/CHANGELOG.md](../../docs/CHANGELOG.md).
+
 ## For AI agents
 
 See [AGENTS.md](AGENTS.md).
+
+## Changelog
+
+[CHANGELOG.md](CHANGELOG.md): what changed in each version, in plain words.
 
 ---
 Part of [story-editor](../../README.md) · MIT License · Copyright (c) 2026 LFC Foundry

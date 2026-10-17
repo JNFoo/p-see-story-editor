@@ -91,6 +91,8 @@ twine-to-story archive.html --story 2     convert the second story of an archive
 
 `npm test`: original, hand-written fixture files (Harlowe, SugarCube Twee, Twine 1, an archive) import to valid projects that the checker can read, the author is never invented, and non-Twine text is refused in plain words.
 
+**Browsers:** none. These tests run in Node (22.22.0 for the latest release run, earlier releases not recorded); the code is cut from the editor, whose browser runs are listed in [docs/CHANGELOG.md](../../docs/CHANGELOG.md).
+
 ## For AI agents
 
 See [AGENTS.md](AGENTS.md).

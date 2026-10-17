@@ -91,9 +91,15 @@ General graph-layout libraries (dagre, ELK, d3-dag and others) already draw laye
 
 `npm test`: every starter draws to a well-formed SVG; names are escaped; and on 60 random stories the graph, the layered, arc, matrix and shape layouts and the simulated players are **identical to the editor's own**.
 
+**Browsers:** none. These tests run in Node (22.22.0 for the latest release run, earlier releases not recorded); the code is cut from the editor, whose browser runs are listed in [docs/CHANGELOG.md](../../docs/CHANGELOG.md).
+
 ## For AI agents
 
 See [AGENTS.md](AGENTS.md).
+
+## Changelog
+
+[CHANGELOG.md](CHANGELOG.md): what changed in each version, in plain words.
 
 ---
 Part of [story-editor](../../README.md) · MIT License · Copyright (c) 2026 LFC Foundry

@@ -139,6 +139,8 @@ A summary of each format's public design, written from its documentation as I un
 
 `npm test`: the schema accepts every starter and 150 random stories and rejects broken ones; the schema stays in step with the code (palettes, options); `normalizeProject` survives hostile input; and `normalizeProject`, `exportStory`, short ids, fingerprint, manuscript and stats equal the editor's own results on 100 random stories.
 
+**Browsers:** none. These tests run in Node (22.22.0 for the latest release run, earlier releases not recorded); the code is cut from the editor, whose browser runs are listed in [docs/CHANGELOG.md](../../docs/CHANGELOG.md).
+
 ## For AI agents
 
 See [AGENTS.md](AGENTS.md).

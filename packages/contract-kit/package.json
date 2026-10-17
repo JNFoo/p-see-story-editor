@@ -1,7 +1,7 @@
 {
   "name": "contract-kit",
-  "version": "1.0.0",
-  "description": "A guide and a small helper for keeping two implementations of one rule set from drifting apart: seeded random inputs, a side-by-side comparison, a field table and a time limit. Zero dependencies.",
+  "version": "1.1.0",
+  "description": "A guide and a small helper for keeping two implementations of one rule set from drifting apart: seeded random inputs, a side-by-side comparison that cuts a failing input down, a field table and a time limit. Zero dependencies; the core also runs in browsers.",
   "license": "MIT",
   "author": "LFC Foundry",
   "type": "module",
@@ -13,11 +13,16 @@
       "types": "./index.d.ts",
       "import": "./src/contract.mjs"
     },
+    "./core": {
+      "types": "./core.d.ts",
+      "import": "./src/core.mjs"
+    },
     "./package.json": "./package.json"
   },
   "files": [
     "src",
     "index.d.ts",
+    "core.d.ts",
     "README.md",
     "CHANGELOG.md",
     "AGENTS.md",

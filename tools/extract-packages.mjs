@@ -37,6 +37,8 @@ const CORE = 'editor/core.js';
 const PLAYER = 'editor/player.js';
 const MAP = 'editor/maplayout.js';
 const TWINE = 'editor/twine.js';
+const HELPERS = 'editor/helpers.js';
+const CHANGES = 'editor/changes.js';
 
 /* The rules every package that "plays" a story needs. */
 const RULES = ['klStatMap', 'klInit', 'klAdd', 'klChoose', 'klArrive', 'klVisibleBlocks', 'klVisibleChoices', 'klShown', 'klCondOk', 'klHas', 'klTarget', 'klOdds'];
@@ -60,6 +62,18 @@ export const PACKAGES = {
     files: [CORE, TWINE],
     what: 'Reads Twine stories (Twine 2 HTML, Twee 3, Twine 1) and turns SugarCube and Harlowe code into rules, with a plain-words report.',
     roots: [...MODEL, 'twineRead', 'twineConvert', 'importTwine']
+  },
+  'story-outline': {
+    global: 'StoryOutline',
+    files: [CORE, HELPERS],
+    what: 'Turns an indented outline (page names at the left edge, choices indented under them) into pages and choices, or into a whole story.',
+    roots: [...MODEL, 'parseOutline', 'outlinePlan', 'outlineToProject']
+  },
+  'story-diff': {
+    global: 'StoryDiff',
+    files: [CHANGES],
+    what: 'Says in plain words what one edit did to a story: "Add page “The Cellar”", "Delete a choice on “Start”".',
+    roots: ['describeChange']
   },
   'story-check': {
     global: 'StoryCheck',

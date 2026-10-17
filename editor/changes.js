@@ -13,19 +13,20 @@ function chgName(s) {
 }
 
 /**
- * What changed between two copies of the story, in words: { text, pid } where `pid` is the page most worth showing
- * (the one that changed, was added or comes back), or '' when no single page is involved. Never throws: an unreadable
- * copy gives a generic sentence.
+ * What changed between two copies of the story (JSON text, or the stories themselves), in words: { text, pid } where `pid` is the page
+ * most worth showing (the one that changed, was added or comes back), or '' when no single page is involved. It names the first kind
+ * of change it finds, not every change. Never throws: an unreadable copy gives a generic sentence.
  */
 function describeChange(beforeText, afterText) {
   let a;
   let b;
   try {
-    a = JSON.parse(beforeText);
-    b = JSON.parse(afterText);
+    a = typeof beforeText === 'string' ? JSON.parse(beforeText) : beforeText;
+    b = typeof afterText === 'string' ? JSON.parse(afterText) : afterText;
   } catch {
     return { text: 'Edit the story', pid: '' };
   }
+  if (!a || !b || typeof a !== 'object' || typeof b !== 'object') return { text: 'Edit the story', pid: '' };
   const pa = Array.isArray(a.passages) ? a.passages : [];
   const pb = Array.isArray(b.passages) ? b.passages : [];
   if (a.id !== b.id) return { text: 'Open another story', pid: '' };

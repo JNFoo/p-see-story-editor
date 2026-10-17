@@ -1,6 +1,6 @@
 /* ============================================================================
    HELPERS: two offline writing helpers that read only text the author already has or pastes in.
-     parseOutline   an indented outline becomes pages and choices (File → Paste an outline…)
+     parseOutline   an indented outline becomes pages and choices (File → Paste an outline…); outlinePlan and outlineToProject put them into a story
      writingChecks  repeated words, names spelled two ways, very long paragraphs and pages, choices that read alike
    Pure functions over plain data: nothing here touches the screen, the story or the network.
    Copyright (c) 2026 LFC Foundry. MIT License.
@@ -87,6 +87,83 @@ function parseOutline(text) {
   });
   if (!pages.length && lines.length) issues.push('No pages were found. Write each page name at the left edge, its choices indented under it.');
   return { pages, issues, lines: lines.length };
+}
+
+/**
+ * Turns what parseOutline read into the pages to add to the story `proj`: names made unique, choices pointed at pages, endings given no choices.
+ * Returns { pages, empties, blank, issues }: `pages` are the new pages, `empties` the pages named only in a choice, `blank` the story's
+ * untouched first page if it is to be replaced (the caller removes it and starts the story at pages[0]), `issues` plain-words notes.
+ * Nothing in `proj` is changed.
+ */
+function outlinePlan(parsed, proj) {
+  const issues = parsed.issues.slice();
+  const taken = new Set(proj.passages.map(p => outlineName(p).trim().toLowerCase()));
+  const blank = proj.passages.length === 1 && isBlankPage(proj.passages[0]) ? proj.passages[0] : null;
+  if (blank) taken.delete(outlineName(blank).trim().toLowerCase());
+  const made = new Map(); // outline name (lowercase) -> the page to make
+  const create = [];
+  parsed.pages.forEach(op => {
+    let name = op.name;
+    let n = 2;
+    while (taken.has(name.toLowerCase())) name = `${op.name} ${n++}`;
+    if (name !== op.name) issues.push(`A page called “${op.name}” is already in the story, so the new one is named “${name}”.`);
+    taken.add(name.toLowerCase());
+    const p = makePassage(name);
+    if (op.texts.length) p.blocks = op.texts.map(makeBlock);
+    if (op.ending) {
+      p.ending = true;
+      p.valence = op.valence;
+      if (op.choices.length) issues.push(`“${op.name}” is an ending, so its ${op.choices.length === 1 ? 'choice was' : 'choices were'} left out.`);
+    }
+    made.set(op.name.toLowerCase(), p);
+    create.push({ p, op });
+  });
+  const existing = new Map(proj.passages.filter(p => p !== blank).map(p => [outlineName(p).trim().toLowerCase(), p]));
+  const empties = []; // pages named only in a choice
+  create.forEach(({ p, op }) => {
+    if (p.ending) return;
+    op.choices.forEach(c => {
+      let dest = '';
+      if (c.to) {
+        const key = c.to.toLowerCase();
+        const target = made.get(key) || existing.get(key) || empties.find(e => e.name.toLowerCase() === key);
+        if (target) dest = target.id;
+        else {
+          const e = makePassage(c.to);
+          empties.push(e);
+          dest = e.id;
+        }
+      }
+      p.choices.push(makeChoice(c.label, dest));
+    });
+  });
+  if (empties.length) issues.push(`${empties.length === 1 ? 'A page is' : `${empties.length} pages are`} named in a choice but not written yet, so ${empties.length === 1 ? 'it was' : 'they were'} added empty: ${empties.slice(0, 5).map(e => `“${e.name}”`).join(', ')}${empties.length > 5 ? ', …' : ''}.`);
+  return { pages: create.map(x => x.p), empties, blank, issues };
+}
+
+/** A page with nothing written on it (the one a new story starts with). */
+function isBlankPage(p) {
+  return !p.blocks.some(b => String(b.text).trim()) && !p.choices.length && !p.ending && !p.todo && !p.note && !p.heading && !p.gives.length && !p.takes.length;
+}
+
+/** A page's name, or a stand-in if it is blank. */
+function outlineName(p) {
+  return (p && p.name) || 'Untitled page';
+}
+
+/**
+ * A new story from an outline, in one call: { project, issues }. The outline's first page is the start page. Needs the story model
+ * (makeProject and friends) from core.js. Never throws on odd text; `issues` says what could not be used, and `project` is
+ * null if the outline holds no pages.
+ */
+function outlineToProject(text, title) {
+  const parsed = parseOutline(text);
+  if (!parsed.pages.length) return { project: null, issues: parsed.issues };
+  const proj = makeProject(title || 'Untitled story');
+  const plan = outlinePlan(parsed, proj);
+  proj.passages = plan.pages.concat(plan.empties);
+  proj.start = plan.pages[0].id;
+  return { project: normalizeProject(JSON.parse(JSON.stringify(proj))), issues: plan.issues };
 }
 
 /* ----- writing checks ----- */

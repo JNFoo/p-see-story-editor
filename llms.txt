@@ -7,6 +7,8 @@ The editor: https://lfcfoundry.github.io/story-editor/ (also `index.html` in thi
 ## Packages (each: README.md, AGENTS.md, index.d.ts, examples/quickstart.mjs, tests)
 - [story-format](packages/story-format/README.md): create, clean, import, export, search and measure stories as JSON. `story.schema.json` is the JSON Schema. Start here to write a story.
 - [twine-import](packages/twine-import/README.md): `importTwine(text)` turns a Twine story (Twine 2 HTML, Twee 3, Twine 1) into a story, code and all, with a plain-words report.
+- [story-outline](packages/story-outline/README.md): `outlineToProject(text, title)` turns an indented outline into a story; `parseOutline`, `outlinePlan` for adding to one.
+- [story-diff](packages/story-diff/README.md): `describeChange(before, after)` names an edit in plain words ("Add page “The Cellar”").
 - [story-check](packages/story-check/README.md): `analyze(project)` finds dead ends and endings no player can reach, exactly, over items, numbers and dice.
 - [story-player](packages/story-player/README.md): `buildGame(project)` makes one offline HTML game; `createSession(project)` plays a story from code; `bin/story-player.mjs` builds or plays from a terminal.
 - [story-map](packages/story-map/README.md): `layoutStory`, `toSvg`, `playtest` (seeded simulated players), `mapMetrics`.

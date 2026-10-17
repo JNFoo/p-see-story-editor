@@ -33,6 +33,30 @@
       }
     },
     {
+      "id": "story-outline",
+      "summary": "Turns an indented outline into pages and choices, or into a whole branching story. Zero dependencies.",
+      "esm": "packages/story-outline/dist/story-outline.mjs",
+      "global": "packages/story-outline/dist/story-outline.global.js",
+      "esmMin": "packages/story-outline/dist/story-outline.min.mjs",
+      "globalMin": "packages/story-outline/dist/story-outline.min.global.js",
+      "types": "packages/story-outline/index.d.ts",
+      "readme": "packages/story-outline/README.md",
+      "example": "packages/story-outline/examples/quickstart.mjs",
+      "dependencies": "none"
+    },
+    {
+      "id": "story-diff",
+      "summary": "Says in plain words what one edit did to a story, such as \"Add page “The Cellar”\". Zero dependencies.",
+      "esm": "packages/story-diff/dist/story-diff.mjs",
+      "global": "packages/story-diff/dist/story-diff.global.js",
+      "esmMin": "packages/story-diff/dist/story-diff.min.mjs",
+      "globalMin": "packages/story-diff/dist/story-diff.min.global.js",
+      "types": "packages/story-diff/index.d.ts",
+      "readme": "packages/story-diff/README.md",
+      "example": "packages/story-diff/examples/quickstart.mjs",
+      "dependencies": "none"
+    },
+    {
       "id": "story-check",
       "summary": "Exact checker for branching stories with items, numbers and dice: dead ends, unreachable pages, endings no player can reach. Zero dependencies.",
       "esm": "packages/story-check/dist/story-check.mjs",

@@ -117,6 +117,14 @@
       "dependencies": "peer: puppeteer and/or playwright (optional)"
     },
     {
+      "id": "contract-kit",
+      "summary": "A guide and small helper for keeping two implementations of one rule set from drifting apart: seeded random inputs, side-by-side comparison, a field table, a time limit.",
+      "types": "packages/contract-kit/index.d.ts",
+      "readme": "packages/contract-kit/README.md",
+      "example": "packages/contract-kit/examples/quickstart.mjs",
+      "dependencies": "none"
+    },
+    {
       "id": "ai-collab-kit",
       "summary": "A written process and templates for a person and an AI assistant building software together.",
       "readme": "packages/ai-collab-kit/README.md",

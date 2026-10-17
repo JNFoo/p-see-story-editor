@@ -14,6 +14,7 @@ The editor: https://lfcfoundry.github.io/story-editor/ (also `index.html` in thi
 - [story-map](packages/story-map/README.md): `layoutStory`, `toSvg`, `playtest` (seeded simulated players), `mapMetrics`.
 - [zip-page](packages/zip-page/README.md): `zipPage(html)`; a readable pure-JS inflater.
 - [qa-kit](packages/qa-kit/README.md): tiered test runner; Playwright-style API over Puppeteer WebDriver BiDi for stock Firefox; seeded random-story generator.
+- [contract-kit](packages/contract-kit/README.md): a guide and helper (`agree`, `watchReads`, `checkFieldTable`, `guarded`) for tests that compare two implementations of one rule set.
 - [ai-collab-kit](packages/ai-collab-kit/README.md): a process for a person and an AI assistant building software together, with templates.
 
 ## Machine-readable

@@ -52,7 +52,7 @@ Honest comparison against `JS-modules` and the games, as of 2026-10-13. "Reuse" 
 | Thing | Where | Status versus the other repos |
 |---|---|---|
 | **Exact story checker** (items, numbers, dice, locked choices, Given answers; bit masks, BigInt above 30 tracked items, honest "not checked" at a work limit, trap loops, why-unreachable) | `core.js` `analyze`; package `story-check` | New. No counterpart in JS-modules. |
-| **Contract test + field table** (`FIELD_CONTRACT`, `KL_RULES`, 400 random stories played two ways) | `editor/contract.mjs`, `core.js` | New as a pattern. JS-modules tests check modules; nothing there compares two implementations of one rule set. |
+| **Contract test + field table** (`FIELD_CONTRACT`, `KL_RULES`, 400 random stories played two ways) | `editor/contract.mjs`, `core.js`; the generic guide and helper are `packages/contract-kit` (2026-10-17) | New as a pattern. JS-modules tests check modules; nothing there compares two implementations of one rule set. |
 | **Story model, cleaner, exporter** | `core.js`; package `story-format` | New. |
 | **Outline reader** (indented outline to pages and choices, or a whole story) | `helpers.js`; package `story-outline` (2026-10-17) | New. |
 | **Plain-words edit labels** ("Add page “The Cellar”") | `changes.js`; package `story-diff` (2026-10-17) | New. |

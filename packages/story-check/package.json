@@ -8,14 +8,15 @@
   "main": "dist/story-check.mjs",
   "module": "dist/story-check.mjs",
   "types": "index.d.ts",
-  "unpkg": "dist/story-check.global.js",
-  "jsdelivr": "dist/story-check.global.js",
+  "unpkg": "dist/story-check.min.global.js",
+  "jsdelivr": "dist/story-check.min.global.js",
   "exports": {
     ".": {
       "types": "./index.d.ts",
       "import": "./dist/story-check.mjs"
     },
     "./global": "./dist/story-check.global.js",
+    "./min": "./dist/story-check.min.mjs",
     "./package.json": "./package.json"
   },
   "files": [

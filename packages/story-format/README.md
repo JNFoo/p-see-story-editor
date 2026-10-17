@@ -8,7 +8,7 @@ It is the model inside a single-file story editor, cut out so that **people and 
 
 ## Install
 
-Copy `dist/story-format.mjs` (ES module) or `dist/story-format.global.js` (`<script>`, defines `StoryFormat`), or:
+Copy `dist/story-format.mjs` (ES module) or `dist/story-format.global.js` (`<script>`, defines `StoryFormat`), or the smaller `dist/story-format.min.mjs` / `dist/story-format.min.global.js` (the same code with the names shortened: about 40% smaller, about 20% smaller gzipped), or:
 
 ```js
 import { normalizeProject } from 'https://cdn.jsdelivr.net/gh/lfcfoundry/story-editor@main/packages/story-format/dist/story-format.mjs';

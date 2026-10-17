@@ -156,3 +156,43 @@ test('the story written out in the README is valid and passes the checker', asyn
   assert.deepEqual(r.problems, []);
   assert.equal(r.endings.filter(e => e.reachable).length, 2);
 });
+
+test('normalizeProject leaves the data it is given alone, even when it is frozen', () => {
+  const raw = { passages: [{ name: 'One', choices: [{ label: 'Go', to: 'b' }] }, { id: 'b', name: 'Two' }], items: [{ name: 'Key' }] };
+  const before = JSON.stringify(raw);
+  const freeze = o => (Object.values(o).forEach(v => v && typeof v === 'object' && freeze(v)), Object.freeze(o));
+  const p = normalizeProject(freeze(raw));
+  assert.equal(JSON.stringify(raw), before);
+  assert.equal(p.passages.length, 2);
+});
+
+test('normalizeProject with ids: "sequential" gives the same story every time, and says what it fixed', () => {
+  const raw = { passages: [{ name: 'One', choices: [{ label: 'Go', to: 'b' }] }, { id: 'b', name: 'Two', ending: true }, { name: 'Three' }], items: [{ name: 'Key' }, { name: 'Lamp' }] };
+  const a = normalizeProject(JSON.parse(JSON.stringify(raw)), { ids: 'sequential' });
+  const b = normalizeProject(JSON.parse(JSON.stringify(raw)), { ids: 'sequential' });
+  assert.deepEqual(a, b);
+  assert.deepEqual(a.passages.map(q => q.id), ['p_1', 'b', 'p_2']);
+  assert.deepEqual(a.items.map(q => q.id), ['i_1', 'i_2']);
+  assert.equal(a.passages[0].choices[0].to, 'b');
+  const notes = [];
+  normalizeProject({ start: 'x', passages: [{ id: 'x', name: 'Only', ending: true }] }, { notes });
+  assert.equal(notes.length, 1);
+  assert.match(notes[0], /cannot be an ending/);
+  assert.notDeepEqual(normalizeProject(JSON.parse(JSON.stringify(raw))).passages[0].id, 'p_1'); // without the option the ids stay random
+});
+
+test('the manuscript names pages by their first match when two share an id, and stays fast on a big story', () => {
+  const p = normalizeProject({ passages: [{ id: 'a', name: 'First', choices: [{ label: 'On', to: 'b' }] }, { id: 'b', name: 'Second' }] });
+  p.passages.push({ ...p.passages[1], name: 'Impostor' });
+  assert.match(storyManuscript(p), /\*Second\*/);
+  const many = normalizeProject({ passages: [...Array(4000)].map((_, i) => ({ id: `p${i}`, name: `Page ${i}`, choices: [{ label: 'On', to: `p${(i * 7 + 3) % 4000}` }] })) });
+  const t = Date.now();
+  storyManuscript(many);
+  assert.ok(Date.now() - t < 500, 'the manuscript of 4,000 pages takes well under half a second');
+});
+
+test('the minified builds export the same names as the readable ones', async () => {
+  const [a, b] = [await import('../dist/story-format.mjs'), await import('../dist/story-format.min.mjs')];
+  assert.deepEqual(Object.keys(b).sort(), Object.keys(a).sort());
+  assert.equal(JSON.stringify(b.normalizeProject(JSON.parse('{"id":"s","passages":[{"id":"a","name":"x"}]}'))), JSON.stringify(a.normalizeProject(JSON.parse('{"id":"s","passages":[{"id":"a","name":"x"}]}'))));
+});

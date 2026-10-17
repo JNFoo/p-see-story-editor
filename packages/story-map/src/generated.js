@@ -335,7 +335,12 @@ const MIGRATIONS = {};
 /** Set by normalizeProject when it had to change something the author should hear about (shown after opening a file). */
 let startFixNote = '';
 
-function normalizeProject(raw) {
+/**
+ * `opt` (all optional): `ids: 'sequential'` hands out p_1, p_2, i_1 ... to anything without a usable id, instead of random ones, so the same file
+ * always gives the same story; `notes: []` collects what the author should hear about (the text startFixNote holds).
+ * The data passed in is never changed (it may be frozen).
+ */
+function normalizeProject(raw, opt) {
   if (!raw || typeof raw !== 'object' || !Array.isArray(raw.passages)) {
     throw new Error('This file is not a story backup.');
   }
@@ -345,13 +350,16 @@ function normalizeProject(raw) {
   const taken = Object.create(null); // ids already handed out
   const itemMap = Object.create(null); // id as found in the file -> id we use
   const passMap = Object.create(null); // same, for pages
+  const seq = Object.create(null);
+  const fresh = prefix => (opt && opt.ids === 'sequential' ? prefix + (seq[prefix] = (seq[prefix] || 0) + 1) : uid(prefix));
+  const newId = new Map(); // a page as found in the file -> the id we give it
 
   /* Ids become object keys and are shown in nothing, so they only need to be
      simple and unique. Anything else gets a fresh id. */
   function cleanId(found, prefix, map) {
     let id = String(found === undefined || found === null ? '' : found);
-    if (!/^[A-Za-z0-9_\-]{1,64}$/.test(id) || RESERVED_IDS.includes(id) || taken[id]) id = uid(prefix);
-    while (taken[id]) id = uid(prefix);
+    if (!/^[A-Za-z0-9_\-]{1,64}$/.test(id) || RESERVED_IDS.includes(id) || taken[id]) id = fresh(prefix);
+    while (taken[id]) id = fresh(prefix);
     taken[id] = true;
     if (map && found !== undefined && found !== null && map[String(found)] === undefined) map[String(found)] = id;
     return id;
@@ -360,7 +368,7 @@ function normalizeProject(raw) {
   const p = {
     format: 'story-editor',
     version: STORY_VERSION,
-    id: String(raw.id || uid('s_')).slice(0, 64),
+    id: String(raw.id || fresh('s_')).slice(0, 64),
     title: String(raw.title || 'Untitled story'),
     author: String(raw.author || ''),
     start: '',
@@ -423,7 +431,7 @@ function normalizeProject(raw) {
   });
   const rawPages = raw.passages.filter(q => q && typeof q === 'object'); // an entry that is not a page (hand-edited file) is skipped
   rawPages.forEach(q => {
-    if (q) q._newId = cleanId(q.id, 'p_', passMap);
+    if (q) newId.set(q, cleanId(q.id, 'p_', passMap));
   });
 
   /* Keep only ids that exist. Conditions may also name "where things went" (m: ids);
@@ -485,7 +493,7 @@ function normalizeProject(raw) {
       });
     }
     p.passages.push({
-      id: q._newId,
+      id: newId.get(q),
       name: String(q.name || 'Untitled page'),
       heading: String(q.heading || ''),
       ending: !!q.ending,
@@ -516,7 +524,11 @@ function normalizeProject(raw) {
       })
     });
   });
-  if (!p.passages.length) p.passages.push(makePassage('The beginning'));
+  if (!p.passages.length) {
+    const first = makePassage('The beginning');
+    first.id = cleanId('', 'p_');
+    p.passages.push(first);
+  }
   p.start = passMap[String(raw.start)] || p.passages[0].id;
   /* the first page can never be an ending: a story that begins by ending is not a story, so such a page becomes a normal one */
   startFixNote = '';
@@ -534,6 +546,7 @@ function normalizeProject(raw) {
   if (typeof raw.lang0c === 'string' && LANG_CODE.test(raw.lang0c.trim()) && raw.lang0c.trim().toLowerCase() !== 'en') p.lang0c = raw.lang0c.trim();
   pruneVirtual(p);
   if (fileVersion > STORY_VERSION && !startFixNote) startFixNote = `This story was saved by a newer version of the editor (file format ${fileVersion}; this editor reads format ${STORY_VERSION}). It opened, but anything this editor does not know about was left out. Do not save over the original file.`;
+  if (opt && Array.isArray(opt.notes) && startFixNote) opt.notes.push(startFixNote);
   return p;
 }
 

@@ -18,6 +18,7 @@ This repository holds a single-file offline story editor (`editor/`) and small p
 - Every package keeps a plain-words `CHANGELOG.md`, newest first. Each entry says what is new, or how much better something got, with numbers (size, speed) that were measured; say "about" or "estimated" for anything that was not. No jargon.
 - **Test browsers.** Test only with the browsers on the `browsers` branch of the owner's private knowledge base (Firefox 158, ungoogled Chromium 155 and WebKitGTK 2.52.6 as of 2026-10-17), one at a time, never two together. Re-read that branch's README before each test run, because versions can change and browsers can be added or removed. Write down the exact versions you used.
 - **Every release lists its browsers.** Each changelog entry (this repository's `docs/CHANGELOG.md` rows and each package `CHANGELOG.md`) ends with "Tested in: ..." naming the browsers with versions that tested that build, or "not recorded" if you do not know. Package READMEs say the same under "Tests". Never guess a version, and never rerun old tests just to fill one in.
+- **Faster, trustworthy testing:** follow the universal QA and browser-testing guide at `build-notes/qa/QA-AND-BROWSER-TESTING-UNIVERSAL-GUIDE.md` in the private knowledgebase-single-file repo (print the real browser version on line 1 of every run; targeted checks while working; full run once when the design is final).
 - American English in anything a user sees.
 
 ## Run the tests

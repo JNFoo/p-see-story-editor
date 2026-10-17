@@ -97,5 +97,9 @@ General graph-layout libraries (dagre, ELK, d3-dag and others) already draw laye
 
 See [AGENTS.md](AGENTS.md).
 
+## Changelog
+
+[CHANGELOG.md](CHANGELOG.md): what changed in each version, in plain words.
+
 ---
 Part of [story-editor](../../README.md) · MIT License · Copyright (c) 2026 LFC Foundry

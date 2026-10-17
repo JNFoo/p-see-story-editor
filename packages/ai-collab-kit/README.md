@@ -23,5 +23,9 @@ The expensive mistakes in AI-assisted building are not typos. They are a feature
 
 Related, in this repository: the [editor's QA suites](../../editor/qa/README.md) and the [Firefox test shim](../qa-kit/README.md) are the working examples of the testing habits. In [JS-modules](https://github.com/lfcfoundry/JS-modules), `AGENTS.md` and `TASKS.md` show the same task-board idea used by several sessions at once.
 
+## Changelog
+
+[CHANGELOG.md](CHANGELOG.md): what changed in each version, in plain words.
+
 ---
 Part of [story-editor](../../README.md) · MIT License · Copyright (c) 2026 LFC Foundry

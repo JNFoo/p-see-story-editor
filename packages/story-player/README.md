@@ -107,5 +107,9 @@ Twine and Ink can publish playable pages too, usually with a runtime of tens or 
 
 See [AGENTS.md](AGENTS.md).
 
+## Changelog
+
+[CHANGELOG.md](CHANGELOG.md): what changed in each version, in plain words.
+
 ---
 Part of [story-editor](../../README.md) · MIT License · Copyright (c) 2026 LFC Foundry

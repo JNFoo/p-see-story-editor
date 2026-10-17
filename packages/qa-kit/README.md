@@ -110,4 +110,8 @@ node --test test/
 
 **Browsers:** the Firefox test is skipped unless `FIREFOX_PATH` is set. In the latest release run (Node 22.22.0) it was skipped, so no browser was used; earlier runs on Firefox 158 are not recorded per release.
 
+## Changelog
+
+[CHANGELOG.md](CHANGELOG.md): what changed in each version, in plain words.
+
 Copyright (c) 2026 LFC Foundry. MIT License.
